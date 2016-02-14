@@ -3,3 +3,4 @@ security
 secret/
 .vscode
 DS_STORE
+.vagrant
