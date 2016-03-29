@@ -4,3 +4,6 @@ secret/
 .vscode
 DS_STORE
 .vagrant
+Vagrantfile
+common.cab
+install.log
