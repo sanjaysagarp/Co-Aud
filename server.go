@@ -29,13 +29,13 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	rootdir, err := os.Getwd()
 	if err != nil {
-	rootdir = "no directory found"
+		rootdir = "no directory found"
 	}
 	http.Handle("/public/", http.StripPrefix("/public",
 		http.FileServer(http.Dir(path.Join(rootdir, "public/")))))
 	http.HandleFunc("/", mainHandler)
 	
-	//Listen on port 8080
-	fmt.Println("Server is listening on port 8080...")
-	http.ListenAndServe(":8080", nil)
+	//Listen on port 80
+	fmt.Println("Server is listening on port 80...")
+	http.ListenAndServe(":80", nil)
 }
