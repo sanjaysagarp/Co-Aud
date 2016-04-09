@@ -9,20 +9,21 @@ buttons: #f8b72d #fce230 #53979c #36ced9
 media title bar: #86adb2
 Media title text: #eedd75*/
 
-navbar {
+.navbar, footer {
 	background-color: #1e223d;
 }
 
-navbar > li {
+.navbar > li {
 	color: #f6efc0;
 }
 
 body {
 	background-color: #edeaed;
+	padding-bottom: 60px;
 }
 
 h1 {
-	color: #edeaed;
+	color: #000;
 }
 
 .card {
@@ -40,3 +41,68 @@ p {
 	color: #8e8d8e;
 }
 
+#navbar-block {
+	height: 50px;
+	margin-bottom: 30px;
+}
+
+.img-contact {
+	height: 50px;
+	width: 50px;
+	display: inline;
+}
+
+.img-profile {
+	height: 64px;
+	width: 64px;
+}
+
+.comment-section .img-profile {
+	height: 48px;
+	width: 48px;
+}
+
+.comment-section {
+	margin-top: 10px;
+}
+
+audio {
+	width: 100%;
+}
+
+.user-contacts {
+	text-align: center;
+}
+
+.user-contacts a {
+	text-decoration: none;
+}
+
+/*to stretch audio player 100% on chrome*/
+audio::-webkit-media-controls-enclosure {
+    max-width: 100%; /*or inherit*/
+}
+
+.thumbnail {
+	padding: 0px;
+}
+
+.thumbnail h2 {
+	width: 100%;
+	background-color: rgba(1,1,1,0.5);
+	margin: 0px;
+	position: absolute;
+	padding: 5px;
+	overflow: hidden;
+}
+
+.thumbnail a {
+	text-decoration: none;
+}
+
+footer {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	padding: 10px;
+}
