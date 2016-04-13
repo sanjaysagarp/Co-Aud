@@ -16,6 +16,12 @@ import (
 //A Page structure
 type Page struct {
 	Title string
+	Data interface{}
+}
+
+//UserPage struct
+type UserPage struct {
+	Title string
 }
 
 //GoogleUser struct that captures initial user information for acct creation
@@ -25,7 +31,7 @@ type GoogleUser struct {
 }
 
 //Compile templates on start
-var templates = template.Must(template.ParseFiles("./app/views/header.html", "./app/views/footer.html", "./app/views/main.html"))
+var templates = template.Must(template.ParseFiles("./app/views/header.html", "./app/views/footer.html", "./app/views/main.html", "./app/views/information.html"))
 //var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 
@@ -39,6 +45,7 @@ var (
 					"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
+	currentUser = &user.User{}
 // Some random string, random for each request
 	oauthStateString = "random"
 )
@@ -82,12 +89,23 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(gUser.Email)
 	
 	//need to search for email in our db -> if found, navigate back to homepage?
-	newUser := user.NewUser(gUser.Email, gUser.Name)
-	user.InsertUser(newUser)
-	http.Redirect(w, r, "/", http.StatusFound)
+	
+	currentUser = user.FindUser(gUser.Email)
+	if(currentUser == nil) {
+		newUser := user.NewUser(gUser.Email, gUser.Name)
+		user.InsertUser(newUser)
+		currentUser = newUser
+	}
+	
+	
+	http.Redirect(w, r, "/user", http.StatusTemporaryRedirect)
 	
 }
 
+func userHandler(w http.ResponseWriter, r *http.Request) {
+	//should check if token is still valid?
+	display(w, "information", &Page{Title: "Profile", Data: currentUser})
+}
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	//Checks if user has a valid oauth token
 	// code := r.FormValue("code")
@@ -97,12 +115,9 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	// 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	// 	return
 	// }
-	
-	// if(token.Valid()) {
-		
+	// if(!token.Valid()) {
+	// 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	// }
-	
-	
 }
 
 func main() {
@@ -115,7 +130,8 @@ func main() {
 	http.HandleFunc("/", mainHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
-	http.HandleFunc("/createUser", createUserHandler)
+	//http.HandleFunc("/createUser", createUserHandler)
+	http.HandleFunc("/user", userHandler)
 	
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")

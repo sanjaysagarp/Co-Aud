@@ -9,78 +9,80 @@ import (
 
 //User struct
 type User struct {
-	displayName string
-	username string
-	aboutMe string
-	personalWebsite string
-	facebookLink string
-	instagramLink string
-	twitterLink string
-	videoSubmission []Work
-	contestTeamNames []string
-	email string
+	ID bson.ObjectId `bson:"_id,omitempty"`
+	DisplayName string
+	Username string
+	AboutMe string
+	PersonalWebsite string
+	FacebookURL string
+	InstagramURL string
+	TwitterURL string
+	VideoSubmission []Work
+	ContestTeamNames []string
+	Email string
 	
 }
 
 //Work struct defines a person's personal work
 type Work struct {
-	title string
-	url string
-	shortDescription string
-	description string
-	cast []Cast
-	postedDate string
-	postedTime string
+	Title string
+	URL string
+	ShortDescription string
+	Description string
+	Cast []Cast
+	PostedDate string
+	PostedTime string
 }
 
 //Cast struct
 type Cast struct {
-	username string
-	role string
+	Username string
+	Role string
 }
 
 //Contest struct
 type Contest struct {
-	createdBy string
-	shortDescription string
-	description string
-	participatingTeams []Team
-	startDate string
-	endDate string
+	CreatedBy string
+	ShortDescription string
+	Description string
+	ParticipatingTeams []Team
+	StartDate string
+	EndDate string
 }
 
 //Team struct
 type Team struct {
-	userNames []Cast
-	teamName string
+	UserNames []Cast
+	TeamName string
 }
 
 //Role struct
 type Role struct {
-	username string
-	shortDescription string
-	description string
-	votesUp int
-	votesDown int
+	Username string
+	ShortDescription string
+	Description string
+	VotesUp int
+	VotesDown int
 }
 
 //Comment struct
 type Comment struct {
-	username string
-	message string
-	replies []Comment
+	Username string
+	Message string
+	Replies []Comment
 }
 
 //NewUser creates a new user after signed in with google
 func NewUser(email string, displayName string) *User{
-	return &User{email: email, displayName: displayName}
+	return &User{Email: email, DisplayName: displayName}
 }
 
 //FindUser searches for the user
 func FindUser(email string) *User {
 	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
@@ -89,7 +91,8 @@ func FindUser(email string) *User {
 	result := &User{}
 	err = c.Find(bson.M{"email": email}).One(&result)
 	if err != nil {
-			log.Fatal(err)
+		fmt.Println("User not found, creating one")
+		return nil
 	}
 	return result
 }
@@ -102,15 +105,13 @@ func InsertUser(user *User) {
 			panic(err)
 	}
 	defer session.Close()
-
-	// Optional. Switch the session to a monotonic behavior.
+	
 	session.SetMode(mgo.Monotonic, true)
-
 	c := session.DB("CoAud").C("users")
-	err = c.Insert(user)
+	err = c.Insert(&User{Email: user.Email, DisplayName: user.DisplayName})
 	
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(user.displayName + " added with email " + user.email)
+	fmt.Println(user.DisplayName + " added with email " + user.Email)
 }
