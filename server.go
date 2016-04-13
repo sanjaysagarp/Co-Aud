@@ -9,6 +9,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
+	"encoding/json"
+	"github.com/sanjaysagarp/Co-Aud/packages"
 )
 
 //A Page structure
@@ -16,14 +18,11 @@ type Page struct {
 	Title string
 }
 
-//config structure
-// type Config struct {
-// 	Domain string
-// 	Port int
-// 	DB string
-// 	SessionSecret string
-// 	CookieSecret string
-// }
+//GoogleUser struct that captures initial user information for acct creation
+type GoogleUser struct {
+	Email string `json:"email"`
+	Name string `json:"name"`
+}
 
 //Compile templates on start
 var templates = template.Must(template.ParseFiles("./app/views/header.html", "./app/views/footer.html", "./app/views/main.html"))
@@ -76,12 +75,35 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
-
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
-	fmt.Fprintf(w, "Content: %s\n", contents)
+	var gUser GoogleUser
+	json.Unmarshal(contents, &gUser)
+	//fmt.Println(gUser.Email)
+	
+	//need to search for email in our db -> if found, navigate back to homepage?
+	newUser := user.NewUser(gUser.Email, gUser.Name)
+	user.InsertUser(newUser)
+	http.Redirect(w, r, "/", http.StatusFound)
+	
 }
 
+func createUserHandler(w http.ResponseWriter, r *http.Request) {
+	//Checks if user has a valid oauth token
+	// code := r.FormValue("code")
+	// token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
+	// if err != nil {
+	// 	fmt.Println("Code exchange failed with '%s'\n", err)
+	// 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	// 	return
+	// }
+	
+	// if(token.Valid()) {
+		
+	// }
+	
+	
+}
 
 func main() {
 	rootdir, err := os.Getwd()
@@ -93,6 +115,7 @@ func main() {
 	http.HandleFunc("/", mainHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
+	http.HandleFunc("/createUser", createUserHandler)
 	
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
