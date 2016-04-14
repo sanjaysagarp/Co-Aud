@@ -27,3 +27,12 @@ add-apt-repository -y ppa:rwky/redis
 apt-get update
 apt-get install -y redis-server
 
+# To finish provisioning for mongodb:
+
+# vagrant ssh
+# sudo nano /etc/mongod.conf 
+# ------ replace 'ip_bind 127.0.0.1' with 'ip_bind 0.0.0.0'
+# exit nano and save (ctr-x)
+# sudo service mongod restart
+
+# To check, run 'mongo localhost:27018' on host machine
