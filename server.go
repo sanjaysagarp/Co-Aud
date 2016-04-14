@@ -84,6 +84,9 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
+	
+	
+	
 	var gUser GoogleUser
 	json.Unmarshal(contents, &gUser)
 	//fmt.Println(gUser.Email)
@@ -105,19 +108,6 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 func userHandler(w http.ResponseWriter, r *http.Request) {
 	//should check if token is still valid?
 	display(w, "information", &Page{Title: "Profile", Data: currentUser})
-}
-func createUserHandler(w http.ResponseWriter, r *http.Request) {
-	//Checks if user has a valid oauth token
-	// code := r.FormValue("code")
-	// token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
-	// if err != nil {
-	// 	fmt.Println("Code exchange failed with '%s'\n", err)
-	// 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	// 	return
-	// }
-	// if(!token.Valid()) {
-	// 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	// }
 }
 
 func main() {
