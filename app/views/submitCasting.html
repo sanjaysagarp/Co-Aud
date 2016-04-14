@@ -1,0 +1,88 @@
+{{define "submitCasting"}}
+{{template "header" .}}
+
+<div id="container"> 
+
+    <div id="form1" class="card">
+	<form action="test.asp">
+        <div>
+            <p class="upload">Upload new photo</p>
+            <div id="placeholderimage"></div>
+		<input type="file" name="pic" accept="image/*" id="photo">
+        </div>
+        
+        <br/> 
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" id="title" placeholder="Type here...">
+        </div>
+	</form>
+    </div>
+    
+    <br/> 
+    
+    <div id="form2" class="card">
+    <div class="clear"></div>
+    <form action="post">
+        
+        <div class="form-group">
+            <label>Age</label>
+            <input type="text" class="form-control" id="age" placeholder="Type here...">
+        </div>
+        
+        <br/>
+        
+        <div class="form-group">
+            <label>Gender</label>
+            <input type="text" class="form-control" id="gender" placeholder="Type here...">
+        </div>
+        
+        <br/>
+        
+        <div class="form-group">
+            <label>Traits</label>
+            <input type="text" class="form-control" id="traits" placeholder="Type here...">
+        </div>
+        
+        <br/>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <input type="text" class="form-control" id="description" placeholder="Type here...">
+        </div>
+        </form>
+        </div>
+        
+        <div id="form3" class="card">
+        <form action="post">
+        <div class="form-group">
+            <label>Deadline</label>
+            <input type="text" class="form-control" id="deadline" placeholder="Type here...">
+        </div>
+        
+        <br/>
+        
+        <form action="test.asp">
+        <div>
+        <p class="upload">Upload your script</p>
+		<input type="file" name="script" accept="image/*" id="script">
+        </div>
+	    </form>
+        </form>
+        </div>
+    
+        <br/>
+        
+        <div id="form4">
+            <form action = "post">
+            <div class= "form-group">
+                <input type="submit">
+            </div>
+            </form>
+        </div>
+            
+    </div>
+</div>
+
+{{template "footer" .}}
+{{end}}

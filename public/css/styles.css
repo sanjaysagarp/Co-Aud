@@ -106,3 +106,94 @@ footer {
 	width: 100%;
 	padding: 10px;
 }
+
+
+/** JENNA'S STYLINGGGGGGGGG **/
+#title{
+    width: 200px;
+}
+
+#age{
+    width: 100px;
+}
+
+#gender{
+    width: 200px;
+}
+
+#traits{
+    width:600px;
+}
+
+#description{
+    width: 600px;
+    height: 300px;
+}
+
+#deadline{
+    width:200px;
+}
+
+label{
+    color:#76a8cc;
+    font-family: White Pine; 
+}
+
+.upload{
+    color: #76a8cc;
+    font-weight: bold;
+    font-family: White Pine;
+}
+
+
+#form1{
+    margin-top: 20px;
+    margin-left: 40px;
+    margin-right: 80px;
+    padding:20px;
+    width: 250px;
+    float:left;
+
+}
+
+#form2{
+    padding: 20px 40px;
+    margin-right: 80px;
+    width: 700px;
+    float:left;
+
+}
+
+#form3{
+    width:300px;
+    padding: 20px 30px;
+    float:left;
+
+}
+
+#form4{
+    clear:both;
+    float:left;
+    margin-left:1400px;
+    margin-top:20px;
+}
+
+#placeholderimage{
+    margin:4px 4px 15px 6px;
+    width:130px;
+    height:130px;
+    background-color:lightgrey;
+}
+
+input[type=text]{
+    background-color:#edeaed;
+}
+
+input[type=submit]{
+    padding:10px 20px;
+    font-family:White Pine;
+    color:white;
+    font-size:2em;
+    border-radius:5px;
+    background-color:#36ced9;
+}

@@ -1,0 +1,48 @@
+{{define "editProfile"}}
+{{template "header" .}}
+<div class="container">
+	<div class="row">
+		<div class="col-md-4">
+			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+			<h1>Phil Slug</h1>
+			<h3>(Phlugger)</h3>
+			<form action="test.asp">
+				<label> </label>	
+				<input type="file" name="pic" accept="image/*">
+			<!--</form>	-->
+			<hr>
+			<p>Animator</p>
+			<p>Member for 2 months</p>
+		</div>
+		<div class="col-md-8">
+			<h1>Edit Profile</h1>
+				<!--<form>-->
+					<div class="form-group">
+						<label>Name</label>
+						<input type="text" class="form-control" id="name">
+					</div>
+					<div class="form-group">
+						<label>Display Name</label>
+						<input type="text" class="form-control" id="displayName">
+					</div>
+					<div class="form-group">
+						<label>Role</label>
+						<input type="text" class="form-control" id="role">
+					</div>
+					<div class="form-group">
+						<label>Personal Website</label>
+						<input type="text" class="form-control" id="personalWebsite" placeholder="URL...">
+					</div>
+					<div class="form-group">
+						<label>About Me:</label>
+						<input type="text" class="form-control" id="aboutMe" style="length: 300px;">
+					</div>
+					
+					<button type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+{{template "footer" .}}
+{{end}}

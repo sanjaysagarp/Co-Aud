@@ -1,0 +1,50 @@
+{{define "addWork"}}
+{{template "header" .}}
+<div class="container">
+	<div class="row">
+		<div class="col-md-8">
+			<h1>Add Work</h1>
+				<!--<form>-->
+					<div class="form-group">
+						<label>Youtube URL</label>
+						<input type="text" class="form-control" id="url">
+					</div>
+					<div class="form-group">
+						<label>Title</label>
+						<input type="text" class="form-control" id="title">
+					</div>
+					<div class="form-group">
+						<label>Short Description</label>
+						<input type="text" class="form-control" id="shortDescription">
+					</div>
+					<div class="form-group">
+						<label>Description</label>
+						<input type="text" class="form-control" id="description">
+					</div>
+					<div id="dynamicInput">
+						Cast Member 1<br><input type="text" name="myInputs[]">as<input type="text" name="myInputs[]">						
+					</div>
+					<div>
+						<br>
+						<input type="button" class="btn btn-info" value="Add another cast member" onClick="addInput('dynamicInput');">
+					</div>
+					<br/>
+					<button type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	var counter = 1;
+	function addInput(divName){
+		var newdiv = document.createElement('div');
+		newdiv.innerHTML = "Cast Member " + (counter + 1) + " <br><input type='text' name='myInputs[]'>as<input type='text' name='myInputs[]'>";
+		document.getElementById(divName).appendChild(newdiv);
+		counter++;
+
+	}
+</script>
+
+{{template "footer" .}}
+{{end}}
