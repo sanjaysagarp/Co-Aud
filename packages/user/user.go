@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/sanjaysagarp/Co-Aud/packages/work"
 )
 
 //User struct
@@ -66,13 +65,3 @@ func InsertUser(user *User) {
 	}
 	fmt.Println(user.DisplayName + " added with email " + user.Email)
 }
-
-//FindWorks returns all works provided by user
-func FindWorks() []work.Work {
-	
-}
-
-//FindWork returns all works provided by user
-func FindWork() []work.Work {
-	
-} 
