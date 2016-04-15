@@ -31,7 +31,7 @@ type GoogleUser struct {
 }
 
 var templates = template.Must(template.ParseFiles("./app/views/header.html", "./app/views/footer.html", "./app/views/main.html", 
-									"./app/views/profile.html", "./app/views/navbar.html", "./app/views/rolepage.html", "./app/views/projects.html", "./app/views/editProfile.html", "./app/views/projectPage.html", "./app/views/addWork.html", "./app/views/contestMain.html", "./app/views/submitCasting.html", "./app/views/information.html"))
+									"./app/views/profile.html", "./app/views/navbar.html", "./app/views/rolepage.html", "./app/views/projects.html", "./app/views/editProfile.html", "./app/views/projectPage.html", "./app/views/addWork.html", "./app/views/contestMain.html", "./app/views/submitCasting.html", "./app/views/information.html", "./app/views/castings.html"))
 //var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 
@@ -92,6 +92,9 @@ func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+func castingsHandler(w http.ResponseWriter, r *http.Request) {
+	display(w, "castings", &Page{Title: "Casting List"})
 }
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -158,6 +161,7 @@ func main() {
 	http.HandleFunc("/submitCasting/", submitCastingHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
+	http.HandleFunc("/castings", castingsHandler)
 	//http.HandleFunc("/createUser", createUserHandler)
 	http.HandleFunc("/user", userHandler)
 	
