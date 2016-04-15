@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/tchin94/Co-Aud/packages/work"
+	"github.com/sanjaysagarp/Co-Aud/packages/work"
 )
 
 //User struct

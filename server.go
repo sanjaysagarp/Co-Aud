@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
 	"encoding/json"
-	"github.com/tchin94/Co-Aud/packages/user"
+	"github.com/sanjaysagarp/Co-Aud/packages/user"
 )
 
 //A Page structure
