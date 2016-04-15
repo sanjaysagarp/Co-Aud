@@ -161,9 +161,9 @@ func main() {
 	http.HandleFunc("/submitCasting/", submitCastingHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
-	http.HandleFunc("/castings", castingsHandler)
+	http.HandleFunc("/castings/", castingsHandler)
 	//http.HandleFunc("/createUser", createUserHandler)
-	http.HandleFunc("/user", userHandler)
+	http.HandleFunc("/user/", userHandler)
 	
 
 	//Listen on port 80
