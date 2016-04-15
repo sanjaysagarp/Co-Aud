@@ -18,7 +18,6 @@ type User struct {
 	FacebookURL string
 	InstagramURL string
 	TwitterURL string
-	VideoSubmission []work.Work
 	ContestTeamNames []string
 	Email string
 	
@@ -67,3 +66,13 @@ func InsertUser(user *User) {
 	}
 	fmt.Println(user.DisplayName + " added with email " + user.Email)
 }
+
+//FindWorks returns all works provided by user
+func FindWorks() []work.Work {
+	
+}
+
+//FindWork returns all works provided by user
+func FindWork() []work.Work {
+	
+} 
