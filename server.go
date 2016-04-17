@@ -3,14 +3,16 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"fmt"
 	"os"
 	"path"
+	"log"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	"github.com/aaudis/GoRedisSession"
+	"fmt"
 )
 
 //A Page structure
@@ -46,8 +48,10 @@ var (
 		Endpoint:     google.Endpoint,
 	}
 	currentUser = &user.User{}
-// Some random string, random for each request
+	// Some random string, random for each request
 	oauthStateString = "random"
+	
+	redis_session *rsess.SessionConnect
 )
 
 //Display the named template
@@ -121,9 +125,6 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	
 	var gUser GoogleUser
 	json.Unmarshal(contents, &gUser)
-	//fmt.Println(gUser.Email)
-	
-	//need to search for email in our db -> if found, navigate back to homepage?
 	
 	currentUser = user.FindUser(gUser.Email)
 	if(currentUser == nil) {
@@ -132,18 +133,38 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		currentUser = newUser
 	}
 	
+	//get session and set whatever variables you want to access!
+	s := redis_session.Session(w, r)
+	s.Set("DisplayName", currentUser.Email)
+	s.Set("Email", currentUser.Email)
+	fmt.Println(s.Get("Email"))
+	//fmt.Fprintf(w, "Setting session variable done!")
+	
 	
 	http.Redirect(w, r, "/user", http.StatusTemporaryRedirect)
 	
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
-	//should check if token is still valid?
 	display(w, "information", &Page{Title: "Profile", Data: currentUser})
 
 }
 
 func main() {
+	
+	rsess.Prefix = "sess:" // session prefix (in Redis)
+	rsess.Expire = 3600    // 60 minute session expiration
+
+	// Connecting to Redis and creating storage instance
+	temp_sess, err := rsess.New("sid", 0, "127.0.0.1", 6379)
+	if err != nil {
+		log.Printf("%s", err)
+	}
+	
+	redis_session = temp_sess
+	
+	
+	
 	rootdir, err := os.Getwd()
 	if err != nil {
 		rootdir = "no directory found"
@@ -162,7 +183,6 @@ func main() {
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
-	//http.HandleFunc("/createUser", createUserHandler)
 	http.HandleFunc("/user/", userHandler)
 	
 
