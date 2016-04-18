@@ -31,7 +31,7 @@ type GoogleUser struct {
 }
 
 var templates = template.Must(template.ParseFiles("./app/views/header.html", "./app/views/footer.html", "./app/views/main.html", 
-									"./app/views/profile.html", "./app/views/navbar.html", "./app/views/rolepage.html", "./app/views/projects.html", "./app/views/editProfile.html", "./app/views/projectPage.html", "./app/views/addWork.html", "./app/views/contestMain.html", "./app/views/submitCasting.html", "./app/views/information.html", "./app/views/castings.html"))
+									"./app/views/profile.html", "./app/views/navbar.html", "./app/views/rolepage.html", "./app/views/projects.html", "./app/views/editProfile.html", "./app/views/projectPage.html", "./app/views/addWork.html", "./app/views/contestMain.html", "./app/views/submitCasting.html", "./app/views/information.html", "./app/views/castings.html", "./app/views/home.html"))
 //var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 
@@ -56,8 +56,8 @@ func display(w http.ResponseWriter, tmpl string, data interface{}) {
 }
 
 //The handlers.
-func mainHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "main", &Page{Title: "h0i!"})
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	display(w, "home", &Page{Title: "Home!"})
 }
 
 
@@ -150,7 +150,7 @@ func main() {
 	}
 	http.Handle("/public/", http.StripPrefix("/public",
 		http.FileServer(http.Dir(path.Join(rootdir, "public/")))))
-	http.HandleFunc("/", mainHandler)
+	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/profile/", profileHandler)
 	http.HandleFunc("/role/", rolePageHandler)
 	http.HandleFunc("/projects/", projectsHandler)
