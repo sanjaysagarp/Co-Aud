@@ -156,7 +156,7 @@ func main() {
 	rsess.Expire = 3600    // 60 minute session expiration
 
 	// Connecting to Redis and creating storage instance
-	temp_sess, err := rsess.New("sid", 0, "127.0.0.1", 6379)
+	temp_sess, err := rsess.New("sid", 0, "127.0.0.1", 27018)
 	if err != nil {
 		log.Printf("%s", err)
 	}
