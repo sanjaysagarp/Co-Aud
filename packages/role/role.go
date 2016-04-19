@@ -47,26 +47,51 @@ type Comment struct {
 
 //NewComment creates an instance of a new comment and returns it
 //TODO: FILL OUT FIELDS
-func NewComment() *Comment {
-	return &Comment{}
+func NewComment(username string, message string, timeStamp, replies []Comment) *Comment {
+	return &Comment{
+		Username : username,
+		Message : message,
+		TimeStamp : timeStamp,
+		Replies : replies
+	}
 }
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewRole() *Role {
-	return &Role{}
+func NewRole(id bson.ObjectId, title string, username string, shortDescription string, comment []Comment, voteUp int, voteDown int) *Role {
+	return &Role{
+		ID: id,
+		Title: title,
+		Username, username,
+		ShortDescription: shortDescription,
+		Description: description,
+		Comment: comment,
+		VotesUp: voteUp,
+		VotesDown: voteDown
+	}
 }
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewTeam() *Team {
-	return &Team{}
+func NewTeam(usernames []work.Cast, teamName string) *Team {
+	return &Team{
+		usernames: usernames,
+		TeamName: teamName
+	}
 }
 
 //NewContest creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS 
-func NewContest() *Contest {
-	return &Contest{}
+func NewContest(id bson.ObjectId, author string, sd string, d string, pt []Teams, start string, end string) *Contest {
+	return &Contest{
+		ID: id,
+		CreatedBy: author,
+		ShortDescription: sd,
+		Description: d,
+		ParticipatingTeams: pt,
+		StartDate: start,
+		EndDate: end
+	}
 }
 
 //InsertComment takes a role and inserts a comment into the role's comment array
@@ -85,14 +110,59 @@ func InsertComment(role *Role, comment *Comment) {
 	
 	
 }
+// https://gist.github.com/congjf/8035830
+// hm
 
 //InsertContest inserts contest into db
 func InsertContest(contest *Contest) {
-	
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("contest")
+
+	err = c.Insert(&Contest{
+		ID: contest.ID,
+		CreatedBy: contest.CreatedBy,
+		ShortDescription: contest.ShortDescription,
+		Description: contest.Description,
+		ParticipatingTeams: contest.ParticipatingTeams,
+		StartDate: contest.StartDate,
+		EndDate: contest.EndDate
+	})
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 //InsertRole inserts role into db
 func InsertRole(role *Role) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("role")
+
+	err = c.Insert(&Role{
+		ID: role.ID,
+		Title: role.Title,
+		Username, role.Username,
+		ShortDescription: role.ShortDescription,
+		Description: role.Description,
+		Comment: role.Comment,
+		VotesUp: role.VotesUp,
+		VotesDown: role.VotesDown
+	})
+	if err != nil {
+		panic(err)
+	}
 	
 }
 
