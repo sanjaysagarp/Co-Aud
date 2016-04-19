@@ -29,8 +29,8 @@ func NewUser(email string, displayName string) *User{
 
 //FindUser searches for the user
 func FindUser(email string) *User {
-	//session, err := mgo.Dial("127.0.0.1:27018")
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -51,8 +51,8 @@ func FindUser(email string) *User {
 
 //InsertUser adds the user to the db
 func InsertUser(user *User) {
-	//session, err := mgo.Dial("127.0.0.1:27018")
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 			panic(err)
 	}
