@@ -48,7 +48,6 @@ func FindUser(email string) *User {
 	return result
 }
 
-
 //InsertUser adds the user to the db
 func InsertUser(user *User) {
 	session, err := mgo.Dial("127.0.0.1:27018")

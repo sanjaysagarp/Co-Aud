@@ -105,6 +105,7 @@ footer {
 	bottom: 0;
 	width: 100%;
 	padding: 10px;
+    z-index: 1000;
 }
 
 
@@ -196,4 +197,19 @@ input[type=submit]{
     font-size:2em;
     border-radius:5px;
     background-color:#36ced9;
+}
+
+.google-signin-btn {
+    background-color: #F32E06;
+    color: white;
+    border-color: black;
+}
+
+hr {
+    border-color: #ccc;
+}
+
+.search-side-nav {
+    float: left;
+    margin-left: 30px;
 }

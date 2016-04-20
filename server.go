@@ -137,7 +137,9 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r) // use this to retrieve current user session
 	s.Set("DisplayName", currentUser.Email)
 	s.Set("Email", currentUser.Email)
+	s.Set("ID", currentUser.ID.String())
 	fmt.Println(s.Get("Email"))
+	fmt.Println(s.Get("ID"))
 	//fmt.Fprintf(w, "Setting session variable done!")
 	
 	

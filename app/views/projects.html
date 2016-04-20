@@ -1,62 +1,119 @@
 {{define "projects"}}
 {{template "header" .}}
+<div class="search-side-nav">
+	<div data-spy="affix" data-offset-top="200px" data-offset-bottom="200px">
+		<a href="/addWork/" class="btn btn-lg btn-default">SUBMIT</a>
+	</div>
+</div>
 <div class="container">
 	<div class="row">
-		<div class="thumbnail col-md-2">
+		<div class="col-lg-12">
+			<div class="input-group">
+	      <input type="text" class="form-control" placeholder="Search for...">
+	      <span class="input-group-btn">
+	        <button class="btn btn-default" type="button">
+	        	<span class="glyphicon glyphicon-search" aria-hidden="true"></span>Search
+	        </button>
+	      </span>
+	    </div>
+    </div>	
+  </div>	
+  <hr>
+	<div class="row">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 1</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 2</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 3</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 1</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 2</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 3</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 1</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 2</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
-		<div class="thumbnail col-md-2">
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
+			<a href="/projectPage/">
+				<h2>Video 3</h2>
+				<img class="img-responsive" src="/public/img/placeholder.png">
+			</a>
+		</div>
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
+			<a href="/projectPage/">
+				<h2>Video 1</h2>
+				<img class="img-responsive" src="/public/img/placeholder.png">
+			</a>
+		</div>
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
+			<a href="/projectPage/">
+				<h2>Video 2</h2>
+				<img class="img-responsive" src="/public/img/placeholder.png">
+			</a>
+		</div>
+		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/projectPage/">
 				<h2>Video 3</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
 		</div>
 	</div>
+	<nav class=text-center>
+	  <ul class="pagination">
+	    <li class="disabled">
+	      <a href="#" aria-label="Previous">
+	        <span aria-hidden="true">&laquo;</span>
+	      </a>
+	    </li>
+	    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+	    <li><a href="#">2</a></li>
+	    <li><a href="#">3</a></li>
+	    <li><a href="#">4</a></li>
+	    <li><a href="#">5</a></li>
+	    <li>
+	      <a href="#" aria-label="Next">
+	        <span aria-hidden="true">&raquo;</span>
+	      </a>
+	    </li>
+	  </ul>
+	</nav>
 </div>
+<br>
+<br>
 {{template "footer" .}}
 {{end}}
