@@ -9,12 +9,38 @@ buttons: #f8b72d #fce230 #53979c #36ced9
 media title bar: #86adb2
 Media title text: #eedd75*/
 
+@font-face {
+    font-family: espresso-shack;
+    src: url("/public/font/SF Espresso Shack.ttf");
+}
+
 .navbar, footer {
 	background-color: #1e223d;
 }
 
-.navbar > li {
+.navbar-default .navbar-brand {
+    font-family: espresso-shack;
+    color: white;
+    font-size: 24pt;
+}
+
+.navbar-default .navbar-brand:hover {
+    color: #ddd;
+}
+
+.navbar-nav>li>a>span {
+    font-size: 20pt;
+    vertical-align: bottom;
+}
+
+.navbar-default .navbar-nav>li>a {
+    font-family: espresso-shack;
+    vertical-align: middle;
 	color: #f6efc0;
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+    color: #D2C884;
 }
 
 body {
@@ -101,13 +127,11 @@ audio::-webkit-media-controls-enclosure {
 }
 
 footer {
-	position: fixed;
-	bottom: 0;
+    margin-top: 100px;
 	width: 100%;
-	padding: 10px;
-    z-index: 1000;
+	padding-top: 30px;
+    height: 200px;
 }
-
 
 /** JENNA'S STYLINGGGGGGGGG **/
 #title{
