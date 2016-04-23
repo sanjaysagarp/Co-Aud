@@ -127,6 +127,7 @@ audio::-webkit-media-controls-enclosure {
 }
 
 footer {
+    position: absolute;
     margin-top: 100px;
 	width: 100%;
 	padding-top: 30px;
