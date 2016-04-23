@@ -37,7 +37,7 @@ type GoogleUser struct {
 // fmt.Println(err)
 
 
-var templates = template.Must(template.ParseGlob("./app/views/*"))
+var templates = template.Must(template.ParseGlob("./app/views/*.html"))
 var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 
