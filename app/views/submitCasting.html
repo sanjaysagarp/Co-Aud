@@ -1,88 +1,60 @@
 {{define "submitCasting"}}
 {{template "header" .}}
+<form action="/theoTestPage/" method="post">
+	<div class="container">
+		<div class="row row-form">
+			<div class="col-md-3">
+				<div class="form-group">
+					<label>Name</label>
+					<input type="text" class="form-control input-lg" name="title" placeholder="Name">
+				</div>
+				<div class="form-group">
+					<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+					<label class="upload">Upload new photo</label>
+					<input type="file" accept="image/*" name="photo">
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label>Age</label>
+					<input type="number" class="form-control" name="age" placeholder="Age">
+				</div>
+				<div class="form-group">
+					<label>Gender</label>
+					<label class="radio-inline">
+					  <input type="radio" name="gender" id="genderMale" value="Male"> Male
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="gender" id="genderFemale" value="Female"> Female
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="gender" id="genderOther" value="Other"> Other
+					</label>
+				</div>
+				<div class="form-group">
+					<label>Traits</label>
+					<input type="text" class="form-control" name="traits" placeholder="Traits">
+				</div>
+				<div class="form-group">
+					<label>Description</label>
+					<textarea type="text-area" rows="3" class="form-control" name="description" placeholder="Description"></textarea>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-group">
+					<label>Deadline</label>
+					<input type="date" name="deadline">
+				</div>
+				<div>
+					<p class="upload">Upload your script</p>
+					<input type="file" name="script" accept="image/*">
+				</div>
+			</div>
 
-<div id="container"> 
-
-    <div id="form1" class="card">
-	<form action="test.asp">
-        <div>
-            <p class="upload">Upload new photo</p>
-            <div id="placeholderimage"></div>
-		<input type="file" name="pic" accept="image/*" id="photo">
-        </div>
-        
-        <br/> 
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" class="form-control" id="title" placeholder="Type here...">
-        </div>
-	</form>
-    </div>
-    
-    <br/> 
-    
-    <div id="form2" class="card">
-    <div class="clear"></div>
-    <form action="post">
-        
-        <div class="form-group">
-            <label>Age</label>
-            <input type="text" class="form-control" id="age" placeholder="Type here...">
-        </div>
-        
-        <br/>
-        
-        <div class="form-group">
-            <label>Gender</label>
-            <input type="text" class="form-control" id="gender" placeholder="Type here...">
-        </div>
-        
-        <br/>
-        
-        <div class="form-group">
-            <label>Traits</label>
-            <input type="text" class="form-control" id="traits" placeholder="Type here...">
-        </div>
-        
-        <br/>
-        
-        <div class="form-group">
-            <label>Description</label>
-            <input type="text" class="form-control" id="description" placeholder="Type here...">
-        </div>
-        </form>
-        </div>
-        
-        <div id="form3" class="card">
-        <form action="post">
-        <div class="form-group">
-            <label>Deadline</label>
-            <input type="text" class="form-control" id="deadline" placeholder="Type here...">
-        </div>
-        
-        <br/>
-        
-        <form action="test.asp">
-        <div>
-        <p class="upload">Upload your script</p>
-		<input type="file" name="script" accept="image/*" id="script">
-        </div>
-	    </form>
-        </form>
-        </div>
-    
-        <br/>
-        
-        <div id="form4">
-            <form action="/role/">
-            <div class="form-group">
-                <input type="submit">
-            </div>
-            </form>
-        </div>
-            
-    </div>
-</div>
+			<input class="btn btn-submit" type="submit">		
+		</div>  
+	</div>	
+</form>
 
 {{template "footer" .}}
 {{end}}

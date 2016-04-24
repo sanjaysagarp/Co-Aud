@@ -70,7 +70,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "theoTestPage", &Page{Title: "Theo Test"})
+	r.ParseForm()
+	fmt.Println(r.Form)
+	// title = r.PostFormValue("title")
+	// // store photo and get url
+	// age = r.PostFormValue("age")
+	// gender = r.PostFormValue("gender")
+	// traits = r.PostFormValue("traits")
+	// description = r.PostFormValue("description")
+	// deadline = r.PostFormValue("deadline")
+	// role.NewRole(title, currentUser.DisplayName, shortDescription string, comment []Comment, voteUp int, voteDown int)
+	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: r.Form})
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
@@ -88,12 +98,15 @@ func projectsHandler(w http.ResponseWriter, r *http.Request) {
 func editProfileHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "editProfile", &Page{Title: "Edit Profile"})
 }
+
 func projectPageHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "projectPage", &Page{Title: "Project Page"})
 }
+
 func addWorkHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "addWork", &Page{Title: "Add Work"})
 }
+
 func contestMainHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "contestMain", &Page{Title: "Contest"})
 }
@@ -101,10 +114,12 @@ func contestMainHandler(w http.ResponseWriter, r *http.Request) {
 func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "submitCasting", &Page{Title: "Submit Casting"})
 }
+
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
+
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "castings", &Page{Title: "Casting List"})
 }
@@ -152,12 +167,10 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	
 	
 	http.Redirect(w, r, "/user", http.StatusTemporaryRedirect)
-	
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "information", &Page{Title: "Profile", Data: currentUser})
-
 }
 
 func main() {
