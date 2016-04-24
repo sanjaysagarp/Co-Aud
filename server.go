@@ -65,7 +65,9 @@ func display(w http.ResponseWriter, tmpl string, data interface{}) {
 
 //The handlers.
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "home", &Page{Title: "Home!"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "home", &Page{Title: "Home!", Data: currentUser})
 }
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
@@ -74,39 +76,55 @@ func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "profile", &Page{Title: "Profile"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "profile", &Page{Title: "Profile", Data: currentUser})
 }
 
 func rolePageHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "rolepage", &Page{Title: "Role"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "rolepage", &Page{Title: "Role", Data: currentUser})
 }
 
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "projects", &Page{Title: "Projects"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "projects", &Page{Title: "Projects", Data: currentUser})
 }
 
 func editProfileHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "editProfile", &Page{Title: "Edit Profile"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "editProfile", &Page{Title: "Edit Profile", Data: currentUser})
 }
 func projectPageHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "projectPage", &Page{Title: "Project Page"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "projectPage", &Page{Title: "Project Page", Data: currentUser})
 }
 func addWorkHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "addWork", &Page{Title: "Add Work"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "addWork", &Page{Title: "Add Work", Data: currentUser})
 }
 func contestMainHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "contestMain", &Page{Title: "Contest"})
+	display(w, "contestMain", &Page{Title: "Contest", Data: currentUser})
 }
 
 func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "submitCasting", &Page{Title: "Submit Casting"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "submitCasting", &Page{Title: "Submit Casting", Data: currentUser})
 }
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "castings", &Page{Title: "Casting List"})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	display(w, "castings", &Page{Title: "Casting List", Data: currentUser})
 }
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -146,18 +164,10 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	s.Set("DisplayName", currentUser.Email)
 	s.Set("Email", currentUser.Email)
 	s.Set("ID", currentUser.ID.String())
-	fmt.Println(s.Get("Email"))
-	fmt.Println(s.Get("ID"))
-	//fmt.Fprintf(w, "Setting session variable done!")
 	
 	
-	http.Redirect(w, r, "/user", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	
-}
-
-func userHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "information", &Page{Title: "Profile", Data: currentUser})
-
 }
 
 func main() {
@@ -166,7 +176,7 @@ func main() {
 	rsess.Expire = 3600    // 60 minute session expiration
 
 	// Connecting to Redis and creating storage instance
-	temp_sess, err := rsess.New("sid", 0, "127.0.0.1", 27018)
+	temp_sess, err := rsess.New("sid", 0, "127.0.0.1", 6379)
 	if err != nil {
 		log.Printf("%s", err)
 	}
@@ -193,7 +203,6 @@ func main() {
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
-	http.HandleFunc("/user/", userHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
 
 	//Listen on port 80

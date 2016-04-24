@@ -31,7 +31,7 @@ func NewUser(email string, displayName string) *User{
 func FindUser(email string) *User {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
-	fmt.Println("connected")
+	//fmt.Println("connected")
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +42,7 @@ func FindUser(email string) *User {
 	result := &User{}
 	err = c.Find(bson.M{"email": email}).One(&result)
 	if err != nil {
-		fmt.Println("User not found, creating one")
+		fmt.Println("User not found")
 		return nil
 	}
 	return result
