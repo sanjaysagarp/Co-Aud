@@ -58,9 +58,8 @@ func NewComment(username string, message string, timeStamp, replies []Comment) *
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewRole(id bson.ObjectId, title string, username string, shortDescription string, comment []Comment, voteUp int, voteDown int) *Role {
+func NewRole(title string, username string, shortDescription string, comment []Comment, voteUp int, voteDown int) *Role {
 	return &Role{
-		ID: id,
 		Title: title,
 		Username, username,
 		ShortDescription: shortDescription,

@@ -9,17 +9,12 @@ buttons: #f8b72d #fce230 #53979c #36ced9
 media title bar: #86adb2
 Media title text: #eedd75*/
 
-@font-face {
-    font-family: espresso-shack;
-    src: url("/public/font/SF Espresso Shack.ttf");
-}
-
 .navbar, footer {
 	background-color: #1e223d;
 }
 
 .navbar-default .navbar-brand {
-    font-family: espresso-shack;
+    font-family: SF Espresso Shack;
     color: white;
     font-size: 24pt;
 }
@@ -34,7 +29,7 @@ Media title text: #eedd75*/
 }
 
 .navbar-default .navbar-nav>li>a {
-    font-family: espresso-shack;
+    font-family: SF Espresso Shack;
     vertical-align: middle;
 	color: #f6efc0;
 }
@@ -127,7 +122,6 @@ audio::-webkit-media-controls-enclosure {
 }
 
 footer {
-    position: absolute;
     margin-top: 100px;
 	width: 100%;
 	padding-top: 30px;
@@ -135,7 +129,7 @@ footer {
 }
 
 /** JENNA'S STYLINGGGGGGGGG **/
-#title{
+/*#title{
     width: 200px;
 }
 
@@ -222,6 +216,10 @@ input[type=submit]{
     font-size:2em;
     border-radius:5px;
     background-color:#36ced9;
+}*/
+
+textarea { 
+    resize: vertical;
 }
 
 .google-signin-btn {
@@ -237,4 +235,18 @@ hr {
 .search-side-nav {
     float: left;
     margin-left: 30px;
+}
+
+.content-wrapper {
+    min-height: 100%;
+}
+
+.btn-submit {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.row-form {
+    position: relative;
 }
