@@ -2,24 +2,25 @@
 {{template "header" .}}
 <div class="container">
 	<div class="row">
-		<div class="col-md-8">
-			<h1>Add Work</h1>
+		<div class="col-md-8 col-md-offset-2 card">
+			<h3>Add Work</h3>
+			<hr>
 			<form action="/theoTestPage/" method="post">
 				<div class="form-group">
-					<label>Youtube URL</label>
-					<input type="text" class="form-control" name="url">
+					<label>Title</label>
+					<input type="text" class="form-control" name="title" placeholder="Title">
 				</div>
 				<div class="form-group">
-					<label>Title</label>
-					<input type="text" class="form-control" name="title">
+					<label>Youtube URL</label>
+					<input type="text" class="form-control" name="url" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
 				</div>
 				<div class="form-group">
 					<label>Short Description</label>
-					<input type="text" class="form-control" name="shortDescription">
+					<input type="text" class="form-control" name="shortDescription" placeholder="Short Description (140 characters)" maxlength="140">
 				</div>
 				<div class="form-group">
 					<label>Description</label>
-					<input type="text" class="form-control" name="description">
+					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
 				</div>
 				<div id="dynamicInput">
 					Cast Member 1<br><input type="text" name="myInputs">as<input type="text" name="myInputs">						
@@ -45,8 +46,5 @@
 
 	}
 </script>
-<br>
-<br>
-<br>
 {{template "footer" .}}
 {{end}}

@@ -1,8 +1,8 @@
 {{define "information"}}
 {{template "header" .}}
 <div class="container">
-<h1>Hello {{.Data.DisplayName}}</h1>
-<h2>Email {{.Data.Email}}</h2>
+<h1>Hello {{.Data.currentUser.DisplayName}}</h1>
+<h2>Email {{.Data.currentUser.Email}}</h2>
 </div>
 {{template "footer" .}}
 {{end}}

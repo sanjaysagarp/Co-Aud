@@ -1,7 +1,28 @@
 {{define "theoTestPage"}}
 {{template "header" .}}
 <div class="container">
-<p>{{ .Data }}</p>
+	<div class="row">
+		<div class="col-md-3">
+			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+			<h2 class="text-center">{{ .Data.form.title}}</h2>
+		</div>
+		<div class="col-md-6">
+			<h2>Character Bio</h2>
+			<p> Age: {{ .Data.form.age }}
+ Gender: {{ .Data.form.gender }}
+ Traits: {{ .Data.form.traits }}
+ Bio: {{ .Data.form.description }}</p>
+		</div>
+		<div class="col-md-3">
+			<p><strong>Posted by:</strong></p>
+			<p>GrumpyAnimation</p>
+			<p><strong>Deadline:</strong></p>
+			<p>{{ .Data.form.deadline }}</p>
+			<p><strong>Download Script:</strong></p>
+			<p><a href="!">grumpyjoe-script.pdf</a></p>
+		</div>
+	</div>
+<p>{{ .Data.form }}</p>
 </div>
 {{template "footer" .}}
 {{end}}

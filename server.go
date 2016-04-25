@@ -18,8 +18,13 @@ import (
 //A Page structure
 type Page struct {
 	Title string
-	Data interface{}
+	Data map[string]interface{}
 }
+
+// type Page struct {
+// 	Title string
+// 	Data interface{}
+// }
 
 //UserPage struct
 type UserPage struct {
@@ -65,70 +70,57 @@ func display(w http.ResponseWriter, tmpl string, data interface{}) {
 
 //The handlers.
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "home", &Page{Title: "Home!", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "home", &Page{Title: "Home!", Data: data})
 }
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
 	r.ParseForm()
 	fmt.Println(r.Form)
-	// title = r.PostFormValue("title")
-	// // store photo and get url
-	// age = r.PostFormValue("age")
-	// gender = r.PostFormValue("gender")
-	// traits = r.PostFormValue("traits")
-	// description = r.PostFormValue("description")
-	// deadline = r.PostFormValue("deadline")
-	// role.NewRole(title, currentUser.DisplayName, shortDescription string, comment []Comment, voteUp int, voteDown int)
-	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: r.Form})
+	data["form"] = r.Form
+	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "profile", &Page{Title: "Profile", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "profile", &Page{Title: "Profile", Data: data})
 }
 
 func rolePageHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "rolepage", &Page{Title: "Role", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
 
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "projects", &Page{Title: "Projects", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "projects", &Page{Title: "Projects", Data: data})
 }
 
 func editProfileHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "editProfile", &Page{Title: "Edit Profile", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "editProfile", &Page{Title: "Edit Profile", Data: data})
 }
 
 func projectPageHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "projectPage", &Page{Title: "Project Page", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "projectPage", &Page{Title: "Project Page", Data: data})
 }
 
 func addWorkHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "addWork", &Page{Title: "Add Work", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "addWork", &Page{Title: "Add Work", Data: data})
 }
 
 func contestMainHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "contestMain", &Page{Title: "Contest", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "contestMain", &Page{Title: "Contest", Data: data})
 }
 
 func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "submitCasting", &Page{Title: "Submit Casting", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "submitCasting", &Page{Title: "Submit Casting", Data: data})
 }
 
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -137,9 +129,8 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	display(w, "castings", &Page{Title: "Casting List", Data: currentUser})
+	data := setDefaultData(w, r)
+	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -183,6 +174,14 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	
+}
+
+func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
+	data := make(map[string]interface{})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	data["currentUser"] = currentUser
+	return data
 }
 
 func main() {

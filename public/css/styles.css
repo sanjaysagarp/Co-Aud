@@ -52,6 +52,7 @@ h1 {
 	-webkit-box-shadow: 10px 10px 0px 3px rgba(220,217,220,1);
 	-moz-box-shadow: 10px 10px 0px 3px rgba(220,217,220,1);
 	box-shadow: 10px 10px 0px 3px rgba(220,217,220,1);
+    padding: 20px;
 }
 
 .card > h2 {
@@ -129,7 +130,7 @@ footer {
 }
 
 /** JENNA'S STYLINGGGGGGGGG **/
-/*#title{
+#title{
     width: 200px;
 }
 
@@ -143,11 +144,6 @@ footer {
 
 #traits{
     width:600px;
-}
-
-#description{
-    width: 600px;
-    height: 300px;
 }
 
 #deadline{
@@ -165,47 +161,7 @@ label{
     font-family: White Pine;
 }
 
-
-#form1{
-    margin-top: 20px;
-    margin-left: 40px;
-    margin-right: 80px;
-    padding:20px;
-    width: 250px;
-    float:left;
-
-}
-
-#form2{
-    padding: 20px 40px;
-    margin-right: 80px;
-    width: 700px;
-    float:left;
-
-}
-
-#form3{
-    width:300px;
-    padding: 20px 30px;
-    float:left;
-
-}
-
-#form4{
-    clear:both;
-    float:left;
-    margin-left:1400px;
-    margin-top:20px;
-}
-
-#placeholderimage{
-    margin:4px 4px 15px 6px;
-    width:130px;
-    height:130px;
-    background-color:lightgrey;
-}
-
-input[type=text]{
+input[type=text], input[type=number], input[type=date], textarea.form-control {
     background-color:#edeaed;
 }
 
@@ -216,7 +172,9 @@ input[type=submit]{
     font-size:2em;
     border-radius:5px;
     background-color:#36ced9;
-}*/
+    float: right;
+    clear: both;
+}
 
 textarea { 
     resize: vertical;
@@ -239,12 +197,6 @@ hr {
 
 .content-wrapper {
     min-height: 100%;
-}
-
-.btn-submit {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
 }
 
 .row-form {

@@ -2,22 +2,26 @@
 {{template "header" .}}
 <form action="/theoTestPage/" method="post">
 	<div class="container">
-		<div class="row row-form">
-			<div class="col-md-3">
+		<div class="row">
+			<div class="col-md-3 card">
 				<div class="form-group">
 					<label>Name</label>
-					<input type="text" class="form-control input-lg" name="title" placeholder="Name">
+					<input type="text" class="form-control input-lg" name="form[title]" placeholder="Name">
 				</div>
 				<div class="form-group">
 					<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
 					<label class="upload">Upload new photo</label>
 					<input type="file" accept="image/*" name="photo">
 				</div>
+				<div class="form-group">
+					<label>Deadline</label>
+					<input class="form-control" type="date" name="deadline">
+				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-8 col-md-offset-1 card">
 				<div class="form-group">
 					<label>Age</label>
-					<input type="number" class="form-control" name="age" placeholder="Age">
+					<input type="number" class="form-control" id="age" name="age" placeholder="Age">
 				</div>
 				<div class="form-group">
 					<label>Gender</label>
@@ -37,21 +41,14 @@
 				</div>
 				<div class="form-group">
 					<label>Description</label>
-					<textarea type="text-area" rows="3" class="form-control" name="description" placeholder="Description"></textarea>
+					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
 				</div>
-			</div>
-			<div class="col-md-3">
 				<div class="form-group">
-					<label>Deadline</label>
-					<input type="date" name="deadline">
+					<label>Script</label>
+					<textarea type="text-area" rows="6" class="form-control" name="script" placeholder="Script"></textarea>
 				</div>
-				<div>
-					<p class="upload">Upload your script</p>
-					<input type="file" name="script" accept="image/*">
-				</div>
-			</div>
-
-			<input class="btn btn-submit" type="submit">		
+				<input type="submit">
+			</div>		
 		</div>  
 	</div>	
 </form>
