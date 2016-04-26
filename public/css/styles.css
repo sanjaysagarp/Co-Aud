@@ -75,8 +75,16 @@ p {
 }
 
 .img-profile {
-	height: 64px;
-	width: 64px;
+    height: 64px;
+    width: 64px;
+}
+
+.navbar .img-profile {
+    height: 40px;
+    width: 40px;
+    margin-right:10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .comment-section .img-profile {

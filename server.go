@@ -13,6 +13,7 @@ import (
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
+	"io"
 )
 
 //A Page structure
@@ -20,11 +21,6 @@ type Page struct {
 	Title string
 	Data map[string]interface{}
 }
-
-// type Page struct {
-// 	Title string
-// 	Data interface{}
-// }
 
 //UserPage struct
 type UserPage struct {
@@ -37,15 +33,8 @@ type GoogleUser struct {
 	Name string `json:"name"`
 }
 
-// var matches, err = filepath.Glob("./app/views/*")
-// fmt.Println(matches)
-// fmt.Println(err)
-
-
 var templates = template.Must(template.ParseGlob("./app/views/*.html"))
 var configFile, _ = ioutil.ReadFile("./secret/config.json")
-
-
 
 var (
 	googleOauthConfig = &oauth2.Config{
@@ -77,9 +66,38 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	r.ParseForm()
-	fmt.Println(r.Form)
+	submission := make(map[string]interface{})
+
+	// getting string values
+	submission["title"] = r.FormValue("title")
+	submission["description"] = r.FormValue("description")
+	submission["script"] = r.FormValue("script")
+	submission["deadline"] = r.FormValue("deadline")	
+	submission["gender"] = r.FormValue("gender")
+	submission["age"] = r.FormValue("age")
+	submission["traits"] = r.FormValue("traits")
+
+	// get picture
+	// r.ParseMultipartForm(32 << 20)
+ //  file, handler, err := r.FormFile("photo")
+ //  if err != nil {
+ //      fmt.Println(err)
+ //      return
+ //  }
+ //  defer file.Close()
+ //  fmt.Fprintf(w, "%v", handler.Header)
+ //  filepathname := "C:/Users/Theo/Pictures/theo_test"+handler.Filename
+ //  f, err := os.OpenFile(filepathname, os.O_WRONLY|os.O_CREATE, 0666)
+ //  if err != nil {
+ //      fmt.Println(err)
+ //      return
+ //  }
+ //  fmt.Println(filepathname)
+ //  defer f.Close()
+ //  io.Copy(f, file)
+
 	data["form"] = r.Form
+	data["submission"] = submission
 	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
 }
 
