@@ -13,7 +13,6 @@ import (
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
-	"io"
 )
 
 //A Page structure
@@ -187,7 +186,7 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r) // use this to retrieve current user session
 	s.Set("DisplayName", currentUser.Email)
 	s.Set("Email", currentUser.Email)
-	s.Set("ID", currentUser.ID.String())
+	s.Set("ID", currentUser.Id.String())
 	
 	
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
