@@ -9,12 +9,42 @@ buttons: #f8b72d #fce230 #53979c #36ced9
 media title bar: #86adb2
 Media title text: #eedd75*/
 
+@font-face {
+    font-family: sfEspressoShack;
+    src: url("/public/font/SF Espresso Shack.ttf");
+}
+
+@font-face {
+    font-family: sfEspressoShack;
+    src: url("/public/font/SF Espresso Shack.ttf");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: sfEspressoShack;
+    src: url("/public/font/SF Espresso Shack Italic.ttf");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: sfEspressoShack;
+    src: url("/public/font/SF Espresso Shack Bold Italic.ttf");
+    font-style: italic;
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: whitePine;
+    src: url("/public/font/WhitePine-Regular.otf");
+
+}
+
 .navbar, footer {
 	background-color: #1e223d;
 }
 
 .navbar-default .navbar-brand {
-    font-family: SF Espresso Shack;
+    font-family: sfEspressoShack;
     color: white;
     font-size: 24pt;
 }
@@ -29,7 +59,7 @@ Media title text: #eedd75*/
 }
 
 .navbar-default .navbar-nav>li>a {
-    font-family: SF Espresso Shack;
+    font-family: sfEspressoShack;
     vertical-align: middle;
 	color: #f6efc0;
 }
@@ -160,13 +190,13 @@ footer {
 
 label{
     color:#76a8cc;
-    font-family: White Pine; 
+    font-family: whitePine; 
 }
 
 .upload{
     color: #76a8cc;
     font-weight: bold;
-    font-family: White Pine;
+    font-family: whitePine;
 }
 
 input[type=text], input[type=number], input[type=date], textarea.form-control {
@@ -175,7 +205,7 @@ input[type=text], input[type=number], input[type=date], textarea.form-control {
 
 input[type=submit]{
     padding:10px 20px;
-    font-family:White Pine;
+    font-family:whitePine;
     color:white;
     font-size:2em;
     border-radius:5px;
