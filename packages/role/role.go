@@ -5,91 +5,109 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/sanjaysagarp/Co-Aud/packages/work"
+	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	"time"
 )
 
 //Contest struct
 type Contest struct {
-	ID bson.ObjectId `bson:"_id,omitempty"`
-	CreatedBy string
-	ShortDescription string
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Title string
 	Description string
 	ParticipatingTeams []Team
-	StartDate string
-	EndDate string
+	ImageUrl string
+	StartDate time.Time
+	EndDate time.Time
 }
 
 //Team struct
 type Team struct {
-	UserNames []work.Cast
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	UserNames []string
 	TeamName string
 }
 
 //Role struct - posting
 type Role struct {
-	ID bson.ObjectId `bson:"_id,omitempty"`
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
-	Username string
-	ShortDescription string
+	UserEmail string
+	Traits []string
 	Description string
+	Script string
+	TimeStamp time.Time
+	Deadline time.Time
 	Comment []Comment
-	VotesUp int
-	VotesDown int
+	Audition []Audition
+}
+
+//Comment struct - Maybe include audio clip
+type Audition struct {
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	UserEmail string
+	AttachmentUrl string
+	TimeStamp time.Time
+	Comment []Comment
 }
 
 //Comment struct - Maybe include audio clip
 type Comment struct {
-	Username string
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	UserEmail string
 	Message string
-	TimeStamp string
-	Replies []Comment
+	TimeStamp time.Time
 }
 
 //NewComment creates an instance of a new comment and returns it
 //TODO: FILL OUT FIELDS
-func NewComment(username string, message string, timeStamp, replies []Comment) *Comment {
+func NewComment(userEmail string, message string) *Comment {
 	return &Comment{
-		Username : username,
+		UserEmail : userEmail,
 		Message : message,
-		TimeStamp : timeStamp,
-		Replies : replies
+		TimeStamp : time.Now()
 	}
 }
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewRole(title string, username string, shortDescription string, comment []Comment, voteUp int, voteDown int) *Role {
+func NewRole(title string, userEmail string, description string, script string, deadline time, traits []string) *Role {
 	return &Role{
 		Title: title,
-		Username, username,
-		ShortDescription: shortDescription,
+		UserName: userEmail,
 		Description: description,
-		Comment: comment,
-		VotesUp: voteUp,
-		VotesDown: voteDown
+		Script: script,
+		TimeStamp: time.Now(),
+		Deadline: deadline,
+		Traits: traits
 	}
 }
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewTeam(usernames []work.Cast, teamName string) *Team {
+func NewTeam(userNames []string, teamName string) *Team {
 	return &Team{
-		usernames: usernames,
+		UserNames: userNames,
 		TeamName: teamName
+	}
+}
+
+func NewAudition(userEmail string, attachmentUrl string) *Team {
+	return &Team{
+		UserEmail: userEmail,
+		AttachmentUrl: attachmentUrl,
+		TimeStamp: time.Now()
 	}
 }
 
 //NewContest creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS 
-func NewContest(id bson.ObjectId, author string, sd string, d string, pt []Teams, start string, end string) *Contest {
+func NewContest(title string, description string, imageUrl string, endDate time) *Contest {
 	return &Contest{
-		ID: id,
-		CreatedBy: author,
-		ShortDescription: sd,
-		Description: d,
-		ParticipatingTeams: pt,
-		StartDate: start,
-		EndDate: end
+		Title: title,
+		Description: description,
+		ImageUrl: imageUrl,
+		StartDate: time.Now(),
+		EndDate: endDate
 	}
 }
 
@@ -106,11 +124,27 @@ func InsertComment(role *Role, comment *Comment) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("role")
 	
-	
-	
+
+	change := bson.M{"$set": bson.M{"Comment": role.Comment.append(comment)}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
+	//update role - add comment to slice
 }
-// https://gist.github.com/congjf/8035830
-// hm
+
+func InsertComment(audition *Audition, comment *Comment) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("audition")
+
+	//find audition
+	//update audition - add comment to slice	
+	change := bson.M{"$set": bson.M{"Comment": audition.Comment.append(comment)}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
+}
 
 //InsertContest inserts contest into db
 func InsertContest(contest *Contest) {
@@ -124,18 +158,15 @@ func InsertContest(contest *Contest) {
 	c := session.DB("CoAud").C("contest")
 
 	err = c.Insert(&Contest{
-		ID: contest.ID,
-		CreatedBy: contest.CreatedBy,
-		ShortDescription: contest.ShortDescription,
-		Description: contest.Description,
-		ParticipatingTeams: contest.ParticipatingTeams,
-		StartDate: contest.StartDate,
+		Title: contest.Title
+		Description: contest.Description
+		ImageUrl: contest.ImageUrl
+		StartDate: contest.StartDate
 		EndDate: contest.EndDate
 	})
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 //InsertRole inserts role into db
@@ -150,14 +181,13 @@ func InsertRole(role *Role) {
 	c := session.DB("CoAud").C("role")
 
 	err = c.Insert(&Role{
-		ID: role.ID,
 		Title: role.Title,
-		Username, role.Username,
-		ShortDescription: role.ShortDescription,
+		UserEmail: role.UserEmail,
 		Description: role.Description,
-		Comment: role.Comment,
-		VotesUp: role.VotesUp,
-		VotesDown: role.VotesDown
+		Script: role.Script,
+		TimeStamp: role.TimeStamp,
+		Deadline: role.Deadline,
+		Traits: role.Traits
 	})
 	if err != nil {
 		panic(err)

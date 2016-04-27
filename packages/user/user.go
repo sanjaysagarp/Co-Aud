@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 //User struct
 type User struct {
-	ID bson.ObjectId `bson:"_id,omitempty"`
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	DisplayName string
 	Username string
 	AboutMe string
@@ -19,12 +20,12 @@ type User struct {
 	TwitterURL string
 	ContestTeamNames []string
 	Email string
-	
+	JoinDate time.Time
 }
 
 //NewUser creates a new user after signed in with google
 func NewUser(email string, displayName string) *User{
-	return &User{Email: email, DisplayName: displayName}
+	return &User{Email: email, DisplayName: displayName, JoinDate: time.Now()}
 }
 
 //FindUser searches for the user
@@ -59,7 +60,7 @@ func InsertUser(user *User) {
 	
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("users")
-	err = c.Insert(&User{Email: user.Email, DisplayName: user.DisplayName})
+	err = c.Insert(&User{Email: user.Email, DisplayName: user.DisplayName, JoinDate: user.JoinDate})
 	
 	if err != nil {
 		log.Fatal(err)

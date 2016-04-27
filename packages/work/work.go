@@ -11,39 +11,37 @@ import (
 
 //Cast struct
 type Cast struct {
-	ID bson.ObjectId `bson:"_id,omitempty"`
-	UserID bson.ObjectId
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	UserID string
 	Role string
 }
 
 //Work struct defines a person's personal work
 type Work struct {
-	ID bson.ObjectId `bson:"_id,omitempty"`
+	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
 	URL string
 	ShortDescription string
 	Description string
 	Cast []Cast
-	PostedDate string
-	PostedTime string
-	AuthorID bson.ObjectId
+	PostedDate time.Time
+	UserEmail string
 }
 
 //NewWork creates a new instance of work
-func NewWork(title string, url string, shortDescription string, description string, cast []Cast, userID bson.ObjectId) *Work {
+func NewWork(title string, url string, shortDescription string, description string, cast []Cast, userEmail string) *Work {
 	return &Work{
 		Title: title,
 		URL: url,
 		ShortDescription: shortDescription,
 		Cast: cast,
-		PostedDate: time.Now().Date(),
-		PostedTime: time.Now().Clock(),
-		AuthorID: userID
+		PostedDate: time.Now(),
+		UserEmail: userEmail
 	}
 }
 
 //NewCast creates a new instance of cast
-func NewCast(userID bson.ObjectId, role string) *Cast {
+func NewCast(userID string, role string) *Cast {
 	return &Cast{UserID: userID, Role: role}
 }
 
@@ -58,7 +56,7 @@ func InsertWork(work *Work) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
 	err = c.Insert(&Work{Title: work.Title, URL: work.URL, ShortDescription: work.ShortDescription, Cast: work.Cast,
-												PostedDate: work.PostedDate, PostedTime, work.PostedTime, AuthorID: work.AuthorID})
+												PostedDate: work.PostedDate, PostedTime, work.PostedTime, UserEmail: work.UserEmail})
 	
 	if err != nil {
 		log.Fatal(err)
@@ -70,7 +68,7 @@ func InsertWork(work *Work) {
 		"\nCast: " + work.Cast +
 		"\nPosted Date: " + work.PostedDate +
 		"\nPosted Time: " + work.PostedTime +
-		"\nAuthorID: " + work.AuthorID)
+		"\nUserEmail: " + work.UserEmail)
 }
 
 //InsertCast inserts a new cast into a work
@@ -103,7 +101,7 @@ func FindCast(work *Work) []Cast{
 	c := session.DB("CoAud").C("works")
 	
 	result := &Cast[]
-	err = c.Find(bson.M{"ID": work.ID}).One(&result).Cast //<=============this should get the cast array from works
+	err = c.Find(bson.M{"Id": bson.ObjectIdHex(work.Id)}).One(&result).Cast //<=============this should get the cast array from works
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil
@@ -112,7 +110,7 @@ func FindCast(work *Work) []Cast{
 }
 
 //FindWorks finds works for all selected
-func FindWorks(userID bson.ObjectId) []Work{
+func FindWorks(userEmail string) []Work{
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -123,7 +121,7 @@ func FindWorks(userID bson.ObjectId) []Work{
 	c := session.DB("CoAud").C("works")
 	
 	result := &Work[]
-	err = c.Find(bson.M{"AuthorID": userID})
+	err = c.Find(bson.M{"UserEmail": userEmail})
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil
