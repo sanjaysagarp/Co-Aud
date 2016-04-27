@@ -123,7 +123,7 @@ func FindWorks(userID bson.ObjectId) []Work{
 	c := session.DB("CoAud").C("works")
 	
 	result := &Work[]
-	err = c.Find(bson.M{"AuthorID": userID})
+	err = c.Find(bson.M{"AuthorID": userID}).One(&result)
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil
@@ -143,7 +143,7 @@ func FindWorks(title string) []Work{
 	c := session.DB("CoAud").C("works")
 	
 	result := &Work[]
-	err = c.Find(bson.M{"Title": title})
+	err = c.Find(bson.M{"Title": title}).One(&result)
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil

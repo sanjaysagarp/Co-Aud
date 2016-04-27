@@ -13,7 +13,6 @@ import (
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
-	"io"
 )
 
 //A Page structure
