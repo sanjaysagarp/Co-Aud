@@ -34,7 +34,7 @@ type Role struct {
 	UserName string
 	Title string
 	UserEmail string
-	Traits string
+	Traits []string
 	Description string
 	Script string
 	TimeStamp time.Time
@@ -71,7 +71,7 @@ func NewComment(userEmail string, message string) *Comment {
 
 		//TimeStamp: time.Now(),
 		//Deadline: deadline,
-func NewRole(title string, userEmail string, description string, script string, traits string) *Role {
+func NewRole(title string, userEmail string, description string, script string, traits []string) *Role {
 	return &Role{Title: title, UserName: userEmail, Description: description, Script: script, Traits: traits}
 }
 
@@ -190,8 +190,9 @@ func InsertTeam(contest *Contest, team *Team) {
 	c := session.DB("CoAud").C("contest")
 	// Find contest, then insert into contest by contest name
 	
-	contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
-	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.ParticipatingTeams}}
+	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
+	//box.AddItem(item1)
+	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
 
 	err = c.Insert(&Team{UserNames: team.Username,TeamName: team.teamName})
@@ -202,8 +203,8 @@ func InsertTeam(contest *Contest, team *Team) {
 }
 
 func (contest *Contest) AddItem(team Team) []Team {
-    box.Items = append(box.Items, item)
-    return box.Items
+    contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
+    return contest.ParticipatingTeams
 }
 
 //FindRoles searches for all roles
