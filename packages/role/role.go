@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	//"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"time"
 )
 
@@ -31,9 +31,10 @@ type Team struct {
 //Role struct - posting
 type Role struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	UserName string
 	Title string
 	UserEmail string
-	Traits []string
+	Traits string
 	Description string
 	Script string
 	TimeStamp time.Time
@@ -62,25 +63,16 @@ type Comment struct {
 //NewComment creates an instance of a new comment and returns it
 //TODO: FILL OUT FIELDS
 func NewComment(userEmail string, message string) *Comment {
-	return &Comment{
-		UserEmail : userEmail,
-		Message : message,
-		TimeStamp : time.Now()
-	}
+	return &Comment{UserEmail : userEmail, Message : message, TimeStamp : time.Now()}
 }
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewRole(title string, userEmail string, description string, script string, deadline time, traits []string) *Role {
-	return &Role{
-		Title: title,
-		UserName: userEmail,
-		Description: description,
-		Script: script,
-		TimeStamp: time.Now(),
-		Deadline: deadline,
-		Traits: traits
-	}
+
+		//TimeStamp: time.Now(),
+		//Deadline: deadline,
+func NewRole(title string, userEmail string, description string, script string, traits string) *Role {
+	return &Role{Title: title, UserName: userEmail, Description: description, Script: script, Traits: traits}
 }
 
 //NewTeam creates an instance of a new role and returns it
@@ -99,30 +91,20 @@ func NewTeam(userNames []string, teamName string, contestId string) *Team {
 	err = c.Insert(team)
 	
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return team
 
 }
 
 func NewAudition(userEmail string, attachmentUrl string) *Audition {
-	return &Audition{
-		UserEmail: userEmail,
-		AttachmentUrl: attachmentUrl,
-		TimeStamp: time.Now()
-	}
+	return &Audition{UserEmail: userEmail, AttachmentUrl: attachmentUrl, TimeStamp: time.Now()}
 }
 
 //NewContest creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS 
-func NewContest(title string, description string, imageUrl string, endDate time) *Contest {
-	return &Contest{
-		Title: title,
-		Description: description,
-		ImageUrl: imageUrl,
-		StartDate: time.Now(),
-		EndDate: endDate
-	}
+func NewContest(title string, description string, imageUrl string, endDate time.Time) *Contest {
+	return &Contest{Title: title,Description: description,ImageUrl: imageUrl,StartDate: time.Now(),EndDate: endDate}
 }
 
 //InsertComment takes a role and inserts a comment into the role's comment array
@@ -140,11 +122,13 @@ func InsertComment(role *Role, comment *Comment) {
 	
 
 	change := bson.M{"$set": bson.M{"Comment": role.Comment.append(comment)}}
+	err = c.Insert(&Role{User: cast.User, Role: cast.Role})
+	
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
 	//update role - add comment to slice
 }
 
-func InsertComment(audition *Audition, comment *Comment) {
+func InsertComment1(audition *Audition, comment *Comment) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -171,13 +155,7 @@ func InsertContest(contest *Contest) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("contest")
 
-	err = c.Insert(&Contest{
-		Title: contest.Title
-		Description: contest.Description
-		ImageUrl: contest.ImageUrl
-		StartDate: contest.StartDate
-		EndDate: contest.EndDate
-	})
+	err = c.Insert(&Contest{Title: contest.Title, Description: contest.Description, ImageUrl: contest.ImageUrl, StartDate: contest.StartDate, EndDate: contest.EndDate})
 	if err != nil {
 		panic(err)
 	}
@@ -194,15 +172,7 @@ func InsertRole(role *Role) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("role")
 
-	err = c.Insert(&Role{
-		Title: role.Title,
-		UserEmail: role.UserEmail,
-		Description: role.Description,
-		Script: role.Script,
-		TimeStamp: role.TimeStamp,
-		Deadline: role.Deadline,
-		Traits: role.Traits
-	})
+	err = c.Insert(&Role{Title: role.Title,UserEmail: role.UserEmail,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits})
 	if err != nil {
 		panic(err)
 	}
@@ -220,18 +190,20 @@ func InsertTeam(contest *Contest, team *Team) {
 	c := session.DB("CoAud").C("contest")
 	// Find contest, then insert into contest by contest name
 	
+	contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
+	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.ParticipatingTeams}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
 
-	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.ParticipatingTeams.append(team)}}
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
-
-	err = c.Insert(&Team{
-		UserNames: team.Username,
-		TeamName: team.teamName
-	})
+	err = c.Insert(&Team{UserNames: team.Username,TeamName: team.teamName})
 	
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (contest *Contest) AddItem(team Team) []Team {
+    box.Items = append(box.Items, item)
+    return box.Items
 }
 
 //FindRoles searches for all roles
@@ -246,7 +218,7 @@ func FindRoles(role *Role) []Role {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 	result := []Role{}
-	err := c.Find(nil).All(&results)
+	err = c.Find(nil).All(&results)
 	if err != nil {
 		panic(err)
 	}
@@ -268,7 +240,7 @@ func FindSearchedRole(title string) Role {
 	result := Role{}
 	err = c.Find(bson.M{"Title": title}).One(&result)
 	if err != nil {
-		return nil
+		panic(err)
 	}
 	return result
 }
@@ -286,7 +258,7 @@ func FindContests(title string) []Contest {
 	c := session.DB("CoAud").C("contest")
 	
 	result := []Contest{}
-	err := c.Find(nil).All(&results)
+	err = c.Find(nil).All(&results)
 	if err != nil {
 		panic(err)
 	}
@@ -305,8 +277,9 @@ func FindSearchedContest(title string) []Contest {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("contest")
+	result := []Contest{}
 	err = c.Find(bson.M{"Title": title}).One(&result)
-	result := Contest{}
+	
 	
 	return result
 }

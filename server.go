@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	"github.com/sanjaysagarp/Co-Aud/packages/role"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
 )
@@ -150,6 +151,30 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
+func seanTestHands(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	submission := make(map[string]interface{})
+
+	submission["title"] = r.FormValue("title")
+	submission["description"] = r.FormValue("description")
+	submission["script"] = r.FormValue("script")
+	submission["deadline"] = r.FormValue("deadline")	
+	submission["gender"] = r.FormValue("gender")
+	submission["age"] = r.FormValue("age")
+	submission["traits"] = r.FormValue("traits")
+	
+
+	newRole := role.NewRole(submission["title"], "SeannyC", submission["description"] , submission["script"], submission["deadline"], submission["traits"])
+	role.InsertUser(newRole)
+	
+	currentRole := newRole
+
+	data["form"] = r.Form
+	data["submission"] = submission
+	display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+}
+
+
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
 	if state != oauthStateString {
@@ -235,7 +260,7 @@ func main() {
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
-
+	http.HandleFunc("/seanTest/", seanTestHands)
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)
