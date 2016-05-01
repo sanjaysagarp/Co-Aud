@@ -14,6 +14,10 @@ import (
 	"github.com/sanjaysagarp/Co-Aud/packages/role"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
+	"strings"
+	"time"
+  "reflect"
+  "strconv"
 )
 
 //A Page structure
@@ -65,17 +69,43 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
+	data := make(map[string]interface{})
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	data["currentUser"] = currentUser
 	submission := make(map[string]interface{})
 
+
+	fmt.Println(r.Form)
+
+// TESTING CASTING SUBMISSION ==============================================================================================================================
+	traits := strings.Split(r.FormValue("traits"), " ")
+
+  layout := "2006-01-02"
+
+	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	if err != nil {
+      fmt.Println(err)
+      return
+  }
+
+  age, err := strconv.Atoi(r.FormValue("age"))
+  if err != nil {
+      fmt.Println(err)
+      return
+  }
+	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"))
+	fmt.Println(newRole)
+	role.InsertRole(newRole)
 	// getting string values
 	submission["title"] = r.FormValue("title")
 	submission["description"] = r.FormValue("description")
 	submission["script"] = r.FormValue("script")
-	submission["deadline"] = r.FormValue("deadline")	
+	submission["deadline"] = deadline
 	submission["gender"] = r.FormValue("gender")
 	submission["age"] = r.FormValue("age")
-	submission["traits"] = r.FormValue("traits")
+	submission["traits"] = traits
+
 
 	// get picture
 	// r.ParseMultipartForm(32 << 20)
@@ -96,8 +126,18 @@ func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
  //  defer f.Close()
  //  io.Copy(f, file)
 
+// TESTING PROJECT SUBMISSION ===========================================
+	// newWork = work.NewWork(r.FormValue("title"), r.FormValue("url"), r.FormValue("shortDescription"), r.FormValue("description"), cast []Cast, data["currentUser"].Email)
+	// work.InsertWork(newWork)
+
+	// submission["castMember"] = r.FormValue("castMember")
+	// submission["castType"] = r.FormValue("castType")
+	
 	data["form"] = r.Form
 	data["submission"] = submission
+
+	// fmt.Println(submission)
+
 	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
 }
 
@@ -108,6 +148,12 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 
 func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	roleId := r.URL.Query().Get("id")
+	fmt.Println(roleId)
+	fmt.Println(reflect.TypeOf(roleId))
+	role := role.FindRole(roleId)
+	data["role"] = role
+	data["postedBy"] = user.FindUser(role.UserEmail).DisplayName
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
 
@@ -148,30 +194,11 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	roleList := role.FindRoles()
+	fmt.Println(roleList)
+	fmt.Println(reflect.TypeOf(roleList))
+	data["roles"] = roleList
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
-}
-
-func seanTestHands(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	submission := make(map[string]interface{})
-
-	submission["title"] = r.FormValue("title")
-	submission["description"] = r.FormValue("description")
-	submission["script"] = r.FormValue("script")
-	submission["deadline"] = r.FormValue("deadline")	
-	submission["gender"] = r.FormValue("gender")
-	submission["age"] = r.FormValue("age")
-	submission["traits"] = r.FormValue("traits")
-	
-
-	newRole := role.NewRole(submission["title"], "SeannyC", submission["description"] , submission["script"], submission["deadline"], submission["traits"])
-	role.InsertUser(newRole)
-	
-	currentRole := newRole
-
-	data["form"] = r.Form
-	data["submission"] = submission
-	display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
 }
 
 
@@ -260,7 +287,7 @@ func main() {
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
-	http.HandleFunc("/seanTest/", seanTestHands)
+
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)

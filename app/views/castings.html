@@ -1,10 +1,12 @@
 {{define "castings"}}
 {{template "header" .}}
+{{if .Data.currentUser}}
 <div class="search-side-nav">
 	<div data-spy="affix" data-offset-top="200px" data-offset-bottom="200px">
 		<a href="/submitCasting/" class="btn btn-lg btn-default">SUBMIT</a>
 	</div>
 </div>
+{{end}}
 <div class="container">
 	<div class="row">
 		<div class="col-lg-12">
@@ -20,6 +22,14 @@
   </div>	
   <hr>
 	<div class="row">
+		{{ range .Data.roles }}
+			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
+				<a href="/role/?id={{ .Id.Hex }}">
+					<h2>{{ .Title }}</h2>
+					<img class="img-responsive" src="/public/img/placeholder.png">
+				</a>
+			</div>
+		{{ end }}<!-- 
 		<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 			<a href="/role/">
 				<h2>Role 1</h2>
@@ -91,7 +101,7 @@
 				<h2>Role 3</h2>
 				<img class="img-responsive" src="/public/img/placeholder.png">
 			</a>
-		</div>
+		</div> -->
 	</div>
 	<nav class=text-center>
 	  <ul class="pagination">
