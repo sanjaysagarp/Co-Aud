@@ -1,47 +1,57 @@
 {{define "editProfile"}}
 {{template "header" .}}
+<script src="/public/js/editProfile.js"></script>
 <div class="container">
 	<div class="row">
 		<div class="col-md-4">
 			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
-			<h1>Phil Slug</h1>
-			<h3>(Phlugger)</h3>
+			<h1>{{.Data.currentUser.DisplayName}}</h1>
+			<h3>({{.Data.currentUser.Email}})</h3>
 			<form action="test.asp">
 				<label> </label>	
 				<input type="file" name="pic" accept="image/*">
-			<!--</form>	-->
+			</form>	
 			<hr>
-			<p>Animator</p>
+			<p>{{.Data.currentUser.Title}}</p>
 			<p>Member for 2 months</p>
 		</div>
 		<div class="col-md-8">
 			<h1>Edit Profile</h1>
-				<!--<form>-->
-					<div class="form-group">
-						<label>Name</label>
-						<input type="text" class="form-control" id="name">
-					</div>
+				<form action="/api/v1/updateUser/" method="POST">
 					<div class="form-group">
 						<label>Display Name</label>
-						<input type="text" class="form-control" id="displayName">
+						<input type="text" class="form-control" name="displayName" value="{{.Data.currentUser.DisplayName}}">
 					</div>
 					<div class="form-group">
-						<label>Role</label>
-						<input type="text" class="form-control" id="role">
+						<labe>Title</label>
+						<input type="text" class="form-control" name="title" value="{{.Data.currentUser.Title}}">
 					</div>
 					<div class="form-group">
 						<label>Personal Website</label>
-						<input type="text" class="form-control" id="personalWebsite" placeholder="URL...">
+						<input type="text" class="form-control" name="personalWebsite" placeholder="URL..." value="{{.Data.currentUser.PersonalWebsite}}">
 					</div>
 					<div class="form-group">
 						<label>About Me:</label>
-						<input type="text" class="form-control" id="aboutMe" style="length: 300px;">
+						<textarea name="aboutMe" rows="4" class="form-control">{{.Data.currentUser.AboutMe}}</textarea>
+						
 					</div>
-					
-					<button type="submit" class="btn btn-default">Submit</button>
+					<div class="form-group">
+						<label>Facebook URL</label>
+						<input type="text" class="form-control" name="facebookURL" placeholder="URL..." value="{{.Data.currentUser.FacebookURL}}">
+					</div>
+					<div class="form-group">
+						<label>Twitter URL</label>
+						<input type="text" class="form-control" name="twitterURL" placeholder="URL..." value="{{.Data.currentUser.TwitterURL}}">
+					</div>
+					<div class="form-group">
+						<label>Instagram URL</label>
+						<input type="text" class="form-control" name="instagramURL" placeholder="URL..." value="{{.Data.currentUser.InstagramURL}}">
+					</div>
+					<button type="submit" class="btn btn-default" id="updateButton">Submit</button>
 			</form>
 		</div>
 	</div>
+	<div id="notification"></div>
 </div>
 
 {{template "footer" .}}

@@ -222,8 +222,6 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 	
-	
-	
 	var gUser GoogleUser
 	json.Unmarshal(contents, &gUser)
 	
@@ -238,10 +236,34 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r) // use this to retrieve current user session
 	s.Set("DisplayName", currentUser.Email)
 	s.Set("Email", currentUser.Email)
-	s.Set("ID", currentUser.Id.String())
+	s.Set("ID", currentUser.Id.Hex()) //gives hex value of id for access
 	
 	
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	s.Destroy(w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+func updateUserHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	//need to get form fields web page
+	err := r.ParseForm()
+    if err != nil {
+        log.Printf("%s", err)      
+    }
+	
+	//create a new user struct
+	editedUser := user.NewChangeUser(r.FormValue("displayName"), r.FormValue("title"), r.FormValue("aboutMe"), r.FormValue("personalWebsite"),  r.FormValue("facebookURL"), r.FormValue("twitterURL"), r.FormValue("instagramURL"))
+	
+	user.UpdateUser(s.Get("ID"), editedUser)
+	
+	//need to write to page for ajax call
+	w.Write([]byte("updated"))
 	
 }
 
@@ -250,6 +272,11 @@ func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	data["currentUser"] = currentUser
+	if(currentUser != nil) {
+		s.Set("DisplayName", currentUser.Email)
+		s.Set("Email", currentUser.Email)
+		s.Set("ID", currentUser.Id.Hex()) 
+	}
 	return data
 }
 
@@ -278,7 +305,7 @@ func main() {
 	http.HandleFunc("/profile/", profileHandler)
 	http.HandleFunc("/role/", rolePageHandler)
 	http.HandleFunc("/projects/", projectsHandler)
-	http.HandleFunc("/editProfile/", editProfileHandler)
+	http.HandleFunc("/profile/edit/", editProfileHandler)
 	http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/addWork/", addWorkHandler)
 	http.HandleFunc("/contestMain/", contestMainHandler)
@@ -287,6 +314,10 @@ func main() {
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
+	http.HandleFunc("/logout/", logoutHandler)
+	
+	//update handlers
+	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
