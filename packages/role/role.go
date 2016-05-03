@@ -72,8 +72,8 @@ func NewComment(userEmail string, message string) *Comment {
 
 		//TimeStamp: time.Now(),
 		//Deadline: deadline,
-func NewRole(title string, userEmail string, description string, script string, deadline time.Time, traits []string, age int, gender string) *Role {
-	return &Role{Title: title, UserEmail: userEmail, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender}
+func NewRole(title string, userEmail string, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId) *Role {
+	return &Role{Title: title, UserEmail: userEmail, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, Id: id}
 }
 
 //NewTeam creates an instance of a new role and returns it
@@ -174,7 +174,7 @@ func InsertRole(role *Role) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 
-	err = c.Insert(&Role{Title: role.Title,UserEmail: role.UserEmail,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits, Gender: role.Gender, Age: role.Age})
+	err = c.Insert(&Role{Title: role.Title,UserEmail: role.UserEmail,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits, Gender: role.Gender, Age: role.Age, Id: role.Id})
 	if err != nil {
 		panic(err)
 	}
@@ -228,9 +228,26 @@ func FindRoles() []Role {
 	return result
 }
 
+func FindRolesByUserEmail(userEmail string) []Role {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("roles")
+	result := []Role{}
+	err = c.Find(bson.M{"useremail": userEmail}).All(&result)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
 //FindRole searches for the selected role
 //TODO: query db for roles and add to result, then return roles
-func FindRole(id string) Role {
+func FindRole(id string) *Role {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -240,10 +257,10 @@ func FindRole(id string) Role {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 	
-	result := Role{}
-	fmt.Println(bson.ObjectIdHex(id))
+	result := &Role{}
 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 	if err != nil {
+		fmt.Println("Role not found")
 		panic(err)
 	}
 	return result

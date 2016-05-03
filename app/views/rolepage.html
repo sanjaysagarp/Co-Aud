@@ -3,7 +3,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-3">
-			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+			<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
 		</div>
 		<div class="col-md-6">
 			<h2>{{ .Data.role.Title }}</h2>
@@ -17,7 +17,9 @@
 		</div>
 		<div class="col-md-3">
 			<p><strong>Posted by:</strong></p>
-			<p>{{ .Data.postedBy }}</p>
+			<a href="/profile/?id={{.Data.author.Id.Hex}}">
+				<p>{{ .Data.author.DisplayName }}</p>
+			</a>
 			<p><strong>Deadline:</strong></p>
 			<p>{{ .Data.role.Deadline }}</p>
 		</div>

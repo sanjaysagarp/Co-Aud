@@ -56,6 +56,25 @@ func FindUser(email string) *User {
 	return result
 }
 
+//FindUser searches for the user
+func FindUserById(id string) *User {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("users")
+	
+	result := &User{}
+	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
+	if err != nil {
+		fmt.Println("User not found")
+		return nil
+	}
+	return result
+}
+
 //InsertUser adds the user to the db
 func InsertUser(user *User) {
 	session, err := mgo.Dial("127.0.0.1:27018")

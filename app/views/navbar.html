@@ -21,8 +21,8 @@
           <li ><a href="/contestMain/"><span class="glyphicon glyphicon-glass"></span> Contest</a></li>
         </ul>
         {{if .Data.currentUser}}
-        <a href="/logout" class="navbar-link navbar-right">Log out</a>
-        <a href="/profile" class="navbar-link navbar-right"><img class="img-circle img-profile" src="/public/img/default_profile_pic.png"><span>{{.Data.currentUser.DisplayName}}</span></a>
+        <a href="/logout" id="logout" class="navbar-link navbar-right">Log out</a>
+        <a href="/profile/?id={{ .Data.currentUser.Id.Hex }}" class="navbar-link navbar-right"><img class="img-circle img-profile" src="/public/img/default_profile_pic.png"><span>{{.Data.currentUser.DisplayName}}</span></a>
         
         {{else}}
         <a href="/login" type="button" class="btn btn-default navbar-btn navbar-right google-signin-btn">Sign in with Google</a>

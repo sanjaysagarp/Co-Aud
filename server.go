@@ -16,8 +16,9 @@ import (
 	"fmt"
 	"strings"
 	"time"
-  "reflect"
-  "strconv"
+	"reflect"
+	"strconv"
+	"gopkg.in/mgo.v2/bson"
 )
 
 //A Page structure
@@ -69,42 +70,42 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
-	data := make(map[string]interface{})
-	s := redis_session.Session(w, r)
-	currentUser := user.FindUser(s.Get("Email"))
-	data["currentUser"] = currentUser
-	submission := make(map[string]interface{})
+// 	data := make(map[string]interface{})
+// 	s := redis_session.Session(w, r)
+// 	currentUser := user.FindUser(s.Get("Email"))
+// 	data["currentUser"] = currentUser
+// 	submission := make(map[string]interface{})
 
 
-	fmt.Println(r.Form)
+// 	fmt.Println(r.Form)
 
-// TESTING CASTING SUBMISSION ==============================================================================================================================
-	traits := strings.Split(r.FormValue("traits"), " ")
+// // TESTING CASTING SUBMISSION ==============================================================================================================================
+// 	traits := strings.Split(r.FormValue("traits"), " ")
 
-  layout := "2006-01-02"
+//   	layout := "2006-01-02"
 
-	deadline, err := time.Parse(layout, r.FormValue("deadline"))
-	if err != nil {
-      fmt.Println(err)
-      return
-  }
+// 	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+// 	if err != nil {
+//       fmt.Println(err)
+//       return
+//  	 }
 
-  age, err := strconv.Atoi(r.FormValue("age"))
-  if err != nil {
-      fmt.Println(err)
-      return
-  }
-	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"))
-	fmt.Println(newRole)
-	role.InsertRole(newRole)
-	// getting string values
-	submission["title"] = r.FormValue("title")
-	submission["description"] = r.FormValue("description")
-	submission["script"] = r.FormValue("script")
-	submission["deadline"] = deadline
-	submission["gender"] = r.FormValue("gender")
-	submission["age"] = r.FormValue("age")
-	submission["traits"] = traits
+//   	age, err := strconv.Atoi(r.FormValue("age"))
+//   	if err != nil {
+//       fmt.Println(err)
+//       return
+//   	}
+// 	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"))
+// 	fmt.Println(newRole)
+// 	role.InsertRole(newRole)
+// 	// getting string values
+// 	submission["title"] = r.FormValue("title")
+// 	submission["description"] = r.FormValue("description")
+// 	submission["script"] = r.FormValue("script")
+// 	submission["deadline"] = deadline
+// 	submission["gender"] = r.FormValue("gender")
+// 	submission["age"] = r.FormValue("age")
+// 	submission["traits"] = traits
 
 
 	// get picture
@@ -133,27 +134,30 @@ func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
 	// submission["castMember"] = r.FormValue("castMember")
 	// submission["castType"] = r.FormValue("castType")
 	
-	data["form"] = r.Form
-	data["submission"] = submission
+	// data["form"] = r.Form
+	// data["submission"] = submission
 
-	// fmt.Println(submission)
+	// // fmt.Println(submission)
 
-	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
+	// display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	display(w, "profile", &Page{Title: "Profile", Data: data})
+	userID := r.URL.Query().Get("id")
+	user := user.FindUserById(userID)
+	postedRoles := role.FindRolesByUserEmail(user.Email)
+	data["user"] = user
+	data["postedRoles"] = postedRoles
+	display(w, "profile", &Page{Title: user.DisplayName, Data: data})
 }
 
 func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	roleId := r.URL.Query().Get("id")
-	fmt.Println(roleId)
-	fmt.Println(reflect.TypeOf(roleId))
-	role := role.FindRole(roleId)
+	roleID := r.URL.Query().Get("id")
+	role := role.FindRole(roleID)
 	data["role"] = role
-	data["postedBy"] = user.FindUser(role.UserEmail).DisplayName
+	data["author"] = user.FindUser(role.UserEmail)
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
 
@@ -185,6 +189,40 @@ func contestMainHandler(w http.ResponseWriter, r *http.Request) {
 func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	display(w, "submitCasting", &Page{Title: "Submit Casting", Data: data})
+}
+
+func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+
+	fmt.Println(r.Form)
+
+	// converting data to valid format
+	traits := strings.Split(r.FormValue("traits"), " ")
+
+  	layout := "2006-01-02"
+
+	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	if err != nil {
+      fmt.Println(err)
+      return
+ 	 }
+
+  	age, err := strconv.Atoi(r.FormValue("age"))
+  	if err != nil {
+      fmt.Println(err)
+      return
+  	}
+	  
+	// adding new role into db
+	roleID := bson.NewObjectId()
+	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
+	role.InsertRole(newRole)
+
+	urlParts := []string{"/role/?id=", roleID.Hex()}
+	url := strings.Join(urlParts, "")
+	// redirect to role page
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -318,6 +356,7 @@ func main() {
 	
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
+	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
