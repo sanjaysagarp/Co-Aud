@@ -15,7 +15,12 @@ import (
 	"github.com/sanjaysagarp/Co-Aud/packages/work"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
-	//"strings"
+	"strings"
+	"time"
+	"math"
+	// "reflect"
+	"strconv"
+	"gopkg.in/mgo.v2/bson"
 )
 
 //A Page structure
@@ -67,49 +72,27 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	submission := make(map[string]interface{})
 
-	// getting string values
-	submission["title"] = r.FormValue("title")
-	submission["description"] = r.FormValue("description")
-	submission["script"] = r.FormValue("script")
-	submission["deadline"] = r.FormValue("deadline")	
-	submission["gender"] = r.FormValue("gender")
-	submission["age"] = r.FormValue("age")
-	submission["traits"] = r.FormValue("traits")
-
-	// get picture
-	// r.ParseMultipartForm(32 << 20)
- //  file, handler, err := r.FormFile("photo")
- //  if err != nil {
- //      fmt.Println(err)
- //      return
- //  }
- //  defer file.Close()
- //  fmt.Fprintf(w, "%v", handler.Header)
- //  filepathname := "C:/Users/Theo/Pictures/theo_test"+handler.Filename
- //  f, err := os.OpenFile(filepathname, os.O_WRONLY|os.O_CREATE, 0666)
- //  if err != nil {
- //      fmt.Println(err)
- //      return
- //  }
- //  fmt.Println(filepathname)
- //  defer f.Close()
- //  io.Copy(f, file)
-
-	data["form"] = r.Form
-	data["submission"] = submission
-	display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	display(w, "profile", &Page{Title: "Profile", Data: data})
+	userID := r.URL.Query().Get("id")
+	user := user.FindUserById(userID)
+	postedRoles, rolesCount := role.FindRoles(bson.M{"useremail": user.Email}, 0, 3)
+	data["user"] = user
+	data["postedRoles"] = postedRoles
+	data["rolesCount"] = rolesCount
+	display(w, "profile", &Page{Title: user.DisplayName, Data: data})
 }
 
 func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	roleID := r.URL.Query().Get("id")
+	role := role.FindRole(roleID)
+	data["role"] = role
+	data["author"] = user.FindUser(role.UserEmail)
+	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
 
@@ -143,6 +126,40 @@ func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "submitCasting", &Page{Title: "Submit Casting", Data: data})
 }
 
+func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+
+	fmt.Println(r.Form)
+
+	// converting data to valid format
+	traits := strings.Split(r.FormValue("traits"), " ")
+
+  	layout := "2006-01-02"
+
+	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	if err != nil {
+      fmt.Println(err)
+      return
+ 	 }
+
+  	age, err := strconv.Atoi(r.FormValue("age"))
+  	if err != nil {
+      fmt.Println(err)
+      return
+  	}
+	  
+	// adding new role into db
+	roleID := bson.NewObjectId()
+	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
+	role.InsertRole(newRole)
+
+	urlParts := []string{"/role/?id=", roleID.Hex()}
+	url := strings.Join(urlParts, "")
+	// redirect to role page
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -150,6 +167,29 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	roleAmount := 16
+	
+	//pagination
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
+	data["currentPage"] = pageNumber
+	if err != nil {
+		fmt.Println(err)
+	}
+	//zero index page number for skip calculation when querying mongo
+	if pageNumber != 0 {
+		pageNumber --
+	}
+	//get roles
+	roleList, rolesCount := role.FindRoles(nil, (pageNumber)*roleAmount, roleAmount)
+	
+	//get max page number
+	maxPage := int(math.Ceil(float64(rolesCount)/float64(roleAmount)))
+	
+	data["roles"] = roleList
+	data["rolesCount"] = rolesCount
+	data["roleAmount"] = roleAmount
+	data["maxPage"] = maxPage
+	
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
@@ -183,6 +223,9 @@ func seanTestHands(w http.ResponseWriter, r *http.Request) {
 }
 
 
+// INFINITE SCROLL STUFF GOES HERE; NOT COMPLETE
+// func getMoreCastingsHandler()
+
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
 	if state != oauthStateString {
@@ -203,8 +246,6 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 	
-	
-	
 	var gUser GoogleUser
 	json.Unmarshal(contents, &gUser)
 	
@@ -219,18 +260,66 @@ func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r) // use this to retrieve current user session
 	s.Set("DisplayName", currentUser.Email)
 	s.Set("Email", currentUser.Email)
-	s.Set("ID", currentUser.Id.String())
+	s.Set("ID", currentUser.Id.Hex()) //gives hex value of id for access
 	
 	
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	
 }
 
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	s.Destroy(w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+func updateUserHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	//need to get form fields web page
+	err := r.ParseForm()
+    if err != nil {
+        log.Printf("%s", err)      
+    }
+	
+	//create a new user struct
+	editedUser := user.NewChangeUser(r.FormValue("displayName"), r.FormValue("title"), r.FormValue("aboutMe"), r.FormValue("personalWebsite"),  r.FormValue("facebookURL"), r.FormValue("twitterURL"), r.FormValue("instagramURL"))
+	
+	user.UpdateUser(s.Get("ID"), editedUser)
+	
+	//need to write to page for ajax call
+	w.Write([]byte("updated"))
+	
+}
+
+func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	
+	collection := r.FormValue("collection")
+	message := r.FormValue("content")
+	roleID := r.FormValue("id")
+	
+	
+	newComment := role.NewComment(currentUser, message)
+	curRole := role.FindRole(roleID)
+
+	role.InsertComment(curRole.Comment, newComment, collection, curRole.Id.Hex())
+	
+	w.Write([]byte("updated"))
+
+}
+
 func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
 	data := make(map[string]interface{})
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
+	
 	data["currentUser"] = currentUser
+	if(currentUser != nil) {
+		s.Set("DisplayName", currentUser.Email)
+		s.Set("Email", currentUser.Email)
+		s.Set("ID", currentUser.Id.Hex()) 
+	}
 	return data
 }
 
@@ -246,8 +335,6 @@ func main() {
 	}
 	
 	redis_session = temp_sess
-	
-	
 	rootdir, err := os.Getwd()
 	if err != nil {
 		rootdir = "no directory found"
@@ -258,7 +345,7 @@ func main() {
 	http.HandleFunc("/profile/", profileHandler)
 	http.HandleFunc("/role/", rolePageHandler)
 	http.HandleFunc("/projects/", projectsHandler)
-	http.HandleFunc("/editProfile/", editProfileHandler)
+	http.HandleFunc("/profile/edit/", editProfileHandler)
 	http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/addWork/", addWorkHandler)
 	http.HandleFunc("/contestMain/", contestMainHandler)
@@ -267,7 +354,13 @@ func main() {
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
-	http.HandleFunc("/seanTest/", seanTestHands)
+	http.HandleFunc("/logout/", logoutHandler)
+	
+	//update handlers
+	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
+	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
+	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
+
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)

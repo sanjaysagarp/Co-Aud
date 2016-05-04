@@ -1,158 +1,211 @@
 {{define "rolepage"}}
 {{template "header" .}}
+<script src="/public/js/submitComment.js"></script>
 <div class="container">
 	<div class="row">
 		<div class="col-md-3">
-			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
-			<h2 class="text-center">Grumpy Joe</h2>
+			<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
 		</div>
 		<div class="col-md-6">
-			<h2>Character Bio</h2>
-			<p> Age: 67
- Gender: Male
- Traits: Grumpy, Crazy, Sophisticated
- Bio: Lorem ipsum dolor sit amet, consectetur adipiscing</p>
+			<h2>{{ .Data.role.Title }}</h2>
+			<ul> 
+				<li>Age: {{ .Data.role.Age }}</li>
+				<li>Gender: {{ .Data.role.Gender }}</li>
+				<li>Traits: {{ .Data.role.Traits }}</li>
+				<li>Description: {{ .Data.role.Description }}</li>
+				<li>Script: {{ .Data.role.Script }}</li>
+			</ul>
 		</div>
 		<div class="col-md-3">
 			<p><strong>Posted by:</strong></p>
-			<p>GrumpyAnimation</p>
+			<a href="/profile/?id={{.Data.author.Id.Hex}}">
+				<p>{{ .Data.author.DisplayName }}</p>
+			</a>
 			<p><strong>Deadline:</strong></p>
-			<p>March 14th, 2016 @ 6pm</p>
-			<p><strong>Download Script:</strong></p>
-			<p><a href="!">grumpyjoe-script.pdf</a></p>
+			<p>{{ .Data.role.Deadline }}</p>
 		</div>
 	</div>
 
 	<br>
-
-	<form class="form-horizontal">
-		<div class="form-group">
-	    <label class="col-md-2 control-label" for="uploadInput">Audition:</label>
-    	<div class="col-md-8">
-	    	<input type="text" class="form-control" id="uploadInput" placeholder="Choose File" readonly>
-	    </div>	
-	    <div class="col-md-2">	
-	    	<button type="submit" class="btn btn-default">Upload</button>
-	    </div>	
-	  </div>
-	</form>
-
-	<hr>
-
-	<ul class="audition-section media-list">
-	  <li class="audition media">
-	    <div class="media-left">
-	      <a href="/profile/">
-	        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-	      </a>
-	    </div>
-	    <div class="media-body">
-	      <h4 class="media-heading">Interested Person</h4>
-	      <p>Attempt3.mp3
-	      	<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
-	      	<span class="pull-right">234</span>
-	      </p>
-	      <audio controls>
-					<source src="http://hydra-media.cursecdn.com/dota2.gamepedia.com/7/75/Snip_kill_14.mp3" type="audio/mpeg">
-				</audio>
-				<ul class="comment-section media-list">
-				  <li class="media">
-				    <div class="comment-posted media-left">
-				      <a href="/profile/">
-				        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-				      </a>
-				    </div>
-				    <div class="media-body">
-				      <h4 class="media-heading">Critic</h4>
-				      <p>great job! this is pretty awesome yeyeye</p>
-				    </div>
-				  </li>
-				  <li class="comment-posted media">
-				    <div class="media-left">
-				      <a href="/profile/">
-				        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-				      </a>
-				    </div>
-				    <div class="media-body">
-				      <h4 class="media-heading">Critic</h4>
-				      <p>great job! this is pretty awesome yeyeye</p>
-				    </div>
-				  </li>
-				  <li class="comment-submission media">
-				    <div class="media-left">
-				      <a href="/profile/">
-				        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-				      </a>
-				    </div>
-				    <div class="media-body">
-				      <form>
-				      	<textarea class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
-				      	<button type="submit" class="btn btn-default pull-right">Post</button>
-				      	<button type="submit" class="btn btn-default pull-right">Cancel</button>
-				      </form>
-				    </div>
-				  </li>
-				</ul>
-	    </div>
-	  </li>
+	
+	<ul class="nav nav-tabs">
+		<li class="active"><a data-toggle="tab" href="#auditions">Auditions</a></li>
+		<li><a data-toggle="tab" href="#comments">Comments</a></li>
 	</ul>
-	<ul class="audition-section media-list">
-	  <li class="audition media">
-	    <div class="media-left">
-	      <a href="/profile/">
-	        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-	      </a>
-	    </div>
-	    <div class="media-body">
-	      <h4 class="media-heading">Interested Person</h4>
-	      <p>Attempt3.mp3
-	      	<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
-	      	<span class="pull-right">234</span>
-	      </p>
-	      <audio controls>
-					<source src="http://hydra-media.cursecdn.com/dota2.gamepedia.com/7/75/Snip_kill_14.mp3" type="audio/mpeg">
-				</audio>
-				<ul class="comment-section media-list">
-				  <li class="media">
-				    <div class="comment-posted media-left">
-				      <a href="/profile/">
-				        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-				      </a>
-				    </div>
-				    <div class="media-body">
-				      <h4 class="media-heading">Critic</h4>
-				      <p>great job! this is pretty awesome yeyeye</p>
-				    </div>
-				  </li>
-				  <li class="comment-posted media">
-				    <div class="media-left">
-				      <a href="/profile/">
-				        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-				      </a>
-				    </div>
-				    <div class="media-body">
-				      <h4 class="media-heading">Critic</h4>
-				      <p>great job! this is pretty awesome yeyeye</p>
-				    </div>
-				  </li>
-				  <li class="comment-submission media">
-				    <div class="media-left">
-				      <a href="/profile/">
-				        <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-				      </a>
-				    </div>
-				    <div class="media-body">
-				      <form>
-				      	<textarea class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
-				      	<button type="submit" class="btn btn-default pull-right">Post</button>
-				      	<button type="submit" class="btn btn-default pull-right">Cancel</button>
-				      </form>
-				    </div>
-				  </li>
-				</ul>
-	    </div>
-	  </li>
-	</ul>
+
+	<div class="tab-content">
+		<!--Audition section-->
+		<div id="auditions" class="tab-pane fade in active">
+			{{if .Data.currentUser}}
+				<form class="role-form form-horizontal">
+					<div class="form-group">
+						<label class="col-md-2 control-label" for="uploadInput">Your audition:</label>
+						<div class="col-md-8">
+							<input type="text" class="form-control" id="uploadInput" placeholder="Choose File" readonly>
+						</div>	
+						<div class="col-md-2">	
+							<button type="submit" class="btn btn-default">Upload</button>
+						</div>	
+					</div>
+				</form>
+			{{end}}
+			<ul class="audition-section media-list">
+				<li class="audition media">
+					<div class="media-left">
+						<a href="/profile/">
+							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+						</a>
+					</div>
+					<div class="media-body">
+						<h4 class="media-heading">Interested Person</h4>
+						<p>Attempt3.mp3
+							<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
+							<span class="pull-right">234</span>
+						</p>
+						<audio controls>
+							<source src="http://hydra-media.cursecdn.com/dota2.gamepedia.com/7/75/Snip_kill_14.mp3" type="audio/mpeg">
+						</audio>
+						<ul class="comment-section media-list">
+							<li class="comment-posted media">
+								<div class="media-left">
+									<a href="/profile/">
+										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+									</a>
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">Critic</h4>
+									<p>great job! this is pretty awesome yeyeye</p>
+								</div>
+							</li>
+							<li class="comment-posted media">
+								<div class="media-left">
+									<a href="/profile/">
+										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+									</a>
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">Critic</h4>
+									<p>great job! this is pretty awesome yeyeye</p>
+								</div>
+							</li>
+							<li class="comment-submission media">
+								<div class="media-left">
+									<a href="/profile/">
+										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+									</a>
+								</div>
+								<div class="media-body">
+									<form>
+										<textarea class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
+										<button type="submit" class="btn btn-default pull-right">Post</button>
+										<button type="submit" class="btn btn-default pull-right">Cancel</button>
+									</form>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			<ul class="audition-section media-list">
+				<li class="audition media">
+					<div class="media-left">
+						<a href="/profile/">
+							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+						</a>
+					</div>
+					<div class="media-body">
+						<h4 class="media-heading">Interested Person</h4>
+						<p>Attempt3.mp3
+							<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
+							<span class="pull-right">234</span>
+						</p>
+						<audio controls>
+							<source src="http://hydra-media.cursecdn.com/dota2.gamepedia.com/7/75/Snip_kill_14.mp3" type="audio/mpeg">
+						</audio>
+						<ul class="comment-section media-list">
+							<li class="media">
+								<div class="comment-posted media-left">
+									<a href="/profile/">
+										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+									</a>
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">Critic</h4>
+									<p>great job! this is pretty awesome yeyeye</p>
+								</div>
+							</li>
+							<li class="comment-posted media">
+								<div class="media-left">
+									<a href="/profile/">
+										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+									</a>
+								</div>
+								<div class="media-body">
+									<h4 class="media-heading">Critic</h4>
+									<p>great job! this is pretty awesome yeyeye</p>
+								</div>
+							</li>
+							<li class="comment-submission media">
+								<div class="media-left">
+									<a href="/profile/">
+										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+									</a>
+								</div>
+								<div class="media-body">
+									<form>
+										<textarea class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
+										<button type="submit" class="btn btn-default pull-right">Post</button>
+										<button type="submit" class="btn btn-default pull-right">Cancel</button>
+									</form>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+		
+		
+		<!--Comment section-->
+		<div id="comments" class="tab-pane fade">
+			{{if .Data.currentUser}}
+				<div class="role-form comment-submission media">
+					<div class="media-left">
+						<a href="/profile/?id={{.Data.currentUser.Id.Hex}}">
+							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+						</a>
+					</div>
+					<div class="media-body">
+						<form>
+							<textarea name="roleCommentContent" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
+							<button id="roleCommentButton" type="submit" class="btn btn-default pull-right" data-id="{{ .Data.role.Id.Hex }}">Post</button>
+						</form>
+					</div>
+				</div>
+			{{end}}
+			
+			<ul class="comment-section media-list">
+				{{ range .Data.role.Comment }}
+					<li class="comment-posted media">
+						<div class="media-left">
+							<a href="/profile/?id={{.User.Id.Hex}}">
+								<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+							</a>
+						</div>
+						<div class="media-body">
+							<a href="/profile/?id={{.User.Id.Hex}}"><h4 class="media-heading">{{ .User.DisplayName }}</h4></a>
+							<p>{{ .Message }}</p>
+						</div>
+					</li>
+				{{ end }}
+			</ul>
+		</div>
+	</div>
+	
+	<br>
+
+	<!--testing purposes-->
+	<div id="notification"></div>
 </div>
 {{template "footer" .}}
 {{end}}

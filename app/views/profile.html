@@ -1,55 +1,77 @@
 {{define "profile"}}
 {{template "header" .}}
-<div class="container">
-	<div class="row">
-		<div class="col-md-4">
-			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
-			<h1>AnnieMation</h1>
-			<h3>(Annie Maylor)</h3>
-			<hr>
-			<p>Animator</p>
-			<p>member for 2 months</p>
-			<div class="user-contacts row">
-				<a href="https://www.youtube.com/">
-					<img class="img-contact img-circle img-responsive" src="/public/img/youtube_icon.png">
-				</a>
-				<a href="https://www.facebook.com/">
-					<img class="img-contact img-circle img-responsive" src="/public/img/facebook_icon.png">
-				</a>
-				<a href="https://www.twitter.com/">
-					<img class="img-contact img-circle img-responsive" src="/public/img/twitter_icon.png">
-				</a>
-			</div>
+{{if .Data.currentUser }}
+	{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+	<div class="search-side-nav">
+		<div data-spy="affix" data-offset-top="200px" data-offset-bottom="200px">
+			<a href="/profile/edit/" class="btn btn-lg btn-default">Edit Profile</a>
 		</div>
-		<div class="col-md-8">
-			<h1>About Me</h1>
-			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus leo massa, commodo eu volutpat sed, iaculis ut diam. Integer quis scelerisque dui. Integer eros diam, laoreet aliquam bibendum eu, congue et orci. Nam viverra hendrerit orci, quis consequat nulla elementum non. Cras sodales dui finibus, semper neque a, pharetra turpis. Praesent non tincidunt nisl. Curabitur sed neque vitae metus suscipit finibus. Donec pretium arcu ac justo facilisis tristique. Phasellus consequat leo et enim efficitur commodo.
-
-In hac habitasse platea dictumst. Morbi nulla ipsum, euismod et gravida a, scelerisque at dui. Duis nec purus neque. Ut velit sapien, tristique id odio vel, pretium tempus sem. Sed vitae tellus pulvinar, venenatis augue vitae, ultrices sem. Proin dolor velit, pulvinar vel sollicitudin at, aliquam sed leo. Sed posuere neque eros, quis molestie nibh eleifend varius. Curabitur elementum tempor turpis sit amet ornare. Vivamus vitae ultrices erat. Curabitur mollis mattis maximus. Duis molestie risus ut nibh consequat pulvinar. Donec posuere felis et mi rhoncus, et ultricies neque vehicula. Mauris leo neque, hendrerit id risus ut, volutpat vestibulum ante. 
-			</p>
-			<div class="row">
-				<h1>My Works</h1>
-				<div class="thumbnail col-md-4">
-					<a href="/projectPage/">
-						<h2>Video 1</h2>
-						<img class="img-responsive" src="/public/img/placeholder.png">
-					</a>
+	</div>
+	{{end}}
+{{end}}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4">
+				<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+				<h1>{{ .Data.user.DisplayName }}</h1>
+				<!--Username should go here <h3>{{ .Data.user.DisplayName }}</h3>-->
+				<hr>
+				<p>{{ .Data.user.Title }}</p>
+				<p>Joined on: {{ .Data.user.JoinDate }}</p>
+				<div class="user-contacts row">
+					<!--<a href="https://www.youtube.com/">
+						<img class="img-contact img-circle img-responsive" src="/public/img/youtube_icon.png">
+					</a>-->
+					{{if .Data.user.FacebookURL }}
+						<a href="{{ .Data.user.FacebookURL }}">
+							<img class="img-contact img-circle img-responsive" src="/public/img/facebook_icon.png">
+						</a>
+					{{end}}
+					{{if .Data.user.TwitterURL }}
+						<a href="{{ .Data.user.TwitterURL }}">
+							<img class="img-contact img-circle img-responsive" src="/public/img/twitter_icon.png">
+						</a>
+					{{end}}
 				</div>
-				<div class="thumbnail col-md-4">
-					<a href="/projectPage/">
-						<h2>Video 2</h2>
-						<img class="img-responsive" src="/public/img/placeholder.png">
-					</a>
+			</div>
+			<div class="col-md-8">
+				<h1>About Me</h1>
+				<p>{{ .Data.user.AboutMe }} 
+				</p>
+				<div class="row">
+					<h1>My Works</h1>
+					<div class="thumbnail col-md-4">
+						<a href="/projectPage/">
+							<h2>Video 1</h2>
+							<img class="img-responsive" src="/public/img/placeholder.png">
+						</a>
+					</div>
+					<div class="thumbnail col-md-4">
+						<a href="/projectPage/">
+							<h2>Video 2</h2>
+							<img class="img-responsive" src="/public/img/placeholder.png">
+						</a>
+					</div>
+					<div class="thumbnail col-md-4">
+						<a href="/projectPage/">
+							<h2>Video 3</h2>
+							<img class="img-responsive" src="/public/img/placeholder.png">
+						</a>
+					</div>
 				</div>
-				<div class="thumbnail col-md-4">
-					<a href="/projectPage/">
-						<h2>Video 3</h2>
-						<img class="img-responsive" src="/public/img/placeholder.png">
-					</a>
+				<div class="row">
+					<h1>Posted Roles</h1>
+					{{ range .Data.postedRoles }}
+						<div class="thumbnail col-md-4">
+							<a href="/role/?id={{ .Id.Hex }}">
+								<h2>{{.Title}}</h2>
+								<img class="img-responsive" src="/public/img/placeholder.png">
+							</a>
+						</div>
+					{{ end }}
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 {{template "footer" .}}
 {{end}}

@@ -240,3 +240,16 @@ hr {
 .row-form {
     position: relative;
 }
+
+#logout {
+    margin-left: 15px;
+    margin-top: 14px;
+}
+
+.tab-content {
+    padding-top: 30px;
+}
+
+.role-form {
+    margin-bottom: 30px;
+}

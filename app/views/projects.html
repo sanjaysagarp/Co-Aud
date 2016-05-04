@@ -1,10 +1,12 @@
 {{define "projects"}}
 {{template "header" .}}
+{{if .Data.currentUser}}
 <div class="search-side-nav">
 	<div data-spy="affix" data-offset-top="200px" data-offset-bottom="200px">
 		<a href="/addWork/" class="btn btn-lg btn-default">SUBMIT</a>
 	</div>
 </div>
+{{end}}
 <div class="container">
 	<div class="row">
 		<div class="col-lg-12">
