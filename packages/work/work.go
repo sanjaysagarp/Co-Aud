@@ -6,7 +6,7 @@ import (
 	"time"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	//"github.com/sanjaysagarp/Co-Aud/packages/user"
 )
 
 //Cast struct
@@ -23,21 +23,14 @@ type Work struct {
 	URL string
 	ShortDescription string
 	Description string
-	Cast []Cast
+	Cast string // [] Return to the original later **
 	PostedDate time.Time
 	UserEmail string
 }
 
 //NewWork creates a new instance of work
-func NewWork(title string, url string, shortDescription string, description string, cast []Cast, userEmail string) *Work {
-	return &Work{
-		Title: title,
-		URL: url,
-		ShortDescription: shortDescription,
-		Cast: cast,
-		PostedDate: time.Now(),
-		UserEmail: userEmail
-	}
+func NewWork(title string, url string, shortDescription string, description string, cast string, userEmail string) *Work {
+	return &Work{Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: cast, PostedDate: time.Now(),UserEmail: userEmail}
 }
 
 //NewCast creates a new instance of cast
@@ -55,20 +48,11 @@ func InsertWork(work *Work) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
-	err = c.Insert(&Work{Title: work.Title, URL: work.URL, ShortDescription: work.ShortDescription, Cast: work.Cast,
-												PostedDate: work.PostedDate, PostedTime, work.PostedTime, UserEmail: work.UserEmail})
+	err = c.Insert(&Work{Title: work.Title, URL: work.URL, ShortDescription: work.ShortDescription, Description: work.Description, Cast: work.Cast, PostedDate: work.PostedDate, UserEmail: work.UserEmail})
 	
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	fmt.Println(
-		"Title: " + work.Title +
-		"\nURL: " + work.URL +
-		"\nShort Description: " + work.ShortDescription +
-		"\nCast: " + work.Cast +
-		"\nPosted Date: " + work.PostedDate +
-		"\nPosted Time: " + work.PostedTime +
-		"\nUserEmail: " + work.UserEmail)
 }
 
 //InsertCast inserts a new cast into a work
@@ -81,12 +65,11 @@ func InsertCast(cast *Cast) {
 	
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("casts")
-	err = c.Insert(&Cast{User: cast.User, Role: cast.Role})
+	err = c.Insert(&Cast{UserID: cast.UserID, Role: cast.Role})
 	
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	fmt.Println("User with ID: " + cast.User + " added as " + cast.Role)
 }
 
 //FindCast finds casting for work
@@ -100,8 +83,8 @@ func FindCast(work *Work) []Cast{
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
 	
-	result := &Cast[]
-	err = c.Find(bson.M{"Id": bson.ObjectIdHex(work.Id)}).One(&result).Cast //<=============this should get the cast array from works
+	result := []Cast{}
+	err = c.Find(bson.M{"Id": work.Id}).All(&result) 
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil
@@ -120,7 +103,7 @@ func FindWorks(userEmail string) []Work{
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
 	
-	result := &Work[]
+	result := []Work{}
 	err = c.Find(bson.M{"UserEmail": userEmail}).One(&result)
 	if err != nil {
 		fmt.Println("Work now found")
@@ -130,7 +113,7 @@ func FindWorks(userEmail string) []Work{
 }
 
 //FindWorks finds work based on string and returns slice of Work
-func FindWorks(title string) []Work{
+func FindWorks2(title string) Work{
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -140,11 +123,10 @@ func FindWorks(title string) []Work{
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
 	
-	result := &Work[]
+	result := Work{}
 	err = c.Find(bson.M{"Title": title}).One(&result)
 	if err != nil {
-		fmt.Println("Work now found")
-		return nil
+		panic(err)
 	}
 	return result
 }

@@ -5,7 +5,7 @@
 		<div class="col-md-8 col-md-offset-2 card">
 			<h3>Add Work</h3>
 			<hr>
-			<form action="/theoTestPage/" method="post">
+			<form action="/seanTest/" method="post">
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" name="title" placeholder="Title">
@@ -23,7 +23,7 @@
 					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
 				</div>
 				<div id="dynamicInput">
-					Cast Member 1<br><input type="text" name="myInputs">as<input type="text" name="myInputs">						
+					Cast Member 1<br><input type="text" name="castEmail1"> as <input type="text" name="castRole1">						
 				</div>
 				<div>
 					<br>
@@ -37,14 +37,15 @@
 </div>
 
 <script>
-	var counter = 1;
+	var counter = 2;
 	function addInput(divName){
 		var newdiv = document.createElement('div');
-		newdiv.innerHTML = "Cast Member " + (counter + 1) + " <br><input type='text' name='myInputs'>as<input type='text' name='myInputs'>";
+		newdiv.innerHTML = "Cast Member " + counter + " <br><input type='text' name='castEmail'" + counter + ">as<input type='text' name='castRole'"+ counter +">";
 		document.getElementById(divName).appendChild(newdiv);
 		counter++;
-
 	}
+	
+	
 </script>
 {{template "footer" .}}
 {{end}}

@@ -31,7 +31,6 @@ type Team struct {
 //Role struct - posting
 type Role struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	UserName string
 	Title string
 	UserEmail string
 	Traits []string
@@ -72,7 +71,7 @@ func NewComment(userEmail string, message string) *Comment {
 		//TimeStamp: time.Now(),
 		//Deadline: deadline,
 func NewRole(title string, userEmail string, description string, script string, traits []string) *Role {
-	return &Role{Title: title, UserName: userEmail, Description: description, Script: script, Traits: traits}
+	return &Role{Title: title, UserEmail: userEmail, Description: description, Script: script, Traits: traits}
 }
 
 //NewTeam creates an instance of a new role and returns it
@@ -87,7 +86,7 @@ func NewTeam(userNames []string, teamName string, contestId string) *Team {
 	defer session.Close()
 	
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("team")
+	c := session.DB("CoAud").C("teams")
 	err = c.Insert(team)
 	
 	if err != nil {
@@ -110,7 +109,7 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 //InsertComment takes a role and inserts a comment into the role's comment array
 //Need to grab data in handler and create a new comment struct
 //TODO: insert comment to role (db)
-func InsertComment(role *Role, comment *Comment) {
+func InsertComment(role *Role, comment Comment) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -118,17 +117,17 @@ func InsertComment(role *Role, comment *Comment) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("role")
+	c := session.DB("CoAud").C("roles")
 	
-
-	change := bson.M{"$set": bson.M{"Comment": role.Comment.append(comment)}}
-	err = c.Insert(&Role{User: cast.User, Role: cast.Role})
+	role.Comment = append(role.Comment, comment)
+	change := bson.M{"$set": bson.M{"Comment": role.Comment}}
+	//err = c.Insert(&Role{User: cast.User, Role: cast.Role})
 	
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
+	err = c.Update(bson.M{"_id": role.Id}, change)
 	//update role - add comment to slice
 }
 
-func InsertComment1(audition *Audition, comment *Comment) {
+func InsertComment1(audition *Audition, comment Comment) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -140,8 +139,9 @@ func InsertComment1(audition *Audition, comment *Comment) {
 
 	//find audition
 	//update audition - add comment to slice	
-	change := bson.M{"$set": bson.M{"Comment": audition.Comment.append(comment)}}
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
+	audition.Comment = append(audition.Comment, comment)
+	change := bson.M{"$set": bson.M{"Comment": audition.Comment}}
+	err = c.Update(bson.M{"_id": audition.Id}, change)
 }
 
 //InsertContest inserts contest into db
@@ -153,9 +153,26 @@ func InsertContest(contest *Contest) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("contest")
+	c := session.DB("CoAud").C("contests")
 
 	err = c.Insert(&Contest{Title: contest.Title, Description: contest.Description, ImageUrl: contest.ImageUrl, StartDate: contest.StartDate, EndDate: contest.EndDate})
+	if err != nil {
+		panic(err)
+	}
+}
+
+//InsertContest inserts contest into db
+func InsertAudition(audition *Audition) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("roles")
+
+	err = c.Insert(&Audition{UserEmail: audition.UserEmail, AttatchmentUrl: audition.AttatchmentUrl, TimeStamp: audition.TimeStamp, Comment: audition.Comment})
 	if err != nil {
 		panic(err)
 	}
@@ -170,7 +187,7 @@ func InsertRole(role *Role) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("role")
+	c := session.DB("CoAud").C("roles")
 
 	err = c.Insert(&Role{Title: role.Title,UserEmail: role.UserEmail,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits})
 	if err != nil {
@@ -179,7 +196,7 @@ func InsertRole(role *Role) {
 }
 
 //InsertTeam insert team into db within a Contest
-func InsertTeam(contest *Contest, team *Team) {
+func InsertTeam(contest *Contest, team Team) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -187,15 +204,19 @@ func InsertTeam(contest *Contest, team *Team) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("contest")
+	c := session.DB("CoAud").C("contests")
 	// Find contest, then insert into contest by contest name
 	
-	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
+	// bloop := contest.ParticipatingTeams
+	// bloop = append(bloop, team)
+	contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
 	//box.AddItem(item1)
-	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
-
-	err = c.Insert(&Team{UserNames: team.Username,TeamName: team.teamName})
+	//bloop := make([]string, 0)
+	//teamStar := NewTeam(bloop, "teamName", "21321")
+	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.ParticipatingTeams}}
+	err = c.Update(bson.M{"_id": contest.Id}, change)
+	
+	//err = c.Insert(&Team{UserNames: team.Username,TeamName: team.teamName})
 	
 	if err != nil {
 		panic(err)
@@ -219,7 +240,7 @@ func FindRoles(role *Role) []Role {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 	result := []Role{}
-	err = c.Find(nil).All(&results)
+	err = c.Find(nil).All(&result)
 	if err != nil {
 		panic(err)
 	}
@@ -256,10 +277,10 @@ func FindContests(title string) []Contest {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("contest")
+	c := session.DB("CoAud").C("contests")
 	
 	result := []Contest{}
-	err = c.Find(nil).All(&results)
+	err = c.Find(nil).All(&result)
 	if err != nil {
 		panic(err)
 	}
@@ -277,10 +298,9 @@ func FindSearchedContest(title string) []Contest {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("contest")
+	c := session.DB("CoAud").C("contests")
 	result := []Contest{}
 	err = c.Find(bson.M{"Title": title}).One(&result)
-	
 	
 	return result
 }

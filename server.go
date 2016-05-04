@@ -11,9 +11,11 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
-	"github.com/sanjaysagarp/Co-Aud/packages/role"
+	//"github.com/sanjaysagarp/Co-Aud/packages/role"
+	"github.com/sanjaysagarp/Co-Aud/packages/work"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
+	//"strings"
 )
 
 //A Page structure
@@ -154,20 +156,26 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	submission := make(map[string]interface{})
-
+	// traits := strings.Split(r.FormValue("traits"), " ")
+	
+	submission["castEmail"] = r.FormValue("castEmail")
 	submission["title"] = r.FormValue("title")
+	submission["URL"] = r.FormValue("URL")
+	submission["shortDescription"] = r.FormValue("shortDescription")
 	submission["description"] = r.FormValue("description")
-	submission["script"] = r.FormValue("script")
-	submission["deadline"] = r.FormValue("deadline")	
-	submission["gender"] = r.FormValue("gender")
-	submission["age"] = r.FormValue("age")
-	submission["traits"] = r.FormValue("traits")
+	// submission["cast"] = r.FormValue("cast")
 	
-
-	newRole := role.NewRole(submission["title"], "SeannyC", submission["description"] , submission["script"], submission["deadline"], submission["traits"])
-	role.InsertUser(newRole)
+	// submission["script"] = r.FormValue("script")
+	// submission["deadline"] = r.FormValue("deadline")	
+	// submission["gender"] = r.FormValue("gender")
+	// submission["age"] = r.FormValue("age")
+	// submission["traits"] = traits
 	
-	currentRole := newRole
+	 newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), r.FormValue("castEmail"), "seanyy")
+	fmt.Println(newWork)
+	fmt.Println(r.FormValue("castEmail[]"))
+	
+	work.InsertWork(newWork)
 
 	data["form"] = r.Form
 	data["submission"] = submission
@@ -238,7 +246,6 @@ func main() {
 	}
 	
 	redis_session = temp_sess
-	
 	
 	
 	rootdir, err := os.Getwd()
