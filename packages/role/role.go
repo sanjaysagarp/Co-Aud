@@ -210,8 +210,8 @@ func InsertRole(role *Role) {
 // }
 
 // FindRoles searches for all roles
-// TODO: query db for roles and add to result, then return roles
-func FindRoles() []Role {
+// Optional param: q = nil, skip = 0, limit = -1
+func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -221,29 +221,52 @@ func FindRoles() []Role {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 	result := []Role{}
-	err = c.Find(nil).All(&result)
+	err = c.Find(q).Skip(skip).Limit(limit).Sort("-timestamp").All(&result)
 	if err != nil {
 		panic(err)
 	}
-	return result
+	resultCount, err := c.Count()
+	if err != nil {
+		panic(err)
+	}
+	
+	return result, resultCount
 }
 
-func FindRolesByUserEmail(userEmail string) []Role {
-	session, err := mgo.Dial("127.0.0.1:27018")
-	fmt.Println("connected")
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("roles")
-	result := []Role{}
-	err = c.Find(bson.M{"useremail": userEmail}).All(&result)
-	if err != nil {
-		panic(err)
-	}
-	return result
-}
+// // find specific number of roles starting from number*page index.
+// func FindRolesLimit(number int, page int) []Role {
+// 	session, err := mgo.Dial("127.0.0.1:27018")
+// 	fmt.Println("connected")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer session.Close()
+// 	session.SetMode(mgo.Monotonic, true)
+// 	c := session.DB("CoAud").C("roles")
+// 	result := []Role{}
+// 	err = c.Find(nil).Sort("-timestamp").All(&result).Skip(number*page)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return result
+// }
+
+// func FindRolesByUserEmail(userEmail string) []Role {
+// 	session, err := mgo.Dial("127.0.0.1:27018")
+// 	fmt.Println("connected")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer session.Close()
+// 	session.SetMode(mgo.Monotonic, true)
+// 	c := session.DB("CoAud").C("roles")
+// 	result := []Role{}
+// 	err = c.Find(bson.M{"useremail": userEmail}).All(&result)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return result
+// }
 
 //FindRole searches for the selected role
 //TODO: query db for roles and add to result, then return roles

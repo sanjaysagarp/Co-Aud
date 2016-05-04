@@ -16,7 +16,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	"reflect"
+	"math"
+	// "reflect"
 	"strconv"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -146,9 +147,10 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
-	postedRoles := role.FindRolesByUserEmail(user.Email)
+	postedRoles, rolesCount := role.FindRoles(bson.M{"useremail": user.Email}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
+	data["rolesCount"] = rolesCount
 	display(w, "profile", &Page{Title: user.DisplayName, Data: data})
 }
 
@@ -232,13 +234,34 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	roleList := role.FindRoles()
-	fmt.Println(roleList)
-	fmt.Println(reflect.TypeOf(roleList))
+	roleAmount := 16
+	
+	//pagination
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
+	data["currentPage"] = pageNumber
+	if err != nil {
+		fmt.Println(err)
+	}
+	//zero index page number for skip calculation when querying mongo
+	if pageNumber != 0 {
+		pageNumber --
+	}
+	//get roles
+	roleList, rolesCount := role.FindRoles(nil, (pageNumber)*roleAmount, roleAmount)
+	
+	//get max page number
+	maxPage := int(math.Ceil(float64(rolesCount)/float64(roleAmount)))
+	
 	data["roles"] = roleList
+	data["rolesCount"] = rolesCount
+	data["roleAmount"] = roleAmount
+	data["maxPage"] = maxPage
+	
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
+// INFINITE SCROLL STUFF GOES HERE NOT COMPLETE
+// func getMoreCastingsHandler()
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
@@ -330,8 +353,6 @@ func main() {
 	}
 	
 	redis_session = temp_sess
-	
-	
 	
 	rootdir, err := os.Getwd()
 	if err != nil {
