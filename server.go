@@ -11,7 +11,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
-	//"github.com/sanjaysagarp/Co-Aud/packages/role"
+	"github.com/sanjaysagarp/Co-Aud/packages/role"
 	"github.com/sanjaysagarp/Co-Aud/packages/work"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"

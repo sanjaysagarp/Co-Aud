@@ -205,23 +205,6 @@ func InsertContest(contest *Contest) {
 	}
 }
 
-//InsertContest inserts contest into db
-func InsertAudition(audition *Audition) {
-	session, err := mgo.Dial("127.0.0.1:27018")
-	fmt.Println("connected")
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("roles")
-
-	err = c.Insert(&Audition{UserEmail: audition.UserEmail, AttatchmentUrl: audition.AttatchmentUrl, TimeStamp: audition.TimeStamp, Comment: audition.Comment})
-	if err != nil {
-		panic(err)
-	}
-}
-
 //InsertRole inserts role into db
 func InsertRole(role *Role) {
 	session, err := mgo.Dial("127.0.0.1:27018")

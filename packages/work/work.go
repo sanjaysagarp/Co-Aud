@@ -82,9 +82,9 @@ func FindCast(work *Work) []Cast{
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
-
-	result := &Cast[]
-	err = c.Find(bson.M{"_id": bson.ObjectIdHex(work.Id)}).One(&result).Cast //<=============this should get the cast array from works
+	
+	result := []Cast{}
+	err = c.Find(bson.M{"Id": work.Id}).All(&result)
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil
