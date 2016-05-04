@@ -71,76 +71,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
-// 	data := make(map[string]interface{})
-// 	s := redis_session.Session(w, r)
-// 	currentUser := user.FindUser(s.Get("Email"))
-// 	data["currentUser"] = currentUser
-// 	submission := make(map[string]interface{})
 
-
-// 	fmt.Println(r.Form)
-
-// // TESTING CASTING SUBMISSION ==============================================================================================================================
-// 	traits := strings.Split(r.FormValue("traits"), " ")
-
-//   	layout := "2006-01-02"
-
-// 	deadline, err := time.Parse(layout, r.FormValue("deadline"))
-// 	if err != nil {
-//       fmt.Println(err)
-//       return
-//  	 }
-
-//   	age, err := strconv.Atoi(r.FormValue("age"))
-//   	if err != nil {
-//       fmt.Println(err)
-//       return
-//   	}
-// 	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"))
-// 	fmt.Println(newRole)
-// 	role.InsertRole(newRole)
-// 	// getting string values
-// 	submission["title"] = r.FormValue("title")
-// 	submission["description"] = r.FormValue("description")
-// 	submission["script"] = r.FormValue("script")
-// 	submission["deadline"] = deadline
-// 	submission["gender"] = r.FormValue("gender")
-// 	submission["age"] = r.FormValue("age")
-// 	submission["traits"] = traits
-
-
-	// get picture
-	// r.ParseMultipartForm(32 << 20)
- //  file, handler, err := r.FormFile("photo")
- //  if err != nil {
- //      fmt.Println(err)
- //      return
- //  }
- //  defer file.Close()
- //  fmt.Fprintf(w, "%v", handler.Header)
- //  filepathname := "C:/Users/Theo/Pictures/theo_test"+handler.Filename
- //  f, err := os.OpenFile(filepathname, os.O_WRONLY|os.O_CREATE, 0666)
- //  if err != nil {
- //      fmt.Println(err)
- //      return
- //  }
- //  fmt.Println(filepathname)
- //  defer f.Close()
- //  io.Copy(f, file)
-
-// TESTING PROJECT SUBMISSION ===========================================
-	// newWork = work.NewWork(r.FormValue("title"), r.FormValue("url"), r.FormValue("shortDescription"), r.FormValue("description"), cast []Cast, data["currentUser"].Email)
-	// work.InsertWork(newWork)
-
-	// submission["castMember"] = r.FormValue("castMember")
-	// submission["castType"] = r.FormValue("castType")
-	
-	// data["form"] = r.Form
-	// data["submission"] = submission
-
-	// // fmt.Println(submission)
-
-	// display(w, "theoTestPage", &Page{Title: "Theo Test", Data: data})
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
@@ -160,6 +91,7 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	role := role.FindRole(roleID)
 	data["role"] = role
 	data["author"] = user.FindUser(role.UserEmail)
+	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
 
@@ -260,7 +192,7 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
-// INFINITE SCROLL STUFF GOES HERE NOT COMPLETE
+// INFINITE SCROLL STUFF GOES HERE; NOT COMPLETE
 // func getMoreCastingsHandler()
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -328,10 +260,29 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
+func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	
+	collection := r.FormValue("collection")
+	message := r.FormValue("content")
+	roleID := r.FormValue("id")
+	
+	
+	newComment := role.NewComment(currentUser, message)
+	curRole := role.FindRole(roleID)
+
+	role.InsertComment(curRole.Comment, newComment, collection, curRole.Id.Hex())
+	
+	w.Write([]byte("updated"))
+
+}
+
 func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
 	data := make(map[string]interface{})
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
+	
 	data["currentUser"] = currentUser
 	if(currentUser != nil) {
 		s.Set("DisplayName", currentUser.Email)
@@ -378,6 +329,7 @@ func main() {
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
+	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")

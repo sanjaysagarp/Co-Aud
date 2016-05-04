@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	//"github.com/sanjaysagarp/Co-Aud/packages/user"
+	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"time"
 )
 
@@ -40,7 +40,7 @@ type Role struct {
 	Age int
 	TimeStamp time.Time
 	Deadline time.Time
-	Comment []Comment
+	Comment []*Comment
 	Audition []Audition
 }
 
@@ -50,21 +50,21 @@ type Audition struct {
 	UserEmail string
 	AttachmentUrl string
 	TimeStamp time.Time
-	Comment []Comment
+	Comment []*Comment
 }
 
 //Comment struct - Maybe include audio clip
 type Comment struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	UserEmail string
+	User *user.User
 	Message string
 	TimeStamp time.Time
 }
 
 //NewComment creates an instance of a new comment and returns it
 //TODO: FILL OUT FIELDS
-func NewComment(userEmail string, message string) *Comment {
-	return &Comment{UserEmail : userEmail, Message : message, TimeStamp : time.Now()}
+func NewComment(user *user.User, message string) *Comment {
+	return &Comment{User : user, Message : message, TimeStamp : time.Now()}
 }
 
 //NewRole creates an instance of a new role and returns it
@@ -111,7 +111,49 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 //InsertComment takes a role and inserts a comment into the role's comment array
 //Need to grab data in handler and create a new comment struct
 //TODO: insert comment to role (db)
-// func InsertComment(role *Role, comment *Comment) {
+
+//GENERIC INSERT COMMENT
+func InsertComment(commentList []*Comment, comment *Comment, collection string, id string) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("comments")
+
+	err = c.Insert(Comment{User: comment.User, Message: comment.Message, TimeStamp: comment.TimeStamp})
+	if err != nil {
+		panic(err)
+	}
+	
+	c = session.DB("CoAud").C(collection)
+	
+	// commentList = append(commentList, comment)
+	change := bson.M{"$push": bson.M{"comment": comment}}
+	
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+}
+
+//InsertAudition inserts audition into db
+func InsertAudition(audition *Audition) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("roles")
+
+	err = c.Insert(&Audition{UserEmail: audition.UserEmail, AttachmentUrl: audition.AttachmentUrl, TimeStamp: audition.TimeStamp, Comment: audition.Comment})
+	if err != nil {
+		panic(err)
+	}
+}
+
+// func InsertComment2(role *Role, comment Comment) {
 // 	session, err := mgo.Dial("127.0.0.1:27018")
 // 	fmt.Println("connected")
 // 	if err != nil {
@@ -119,17 +161,17 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 // 	}
 // 	defer session.Close()
 // 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("role")
+// 	c := session.DB("CoAud").C("roles")
 	
-
-// 	change := bson.M{"$set": bson.M{"Comment": role.Comment.append(comment)}}
-// 	err = c.Insert(&Role{User: cast.User, Role: cast.Role})
+// 	role.Comment = append(role.Comment, comment)
+// 	change := bson.M{"$set": bson.M{"Comment": role.Comment}}
+// 	//err = c.Insert(&Role{User: cast.User, Role: cast.Role})
 	
-// 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
+// 	err = c.Update(bson.M{"_id": role.Id}, change)
 // 	//update role - add comment to slice
 // }
 
-// func InsertComment1(audition *Audition, comment *Comment) {
+// func InsertComment1(audition *Audition, comment Comment) {
 // 	session, err := mgo.Dial("127.0.0.1:27018")
 // 	fmt.Println("connected")
 // 	if err != nil {
@@ -137,12 +179,13 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 // 	}
 // 	defer session.Close()
 // 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("audition")
+// 	c := session.DB("CoAud").C("auditions")
 
 // 	//find audition
 // 	//update audition - add comment to slice	
-// 	change := bson.M{"$set": bson.M{"Comment": audition.Comment.append(comment)}}
-// 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(role.Id)}, change)
+// 	audition.Comment = append(audition.Comment, comment)
+// 	change := bson.M{"$set": bson.M{"Comment": audition.Comment}}
+// 	err = c.Update(bson.M{"_id": audition.Id}, change)
 // }
 
 //InsertContest inserts contest into db
