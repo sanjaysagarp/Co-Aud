@@ -131,6 +131,7 @@ func InsertComment(commentList []*Comment, comment *Comment, collection string, 
 	c = session.DB("CoAud").C(collection)
 	
 	// commentList = append(commentList, comment)
+	// change := bson.M{"$push": bson.M{"comment": bson.M{"$meta": comment, "$position": 0}}}
 	change := bson.M{"$push": bson.M{"comment": comment}}
 	
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
