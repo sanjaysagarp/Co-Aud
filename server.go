@@ -12,7 +12,6 @@ import (
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"github.com/sanjaysagarp/Co-Aud/packages/role"
-	"github.com/sanjaysagarp/Co-Aud/packages/work"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
 	"strings"
@@ -79,7 +78,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
-	postedRoles, rolesCount := role.FindRoles(bson.M{"useremail": user.Email}, 0, 3)
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user.email": user.Email}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
@@ -91,7 +90,7 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := r.URL.Query().Get("id")
 	role := role.FindRole(roleID)
 	data["role"] = role
-	data["author"] = user.FindUser(role.UserEmail)
+	data["author"] = user.FindUser(role.User.Email)
 	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
@@ -151,7 +150,7 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
 	  
 	// adding new role into db
 	roleID := bson.NewObjectId()
-	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
+	newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
 	role.InsertRole(newRole)
 
 	urlParts := []string{"/role/?id=", roleID.Hex()}
@@ -185,46 +184,26 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	//get max page number
 	maxPage := int(math.Ceil(float64(rolesCount)/float64(roleAmount)))
 	
+	pageList := getPageList()
+	
 	data["roles"] = roleList
 	data["rolesCount"] = rolesCount
 	data["roleAmount"] = roleAmount
 	data["maxPage"] = maxPage
+	data["pageList"] = pageList
 	
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
-func seanTestHands(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	submission := make(map[string]interface{})
-	// traits := strings.Split(r.FormValue("traits"), " ")
-	
-	submission["castEmail"] = r.FormValue("castEmail")
-	submission["title"] = r.FormValue("title")
-	submission["URL"] = r.FormValue("URL")
-	submission["shortDescription"] = r.FormValue("shortDescription")
-	submission["description"] = r.FormValue("description")
-	// submission["cast"] = r.FormValue("cast")
-	
-	// submission["script"] = r.FormValue("script")
-	// submission["deadline"] = r.FormValue("deadline")	
-	// submission["gender"] = r.FormValue("gender")
-	// submission["age"] = r.FormValue("age")
-	// submission["traits"] = traits
-	
-	 newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), r.FormValue("castEmail"), "seanyy")
-	fmt.Println(newWork)
-	fmt.Println(r.FormValue("castEmail[]"))
-	
-	work.InsertWork(newWork)
-
-	data["form"] = r.Form
-	data["submission"] = submission
-	display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+//gets the numbers of the pages that will be shown in pagination given the max page, current page,
+//and the amount of pages you want displayed
+func getPageList(maxPage int, curPage int, amount int) []int{
+	var result []int
+	if (curPage == 1) {
+		
+	}
+	return result
 }
-
-
-// INFINITE SCROLL STUFF GOES HERE; NOT COMPLETE
-// func getMoreCastingsHandler()
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
@@ -291,11 +270,11 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
-func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
+func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	
-	collection := r.FormValue("collection")
+	collection := "roles"
 	message := r.FormValue("content")
 	roleID := r.FormValue("id")
 	
@@ -306,7 +285,6 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
 	role.InsertComment(curRole.Comment, newComment, collection, curRole.Id.Hex())
 	
 	w.Write([]byte("updated"))
-
 }
 
 func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
@@ -335,6 +313,7 @@ func main() {
 	}
 	
 	redis_session = temp_sess
+	
 	rootdir, err := os.Getwd()
 	if err != nil {
 		rootdir = "no directory found"
@@ -359,7 +338,7 @@ func main() {
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
-	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
+	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
