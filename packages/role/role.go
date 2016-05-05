@@ -224,7 +224,6 @@ func InsertRole(role *Role) {
 	}
 }
 
-//InsertTeam insert team into db within a Contest
 // func InsertTeam(contest *Contest, team *Team) {
 // 	session, err := mgo.Dial("127.0.0.1:27018")
 // 	fmt.Println("connected")
@@ -343,7 +342,7 @@ func FindContests(title string) []Contest {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("contest")
+	c := session.DB("CoAud").C("contests")
 	
 	result := []Contest{}
 	err = c.Find(nil).All(&result)
@@ -364,10 +363,9 @@ func FindSearchedContest(title string) []Contest {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("contest")
+	c := session.DB("CoAud").C("contests")
 	result := []Contest{}
 	err = c.Find(bson.M{"Title": title}).One(&result)
-	
 	
 	return result
 }

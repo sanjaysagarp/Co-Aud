@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"github.com/sanjaysagarp/Co-Aud/packages/role"
+	"github.com/sanjaysagarp/Co-Aud/packages/work"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
 	"strings"
@@ -192,6 +193,36 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
+func seanTestHands(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	submission := make(map[string]interface{})
+	// traits := strings.Split(r.FormValue("traits"), " ")
+	
+	submission["castEmail"] = r.FormValue("castEmail")
+	submission["title"] = r.FormValue("title")
+	submission["URL"] = r.FormValue("URL")
+	submission["shortDescription"] = r.FormValue("shortDescription")
+	submission["description"] = r.FormValue("description")
+	// submission["cast"] = r.FormValue("cast")
+	
+	// submission["script"] = r.FormValue("script")
+	// submission["deadline"] = r.FormValue("deadline")	
+	// submission["gender"] = r.FormValue("gender")
+	// submission["age"] = r.FormValue("age")
+	// submission["traits"] = traits
+	
+	 newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), r.FormValue("castEmail"), "seanyy")
+	fmt.Println(newWork)
+	fmt.Println(r.FormValue("castEmail[]"))
+	
+	work.InsertWork(newWork)
+
+	data["form"] = r.Form
+	data["submission"] = submission
+	display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+}
+
+
 // INFINITE SCROLL STUFF GOES HERE; NOT COMPLETE
 // func getMoreCastingsHandler()
 
@@ -304,7 +335,6 @@ func main() {
 	}
 	
 	redis_session = temp_sess
-	
 	rootdir, err := os.Getwd()
 	if err != nil {
 		rootdir = "no directory found"
