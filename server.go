@@ -166,11 +166,17 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	//params for pagination
 	roleAmount := 16
+	pageAmount:= 5
 	
 	//pagination
-	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
-	data["currentPage"] = pageNumber
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page")) //used for getting roles
+	currentPage := pageNumber //used for getting page list
+	if currentPage <= 0 {
+		currentPage = 1
+	}
+	data["currentPage"] = currentPage
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -178,20 +184,21 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	if pageNumber != 0 {
 		pageNumber --
 	}
+	
 	//get roles
 	roleList, rolesCount := role.FindRoles(nil, (pageNumber)*roleAmount, roleAmount)
 	
-	//get max page number
+	//more params for pagination
 	maxPage := int(math.Ceil(float64(rolesCount)/float64(roleAmount)))
-	
-	pageList := getPageList()
+	pageList := getPageList(maxPage, currentPage, pageAmount)
 	
 	data["roles"] = roleList
 	data["rolesCount"] = rolesCount
 	data["roleAmount"] = roleAmount
 	data["maxPage"] = maxPage
 	data["pageList"] = pageList
-	
+	fmt.Println(maxPage)
+	fmt.Println(data["currentPage"])
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
@@ -199,9 +206,32 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 //and the amount of pages you want displayed
 func getPageList(maxPage int, curPage int, amount int) []int{
 	var result []int
-	if (curPage == 1) {
-		
+	var min int
+	var max int
+	
+	if (curPage - (amount/2) <= 1) { //first few pages
+		min = 1
+		if (maxPage > (curPage + amount - 1)) { //if there are more pages than what we will show
+			//get as many pages 1 to amount
+			max = amount
+		} else { //the amount of pages total is less than or equal to the max number of pages
+			//get the pages from 1 to max page
+			max = maxPage
+		}
+	} else if (curPage + (amount/2) >= maxPage) { //last few pages
+		//get as many pages maxPage - (amount - 1) to maxPage
+		min = maxPage - (amount - 1)
+		max = maxPage
+	} else { //somewhere in the middle
+		//get current page - amount/2 to current page - amount/2 + (amount-1)
+		min = curPage - (amount/2)
+		max = min + (amount - 1)
 	}
+	
+	for i := min; i <= max; i++ {
+		result = append(result, i)
+	}
+	fmt.Println(result)
 	return result
 }
 

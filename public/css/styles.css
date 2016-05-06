@@ -229,8 +229,8 @@ hr {
 }
 
 .search-side-nav {
-    float: left;
-    margin-left: 30px;
+    float: right;
+    margin-right: 30px;
 }
 
 .content-wrapper {
@@ -252,4 +252,15 @@ hr {
 
 .role-form {
     margin-bottom: 30px;
+}
+
+#submit-button.affix, #submit-button.affix-top{
+    position: fixed;
+    bottom: 50px;
+    right: 50px
+}
+
+#submit-button.affix-bottom{
+    position: absolute;
+    right: 50px;
 }
