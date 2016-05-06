@@ -80,9 +80,12 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
 	postedRoles, rolesCount := role.FindRoles(bson.M{"user.email": user.Email}, 0, 3)
+	postedWorks, workCount := work.FindWorks(bson.M{"user.email": user.Email}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
+	data["postedWorks"] = postedWorks
+	data["workCount"] = workCount
 	display(w, "profile", &Page{Title: user.DisplayName, Data: data})
 }
 
