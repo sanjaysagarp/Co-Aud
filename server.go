@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/aws/aws-sdk-go/aws"
+	//"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/aws/session"
 )
@@ -101,7 +102,21 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	role := role.FindRole(roleID)
 	data["role"] = role
 	data["author"] = user.FindUser(role.UserEmail)
-	fmt.Println(role.Comment)
+	
+	// svc := s3.New(session.New())
+	// //Pre-signs all audio clips so they cannot be downloaded! -- Do we want this?
+	// for _,audition := range role.Audition {
+	// 	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+	// 		Bucket: aws.String("coaud"),
+	// 		Key:    aws.String(audition.AttachmentUrl),
+	// 	})
+	// 	temp, err := req.Presign(15 * time.Minute)
+	// 	if err != nil {
+	// 		log.Println("Failed to sign request", err)
+	// 	}
+	// 	audition.TempUrl = temp
+	// }
+	
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
 
@@ -314,15 +329,13 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 	
-	
-	fmt.Println("BLAH " + roleID )
-	attachmentUrl := "/media/" + s.Get("Email") + "/" + handler.Filename
+	attachmentURL := "/media/" + s.Get("Email") + "/" + handler.Filename
 	
 	uploader := s3manager.NewUploader(session.New())
     result, err := uploader.Upload(&s3manager.UploadInput{
         Body:   file,
         Bucket: aws.String("coaud"),
-        Key:    aws.String(attachmentUrl),
+        Key:    aws.String(attachmentURL),
     })
 	
 	if err != nil {
@@ -332,7 +345,7 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
     log.Println("Successfully uploaded to", result.Location)
 	
 	//create a new audition and add the link
-	audition := role.NewAudition(s.Get("Email"), attachmentUrl)
+	audition := role.NewAudition(s.Get("Email"), result.Location)
 	curRole := role.FindRole(roleID)
 	role.InsertAudition(audition, curRole)
 	

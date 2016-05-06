@@ -21,6 +21,8 @@ $("#formAudition").submit(function(){
 		async: false,
 		success: function (data) {
 			console.log(data);
+			window.location.href = "/role/?id=" + $('#roleCommentButton').data("id")
+			
 		},
 		cache: false,
 		contentType: false,
