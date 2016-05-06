@@ -328,28 +328,48 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("err opening file1: %s", err)
 	}
 	defer file.Close()
-	
-	attachmentURL := "/media/" + s.Get("Email") + "/" + handler.Filename
-	
-	uploader := s3manager.NewUploader(session.New())
-    result, err := uploader.Upload(&s3manager.UploadInput{
-        Body:   file,
-        Bucket: aws.String("coaud"),
-        Key:    aws.String(attachmentURL),
-    })
-	
 	if err != nil {
-        log.Fatalln("Failed to upload", err)
-    }
+		return
+	}
 
-    log.Println("Successfully uploaded to", result.Location)
+	bytes, err := file.Seek(0,2)
+	if(err != nil) {
+		panic(err)
+	}
 	
-	//create a new audition and add the link
-	audition := role.NewAudition(s.Get("Email"), result.Location)
-	curRole := role.FindRole(roleID)
-	role.InsertAudition(audition, curRole)
+	var kilobytes int64
+	kilobytes = (bytes / 1024)
 	
-	w.Write([]byte("uploaded"))
+	var megabytes float64
+	megabytes = (float64)(kilobytes / 1024)
+	
+	if(megabytes < 6) {
+		attachmentURL := "/media/" + s.Get("Email") + "/" + handler.Filename
+	
+		uploader := s3manager.NewUploader(session.New())
+		result, err := uploader.Upload(&s3manager.UploadInput{
+			Body:   file,
+			Bucket: aws.String("coaud"),
+			Key:    aws.String(attachmentURL),
+		})
+		
+		if err != nil {
+			log.Fatalln("Failed to upload", err)
+		}
+
+		log.Println("Successfully uploaded to", result.Location)
+		
+		//create a new audition and add the link
+		audition := role.NewAudition(s.Get("Email"), result.Location)
+		curRole := role.FindRole(roleID)
+		role.InsertAudition(audition, curRole)
+		
+		w.Write([]byte("uploaded"))
+	} else {
+		w.Write([]byte("rejected"))
+	}
+	
+	
 	
 }
 

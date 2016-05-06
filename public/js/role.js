@@ -21,7 +21,16 @@ $("#formAudition").submit(function(){
 		async: false,
 		success: function (data) {
 			console.log(data);
-			window.location.href = "/role/?id=" + $('#roleCommentButton').data("id")
+			if (data =="rejected") {
+				$("#notification").css("display", "block");
+				$("#notification").addClass("alert alert-danger");
+				$("#notification").html("Filesize too big!");
+				$("#notification").fadeOut( 3000 );
+				
+			}
+			if(data == "uploaded") {
+				window.location.href = "/role/?id=" + $('#roleCommentButton').data("id")
+			}
 			
 		},
 		cache: false,

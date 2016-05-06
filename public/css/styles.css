@@ -203,7 +203,7 @@ input[type=text], input[type=number], input[type=date], textarea.form-control {
     background-color:#edeaed;
 }
 
-input[type=file] {
+#auditionFile {
     display:block;
     height:0;
     width:0;
