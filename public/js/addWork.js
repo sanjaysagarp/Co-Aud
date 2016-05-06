@@ -23,16 +23,15 @@ $(document).ready(function(){
 					shortDescription : $('[name="shortDescription"]').val()
 				},
 				dataType: 'html',
-				success: function(data) {
-					window.location.href = "/projects/"
+				success: function(data) {	
 					if(data) {
 						$("#notification").css("display", "block");
 						$("#notification").addClass("alert alert-success");
 						$("#notification").html("Blah");
 						$("#notification").fadeOut( 3000 );
 						//location.href = "/seanTest/";
+						window.location.href = "/project/id?="
 					} 
-					window.location.href = "/api/v1/publishWork/"
 					
 				},
 				failure: function(err) {
