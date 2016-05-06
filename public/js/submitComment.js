@@ -4,9 +4,8 @@ $(document).ready(function(){
 		e.preventDefault();
 		$.ajax({
 				method: 'POST',
-				url: "/api/v1/submitComment/",
+				url: "/api/v1/submitRoleComment/",
 				data: {
-					collection: "roles",
 					content: $('[name="roleCommentContent"]').val(),
 					id: $('#roleCommentButton').data("id")
 				},

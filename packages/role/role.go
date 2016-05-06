@@ -23,7 +23,7 @@ type Contest struct {
 //Team struct
 type Team struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	UserNames []string
+	Users []*user.User
 	TeamName string
 	ContestId string
 }
@@ -32,7 +32,7 @@ type Team struct {
 type Role struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
-	UserEmail string
+	User *user.User
 	Traits []string
 	Description string
 	Script string
@@ -47,7 +47,7 @@ type Role struct {
 //Comment struct - Maybe include audio clip
 type Audition struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	UserEmail string
+	User *user.User
 	AttachmentUrl string
 	TimeStamp time.Time
 	Comment []*Comment
@@ -69,18 +69,15 @@ func NewComment(user *user.User, message string) *Comment {
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-
-		//TimeStamp: time.Now(),
-		//Deadline: deadline,
-func NewRole(title string, userEmail string, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId) *Role {
-	return &Role{Title: title, UserEmail: userEmail, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, Id: id}
+func NewRole(title string, user *user.User, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId) *Role {
+	return &Role{Title: title, User: user, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, Id: id}
 }
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewTeam(userNames []string, teamName string, contestId string) *Team {
+func NewTeam(users []*user.User, teamName string, contestId string) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
-	team := &Team{UserNames: userNames, TeamName: teamName, ContestId: contestId}
+	team := &Team{Users: users, TeamName: teamName, ContestId: contestId}
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 			panic(err)
@@ -98,12 +95,11 @@ func NewTeam(userNames []string, teamName string, contestId string) *Team {
 
 }
 
-func NewAudition(userEmail string, attachmentUrl string) *Audition {
-	return &Audition{UserEmail: userEmail, AttachmentUrl: attachmentUrl, TimeStamp: time.Now()}
+func NewAudition(user *user.User, attachmentUrl string) *Audition {
+	return &Audition{User: user, AttachmentUrl: attachmentUrl, TimeStamp: time.Now()}
 }
 
 //NewContest creates an instance of a new role and returns it
-//TODO: FILL OUT FIELDS 
 func NewContest(title string, description string, imageUrl string, endDate time.Time) *Contest {
 	return &Contest{Title: title,Description: description,ImageUrl: imageUrl,StartDate: time.Now(),EndDate: endDate}
 }
@@ -130,9 +126,11 @@ func InsertComment(commentList []*Comment, comment *Comment, collection string, 
 	
 	c = session.DB("CoAud").C(collection)
 	
-	// commentList = append(commentList, comment)
-	// change := bson.M{"$push": bson.M{"comment": bson.M{"$meta": comment, "$position": 0}}}
-	change := bson.M{"$push": bson.M{"comment": comment}}
+	// store comment into slice so we can push it to the top in mongo
+	// $push with $position requires $each which requires an array/slice
+	var newComment []*Comment
+	newComment = append(newComment, comment)
+	change := bson.M{"$push": bson.M{"comment": bson.M{"$each": newComment, "$position": 0}}}
 	
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
 }
@@ -219,7 +217,7 @@ func InsertRole(role *Role) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 
-	err = c.Insert(&Role{Title: role.Title,UserEmail: role.UserEmail,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits, Gender: role.Gender, Age: role.Age, Id: role.Id})
+	err = c.Insert(&Role{Title: role.Title,User: role.User,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits, Gender: role.Gender, Age: role.Age, Id: role.Id})
 	if err != nil {
 		panic(err)
 	}
@@ -241,7 +239,7 @@ func InsertRole(role *Role) {
 // 	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
 // 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
 
-// 	err = c.Insert(&Team{UserNames: team.Username,TeamName: team.teamName})
+// 	err = c.Insert(&Team{Users: team.Users,TeamName: team.teamName})
 	
 // 	if err != nil {
 // 		panic(err)
@@ -276,41 +274,6 @@ func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
 	
 	return result, resultCount
 }
-
-// // find specific number of roles starting from number*page index.
-// func FindRolesLimit(number int, page int) []Role {
-// 	session, err := mgo.Dial("127.0.0.1:27018")
-// 	fmt.Println("connected")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer session.Close()
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("roles")
-// 	result := []Role{}
-// 	err = c.Find(nil).Sort("-timestamp").All(&result).Skip(number*page)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return result
-// }
-
-// func FindRolesByUserEmail(userEmail string) []Role {
-// 	session, err := mgo.Dial("127.0.0.1:27018")
-// 	fmt.Println("connected")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer session.Close()
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("roles")
-// 	result := []Role{}
-// 	err = c.Find(bson.M{"useremail": userEmail}).All(&result)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return result
-// }
 
 //FindRole searches for the selected role
 //TODO: query db for roles and add to result, then return roles

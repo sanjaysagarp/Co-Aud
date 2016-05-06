@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 	"math"
-	// "reflect"
+	//"reflect"
 	"strconv"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/aws/aws-sdk-go/aws"
@@ -50,13 +50,13 @@ var configFile, _ = ioutil.ReadFile("./secret/config.json")
 var (
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:    "http://localhost:8080/GoogleCallback",
-		ClientID:     os.Getenv("GOOGLEKEY"),
-		ClientSecret: os.Getenv("GOOGLESECRET"),
+		ClientID:     "688463917821-p5u7nvg7eovcjr92o7e8986b3tl3qdlr.apps.googleusercontent.com",
+		ClientSecret: "nyIHJVB8Fzx76kSL7SMFFRFP",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
 					"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
-	currentUser = &user.User{}
+	currentUser = &user.User{}	
 	// Some random string, random for each request
 	oauthStateString = "random"
 	
@@ -89,10 +89,13 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
-	postedRoles, rolesCount := role.FindRoles(bson.M{"useremail": user.Email}, 0, 3)
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user.email": user.Email}, 0, 3)
+	postedWorks, workCount := work.FindWorks(bson.M{"user.email": user.Email}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
+	data["postedWorks"] = postedWorks
+	data["workCount"] = workCount
 	display(w, "profile", &Page{Title: user.DisplayName, Data: data})
 }
 
@@ -101,7 +104,6 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := r.URL.Query().Get("id")
 	role := role.FindRole(roleID)
 	data["role"] = role
-	data["author"] = user.FindUser(role.UserEmail)
 	
 	// svc := s3.New(session.New())
 	// //Pre-signs all audio clips so they cannot be downloaded! -- Do we want this?
@@ -117,11 +119,53 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	// 	audition.TempUrl = temp
 	// }
 	
-	display(w, "rolepage", &Page{Title: "Role", Data: data})
+	data["author"] = user.FindUser(role.User.Email)
+	fmt.Println(role.Comment)
+	display(w, "rolepage", &Page{Title: role.Title, Data: data})
+}
+func workHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	data := setDefaultData(w, r)
+	workId := r.URL.Query().Get("id")
+	work := work.FindWork(workId)
+	URL := work.URL
+	youtubeCode := strings.Split(URL, "=")
+	//fmt.Println("check below this line")
+	fmt.Println(youtubeCode)
+	data["youtubeCode"] = youtubeCode[1] // causes error,need to find better way
+	data["work"] = work
+	data["user"] = currentUser
+	//data["author"] = user.FindUser(work.UserEmail)
+	//fmt.Println(role.Comment)
+	display(w, "seanTest", &Page{Title: "Work", Data: data})
 }
 
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	projectAmount := 16
+	
+	//pagination
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
+	data["currentPage"] = pageNumber
+	if err != nil {
+		fmt.Println(err)
+	}
+	//zero index page number for skip calculation when querying mongo
+	if pageNumber != 0 {
+		pageNumber --
+	}
+	//get roles
+	projectList, projectCount := work.FindWorks(nil, (pageNumber)*projectAmount, projectAmount)
+	
+	//get max page number
+	maxPage := int(math.Ceil(float64(projectCount)/float64(projectAmount)))
+	
+	data["works"] = projectList
+	data["workCount"] = projectCount
+	data["workAmount"] = projectAmount
+	data["maxPage"] = maxPage
+	
 	display(w, "projects", &Page{Title: "Projects", Data: data})
 }
 
@@ -175,7 +219,7 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
 	  
 	// adding new role into db
 	roleID := bson.NewObjectId()
-	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
+	newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
 	role.InsertRole(newRole)
 
 	urlParts := []string{"/role/?id=", roleID.Hex()}
@@ -191,11 +235,17 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	//params for pagination
 	roleAmount := 16
+	pageAmount:= 5
 	
 	//pagination
-	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
-	data["currentPage"] = pageNumber
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page")) //used for getting roles
+	currentPage := pageNumber //used for getting page list
+	if currentPage <= 0 {
+		currentPage = 1
+	}
+	data["currentPage"] = currentPage
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -203,52 +253,98 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	if pageNumber != 0 {
 		pageNumber --
 	}
+	
 	//get roles
 	roleList, rolesCount := role.FindRoles(nil, (pageNumber)*roleAmount, roleAmount)
 	
-	//get max page number
+	//more params for pagination
 	maxPage := int(math.Ceil(float64(rolesCount)/float64(roleAmount)))
+	pageList := getPageList(maxPage, currentPage, pageAmount)
 	
 	data["roles"] = roleList
 	data["rolesCount"] = rolesCount
 	data["roleAmount"] = roleAmount
 	data["maxPage"] = maxPage
-	
+	data["pageList"] = pageList
+	fmt.Println(maxPage)
+	fmt.Println(data["currentPage"])
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
+
 func seanTestHands(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	submission := make(map[string]interface{})
-	// traits := strings.Split(r.FormValue("traits"), " ")
+	//data := setDefaultData(w, r)
+	//submission := make(map[string]interface{})
+
+	castsAttendees := strings.Split(r.FormValue("castList"), ",")
+	castRoles := strings.Split(r.FormValue("castRoles"), ",")
+	fmt.Println(len(castsAttendees))
+	fmt.Println(len(castRoles))
+
+	castContainer := make([]work.Cast, 0)
+	for i := 0; i < len(castsAttendees); i++ {
+		fmt.Println(castsAttendees[i])
+		fmt.Println(castRoles[i])
+		castUser := user.FindUser(castsAttendees[i])
+		newCast := work.NewCast(castUser, castRoles[i])
+		castContainer = append(castContainer, newCast)
+	}
 	
-	submission["castEmail"] = r.FormValue("castEmail")
-	submission["title"] = r.FormValue("title")
-	submission["URL"] = r.FormValue("URL")
-	submission["shortDescription"] = r.FormValue("shortDescription")
-	submission["description"] = r.FormValue("description")
-	// submission["cast"] = r.FormValue("cast")
+	// data["castEmail"] = r.FormValue("castEmail")
+	// data["title"] = r.FormValue("title")
+	// data["URL"] = r.FormValue("URL")
+	// data["shortDescription"] = r.FormValue("shortDescription")
+	// data["description"] = r.FormValue("description")
+	// data["castHolder"] = castContainer
+	projectId := bson.NewObjectId()
+	//s := redis_session.Session(w, r)
 	
-	// submission["script"] = r.FormValue("script")
-	// submission["deadline"] = r.FormValue("deadline")	
-	// submission["gender"] = r.FormValue("gender")
-	// submission["age"] = r.FormValue("age")
-	// submission["traits"] = traits
-	
-	 newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), r.FormValue("castEmail"), "seanyy")
-	fmt.Println(newWork)
-	fmt.Println(r.FormValue("castEmail[]"))
-	
+	newWork := work.NewWork(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
 	work.InsertWork(newWork)
-
-	data["form"] = r.Form
-	data["submission"] = submission
-	display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+	fmt.Println(newWork)
+	// data["form"] = r.Form
+	// data["submission"] = submission
+	
+	//w.Write([]byte("updated"))
+	//display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+	urlParts := []string{"/work/?id=", projectId.Hex()}
+	url := strings.Join(urlParts, "")
+	// redirect to role page
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
+//gets the numbers of the pages that will be shown in pagination given the max page, current page,
+//and the amount of pages you want displayed
+func getPageList(maxPage int, curPage int, amount int) []int{
+	var result []int
+	var min int
+	var max int
+	
+	if (curPage - (amount/2) <= 1) { //first few pages
+		min = 1
+		if (maxPage > (curPage + amount - 1)) { //if there are more pages than what we will show
+			//get as many pages 1 to amount
+			max = amount
+		} else { //the amount of pages total is less than or equal to the max number of pages
+			//get the pages from 1 to max page
+			max = maxPage
+		}
+	} else if (curPage + (amount/2) >= maxPage) { //last few pages
+		//get as many pages maxPage - (amount - 1) to maxPage
+		min = maxPage - (amount - 1)
+		max = maxPage
+	} else { //somewhere in the middle
+		//get current page - amount/2 to current page - amount/2 + (amount-1)
+		min = curPage - (amount/2)
+		max = min + (amount - 1)
+	}
+	
+	for i := min; i <= max; i++ {
+		result = append(result, i)
+	}
+	fmt.Println(result)
+	return result
 
-
-// INFINITE SCROLL STUFF GOES HERE; NOT COMPLETE
-// func getMoreCastingsHandler()
+}
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
@@ -344,7 +440,7 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	megabytes = (float64)(kilobytes / 1024)
 	
 	if(megabytes < 6) {
-		attachmentURL := "/media/" + s.Get("Email") + "/" + handler.Filename
+		attachmentURL := "/roles/" + roleID + "/" + s.Get("Email") + "/" + handler.Filename
 	
 		uploader := s3manager.NewUploader(session.New())
 		result, err := uploader.Upload(&s3manager.UploadInput{
@@ -360,7 +456,7 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Successfully uploaded to", result.Location)
 		
 		//create a new audition and add the link
-		audition := role.NewAudition(s.Get("Email"), result.Location)
+		audition := role.NewAudition(user.FindUser(s.Get("Email")), result.Location)
 		curRole := role.FindRole(roleID)
 		role.InsertAudition(audition, curRole)
 		
@@ -373,11 +469,12 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
-func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
+
+func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	
-	collection := r.FormValue("collection")
+	collection := "roles"
 	message := r.FormValue("content")
 	roleID := r.FormValue("id")
 	
@@ -391,7 +488,6 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(a)
 	
 	w.Write([]byte("updated"))
-
 }
 
 func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
@@ -420,6 +516,7 @@ func main() {
 	}
 	
 	redis_session = temp_sess
+	
 	rootdir, err := os.Getwd()
 	if err != nil {
 		rootdir = "no directory found"
@@ -430,6 +527,7 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/profile/", profileHandler)
 	http.HandleFunc("/role/", rolePageHandler)
+	http.HandleFunc("/work/", workHandler)
 	http.HandleFunc("/projects/", projectsHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
 	http.HandleFunc("/projectPage/", projectPageHandler)
@@ -442,13 +540,15 @@ func main() {
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
 	http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
+	//http.HandleFunc("/seanTest/", seanTestHands)
 	
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
-	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
 	http.HandleFunc("/api/v1/submitAudition/", submitAuditionHandler)
-
+	http.HandleFunc("/api/v1/submitComment/", submitRoleCommentHandler)
+	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
+	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
