@@ -136,7 +136,7 @@ func InsertComment(commentList []*Comment, comment *Comment, collection string, 
 }
 
 //InsertAudition inserts audition into db
-func InsertAudition(audition *Audition) {
+func InsertAudition(audition *Audition, role *Role) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -145,8 +145,9 @@ func InsertAudition(audition *Audition) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
-
-	err = c.Insert(&Audition{User: audition.User, AttachmentUrl: audition.AttachmentUrl, TimeStamp: audition.TimeStamp, Comment: audition.Comment})
+	
+	change := bson.M{"$push": bson.M{"audition": audition}}
+	err = c.Update(bson.M{"_id": role.Id}, change)
 	if err != nil {
 		panic(err)
 	}

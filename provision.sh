@@ -27,7 +27,7 @@ add-apt-repository -y ppa:rwky/redis
 apt-get update
 apt-get install -y redis-server
 
-# To finish provisioning for mongodb:
+# ===================To finish provisioning for mongodb=======================
 
 # vagrant ssh
 # sudo nano /etc/mongod.conf 
@@ -36,3 +36,14 @@ apt-get install -y redis-server
 # sudo service mongod restart
 
 # To check, run 'mongo localhost:27018' on host machine
+
+# ============================================================================
+
+# ===================Provisioning for aws s3==================================
+
+# http://docs.aws.amazon.com/sdk-for-go/latest/v1/developerguide/configuring-sdk.title.html
+# export/set env variables - ON YOUR MACHINE (Not on vagrant)
+# ask me for keys/secrets
+# luv u guys - Sanjay 
+
+# ============================================================================

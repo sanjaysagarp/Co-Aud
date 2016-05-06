@@ -203,6 +203,12 @@ input[type=text], input[type=number], input[type=date], textarea.form-control {
     background-color:#edeaed;
 }
 
+#auditionFile {
+    display:block;
+    height:0;
+    width:0;
+}
+
 input[type=submit]{
     padding:10px 20px;
     font-family:whitePine;
