@@ -1,14 +1,6 @@
 {{define "castings"}}
 {{template "header" .}}
-<script src="/public/js/infiniteScroll.js"></script>
-
-{{if .Data.currentUser}}
-<div class="search-side-nav">
-	<div data-spy="affix" data-offset-top="200px" data-offset-bottom="200px">
-		<a href="/submitCasting/" class="btn btn-lg btn-default">SUBMIT</a>
-	</div>
-</div>
-{{end}}
+<script src="/public/js/affixSubmit.js"></script>
 <div class="container">
 	<div class="row">
 		<div class="col-lg-12">
@@ -20,7 +12,7 @@
 	        </button>
 	      </span>
 	    </div>
-    </div>	
+    </div>
   </div>	
   <hr>
 	<div class="row">
@@ -42,9 +34,16 @@
 					</a>
 				</li>
 			{{end}}
-	    <li class="active"><a href="/castings/?page=1">1 <span class="sr-only">(current)</span></a></li>
-	    <li><a href="/castings/?page=2">2</a></li>
-	    {{ if not (eq .Data.currentPage .Data.maxPage)}}
+			{{$currentPage := .Data.currentPage}}
+			{{ range .Data.pageList }}	
+				{{if eq . $currentPage }}
+					<li class="active"><a href="/castings/?page={{.}}">{{.}} <span class="sr-only">(current)</span></a></li>
+				{{else}}
+					<li><a href="/castings/?page={{.}}">{{.}}</a></li>
+				{{end}}
+			{{end}}
+	    
+			{{ if not (eq .Data.currentPage .Data.maxPage)}}
 				<li>
 					<a href="/castings/?page=2" aria-label="Next">
 						<span aria-hidden="true">&raquo;</span>
@@ -54,5 +53,11 @@
 	  </ul>
 	</nav>
 </div>
+
+{{if .Data.currentUser}}
+	<div id="submit-button" class="search-side-nav">
+		<a href="/submitCasting/" class="btn btn-lg btn-default">Submit a role!</a>
+	</div>
+{{end}}
 {{template "footer" .}}
 {{end}}

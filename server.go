@@ -79,7 +79,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
-	postedRoles, rolesCount := role.FindRoles(bson.M{"useremail": user.Email}, 0, 3)
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user.email": user.Email}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
@@ -91,7 +91,7 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := r.URL.Query().Get("id")
 	role := role.FindRole(roleID)
 	data["role"] = role
-	data["author"] = user.FindUser(role.UserEmail)
+	data["author"] = user.FindUser(role.User.Email)
 	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
@@ -191,7 +191,7 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
 	  
 	// adding new role into db
 	roleID := bson.NewObjectId()
-	newRole := role.NewRole(r.FormValue("title"), currentUser.Email, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
+	newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
 	role.InsertRole(newRole)
 
 	urlParts := []string{"/role/?id=", roleID.Hex()}
@@ -207,11 +207,17 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	//params for pagination
 	roleAmount := 16
+	pageAmount:= 5
 	
 	//pagination
-	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
-	data["currentPage"] = pageNumber
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page")) //used for getting roles
+	currentPage := pageNumber //used for getting page list
+	if currentPage <= 0 {
+		currentPage = 1
+	}
+	data["currentPage"] = currentPage
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -219,19 +225,24 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	if pageNumber != 0 {
 		pageNumber --
 	}
+	
 	//get roles
 	roleList, rolesCount := role.FindRoles(nil, (pageNumber)*roleAmount, roleAmount)
 	
-	//get max page number
+	//more params for pagination
 	maxPage := int(math.Ceil(float64(rolesCount)/float64(roleAmount)))
+	pageList := getPageList(maxPage, currentPage, pageAmount)
 	
 	data["roles"] = roleList
 	data["rolesCount"] = rolesCount
 	data["roleAmount"] = roleAmount
 	data["maxPage"] = maxPage
-	
+	data["pageList"] = pageList
+	fmt.Println(maxPage)
+	fmt.Println(data["currentPage"])
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
+
 
 func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	//data := setDefaultData(w, r)
@@ -273,10 +284,39 @@ func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	// redirect to role page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
+//gets the numbers of the pages that will be shown in pagination given the max page, current page,
+//and the amount of pages you want displayed
+func getPageList(maxPage int, curPage int, amount int) []int{
+	var result []int
+	var min int
+	var max int
+	
+	if (curPage - (amount/2) <= 1) { //first few pages
+		min = 1
+		if (maxPage > (curPage + amount - 1)) { //if there are more pages than what we will show
+			//get as many pages 1 to amount
+			max = amount
+		} else { //the amount of pages total is less than or equal to the max number of pages
+			//get the pages from 1 to max page
+			max = maxPage
+		}
+	} else if (curPage + (amount/2) >= maxPage) { //last few pages
+		//get as many pages maxPage - (amount - 1) to maxPage
+		min = maxPage - (amount - 1)
+		max = maxPage
+	} else { //somewhere in the middle
+		//get current page - amount/2 to current page - amount/2 + (amount-1)
+		min = curPage - (amount/2)
+		max = min + (amount - 1)
+	}
+	
+	for i := min; i <= max; i++ {
+		result = append(result, i)
+	}
+	fmt.Println(result)
+	return result
 
-
-// INFINITE SCROLL STUFF GOES HERE; NOT COMPLETE
-// func getMoreCastingsHandler()
+}
 
 func googleCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
@@ -343,11 +383,11 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
-func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
+func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	
-	collection := r.FormValue("collection")
+	collection := "roles"
 	message := r.FormValue("content")
 	roleID := r.FormValue("id")
 	
@@ -358,7 +398,6 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
 	role.InsertComment(curRole.Comment, newComment, collection, curRole.Id.Hex())
 	
 	w.Write([]byte("updated"))
-
 }
 
 func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
@@ -387,6 +426,7 @@ func main() {
 	}
 	
 	redis_session = temp_sess
+	
 	rootdir, err := os.Getwd()
 	if err != nil {
 		rootdir = "no directory found"
@@ -413,8 +453,10 @@ func main() {
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
-	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
+	http.HandleFunc("/api/v1/submitComment/", submitRoleCommentHandler)
 	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
+	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
+
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)
