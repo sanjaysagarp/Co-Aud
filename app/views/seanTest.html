@@ -1,28 +1,61 @@
 {{define "seanTest"}}
 {{template "header" .}}
+
 <div class="container">
 	<div class="row">
-		<div class="col-md-3">
-			<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
-			<h2 class="text-center">{{ .Data.submission.title }}</h2>
-		</div>
-		<div class="col-md-6">
-			<h2>Character Bio</h2>
-			<p> Age: {{ .Data.submission.age }}
- Cast: {{ .Data.submission.castEmail }}
- Traits: {{ .Data.submission.traits }}
- Bio: {{ .Data.submission.description }}</p>
-		</div>
-		<div class="col-md-3">
-			<p><strong>Posted by:</strong></p>
-			<p>GrumpyAnimation</p>
-			<p><strong>Deadline:</strong></p>
-			<p>{{ .Data.submission.deadline }}</p>
-			<p><strong>Download Script:</strong></p>
-			<p><a href="!">grumpyjoe-script.pdf</a></p>
+		<div class="col-md-12 embed-responsive embed-responsive-16by9">
+			<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ .Data.youtubeCode }}" frameborder="0" allowfullscreen></iframe>
 		</div>
 	</div>
-<p>{{ .Data.submission }}</p>
+	
+	<br>
+	
+	<div class="row">
+		<div class="col-md-9">
+			<h1>{{ .Data.work.Title }}</h1>
+			<p>
+				{{ .Data.work.Description }}
+			</p>
+		</div>
+		<div id="cast" class="col-md-3">
+			<h1>Cast:</h1>
+			<ul class="media-list">
+				{{ range .Data.work.Cast }}
+				<li class="media">
+				  <div class="media-left">
+				    <a href="/profile/">
+				      <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+				    </a>
+				  </div>
+				  <div class="media-body">
+				    <a href="/profile/"><h4 class="media-heading">{{ .User.DisplayName }}</h4></a>
+				    <p>{{ .Role }}</p>
+				  </div>
+				</li>
+				{{ end }}
+			</ul>	
+		</div>
+	</div>
 </div>
+
+<style>
+	iframe {
+		float:left
+	}
+	#profile #cast {
+		float:left
+	}
+	li > img {
+		float:left
+	}
+	li > p {
+		float:left
+	}
+	li > img {
+		margin-bottom:8px
+		
+	}
+</style>
+
 {{template "footer" .}}
 {{end}}

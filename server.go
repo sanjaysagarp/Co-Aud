@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 	"math"
-	// "reflect"
+	//"reflect"
 	"strconv"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -46,13 +46,13 @@ var configFile, _ = ioutil.ReadFile("./secret/config.json")
 var (
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:    "http://localhost:8080/GoogleCallback",
-		ClientID:     os.Getenv("GOOGLEKEY"),
-		ClientSecret: os.Getenv("GOOGLESECRET"),
+		ClientID:     "688463917821-p5u7nvg7eovcjr92o7e8986b3tl3qdlr.apps.googleusercontent.com",
+		ClientSecret: "nyIHJVB8Fzx76kSL7SMFFRFP",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
 					"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
-	currentUser = &user.User{}
+	currentUser = &user.User{}	
 	// Some random string, random for each request
 	oauthStateString = "random"
 	
@@ -95,9 +95,49 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: "Role", Data: data})
 }
+func workHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	data := setDefaultData(w, r)
+	workId := r.URL.Query().Get("id")
+	work := work.FindWork(workId)
+	URL := work.URL
+	youtubeCode := strings.Split(URL, "=")
+	//fmt.Println("check below this line")
+	fmt.Println(youtubeCode)
+	data["youtubeCode"] = youtubeCode[1] // causes error,need to find better way
+	data["work"] = work
+	data["user"] = currentUser
+	//data["author"] = user.FindUser(work.UserEmail)
+	//fmt.Println(role.Comment)
+	display(w, "seanTest", &Page{Title: "Work", Data: data})
+}
 
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	projectAmount := 16
+	
+	//pagination
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
+	data["currentPage"] = pageNumber
+	if err != nil {
+		fmt.Println(err)
+	}
+	//zero index page number for skip calculation when querying mongo
+	if pageNumber != 0 {
+		pageNumber --
+	}
+	//get roles
+	projectList, projectCount := work.FindWorks(nil, (pageNumber)*projectAmount, projectAmount)
+	
+	//get max page number
+	maxPage := int(math.Ceil(float64(projectCount)/float64(projectAmount)))
+	
+	data["works"] = projectList
+	data["workCount"] = projectCount
+	data["workAmount"] = projectAmount
+	data["maxPage"] = maxPage
+	
 	display(w, "projects", &Page{Title: "Projects", Data: data})
 }
 
@@ -194,32 +234,44 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func seanTestHands(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	submission := make(map[string]interface{})
-	// traits := strings.Split(r.FormValue("traits"), " ")
-	
-	submission["castEmail"] = r.FormValue("castEmail")
-	submission["title"] = r.FormValue("title")
-	submission["URL"] = r.FormValue("URL")
-	submission["shortDescription"] = r.FormValue("shortDescription")
-	submission["description"] = r.FormValue("description")
-	// submission["cast"] = r.FormValue("cast")
-	
-	// submission["script"] = r.FormValue("script")
-	// submission["deadline"] = r.FormValue("deadline")	
-	// submission["gender"] = r.FormValue("gender")
-	// submission["age"] = r.FormValue("age")
-	// submission["traits"] = traits
-	
-	 newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), r.FormValue("castEmail"), "seanyy")
-	fmt.Println(newWork)
-	fmt.Println(r.FormValue("castEmail[]"))
-	
-	work.InsertWork(newWork)
+	//data := setDefaultData(w, r)
+	//submission := make(map[string]interface{})
 
-	data["form"] = r.Form
-	data["submission"] = submission
-	display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+	castsAttendees := strings.Split(r.FormValue("castList"), ",")
+	castRoles := strings.Split(r.FormValue("castRoles"), ",")
+	fmt.Println(len(castsAttendees))
+	fmt.Println(len(castRoles))
+
+	castContainer := make([]work.Cast, 0)
+	for i := 0; i < len(castsAttendees); i++ {
+		fmt.Println(castsAttendees[i])
+		fmt.Println(castRoles[i])
+		castUser := user.FindUser(castsAttendees[i])
+		newCast := work.NewCast(castUser, castRoles[i])
+		castContainer = append(castContainer, newCast)
+	}
+	
+	// data["castEmail"] = r.FormValue("castEmail")
+	// data["title"] = r.FormValue("title")
+	// data["URL"] = r.FormValue("URL")
+	// data["shortDescription"] = r.FormValue("shortDescription")
+	// data["description"] = r.FormValue("description")
+	// data["castHolder"] = castContainer
+	projectId := bson.NewObjectId()
+	//s := redis_session.Session(w, r)
+	
+	newWork := work.NewWork(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	work.InsertWork(newWork)
+	fmt.Println(newWork)
+	// data["form"] = r.Form
+	// data["submission"] = submission
+	
+	//w.Write([]byte("updated"))
+	//display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+	urlParts := []string{"/work/?id=", projectId.Hex()}
+	url := strings.Join(urlParts, "")
+	// redirect to role page
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 
@@ -344,6 +396,7 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/profile/", profileHandler)
 	http.HandleFunc("/role/", rolePageHandler)
+	http.HandleFunc("/work/", workHandler)
 	http.HandleFunc("/projects/", projectsHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
 	http.HandleFunc("/projectPage/", projectPageHandler)
@@ -355,12 +408,13 @@ func main() {
 	http.HandleFunc("/castings/", castingsHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
 	http.HandleFunc("/logout/", logoutHandler)
+	//http.HandleFunc("/seanTest/", seanTestHands)
 	
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
 	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
-
+	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)
