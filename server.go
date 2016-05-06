@@ -21,6 +21,9 @@ import (
 	// "reflect"
 	"strconv"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/aws/session"
 )
 
 //A Page structure
@@ -74,6 +77,12 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func uploadTestHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	display(w, "information", &Page{Title: "Upload pls!", Data: data})
+}
+//==========================================================================================================================================================
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
@@ -285,9 +294,49 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	editedUser := user.NewChangeUser(r.FormValue("displayName"), r.FormValue("title"), r.FormValue("aboutMe"), r.FormValue("personalWebsite"),  r.FormValue("facebookURL"), r.FormValue("twitterURL"), r.FormValue("instagramURL"))
 	
 	user.UpdateUser(s.Get("ID"), editedUser)
-	
-	//need to write to page for ajax call
+
 	w.Write([]byte("updated"))
+	
+}
+
+//Submits an audition in auditions/{auditionid}
+func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	roleID := r.FormValue("id")
+	err := r.ParseMultipartForm(32 << 20)
+    if err != nil {
+        log.Printf("%s", err)
+    }
+	
+	file, handler, err := r.FormFile("auditionFile")
+	if(err != nil) {
+		fmt.Printf("err opening file1: %s", err)
+	}
+	defer file.Close()
+	
+	
+	fmt.Println("BLAH " + roleID )
+	attachmentUrl := "/media/" + s.Get("Email") + "/" + handler.Filename
+	
+	uploader := s3manager.NewUploader(session.New())
+    result, err := uploader.Upload(&s3manager.UploadInput{
+        Body:   file,
+        Bucket: aws.String("coaud"),
+        Key:    aws.String(attachmentUrl),
+    })
+	
+	if err != nil {
+        log.Fatalln("Failed to upload", err)
+    }
+
+    log.Println("Successfully uploaded to", result.Location)
+	
+	//create a new audition and add the link
+	audition := role.NewAudition(s.Get("Email"), attachmentUrl)
+	curRole := role.FindRole(roleID)
+	role.InsertAudition(audition, curRole)
+	
+	w.Write([]byte("uploaded"))
 	
 }
 
@@ -304,6 +353,9 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request) {
 	curRole := role.FindRole(roleID)
 
 	role.InsertComment(curRole.Comment, newComment, collection, curRole.Id.Hex())
+	
+	a := role.FindRole(roleID)
+	fmt.Println(a)
 	
 	w.Write([]byte("updated"))
 
@@ -339,6 +391,7 @@ func main() {
 	if err != nil {
 		rootdir = "no directory found"
 	}
+	
 	http.Handle("/public/", http.StripPrefix("/public",
 		http.FileServer(http.Dir(path.Join(rootdir, "public/")))))
 	http.HandleFunc("/", homeHandler)
@@ -354,12 +407,15 @@ func main() {
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
 	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
+	http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
 	
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
 	http.HandleFunc("/api/v1/submitComment/", submitCommentHandler)
+	http.HandleFunc("/api/v1/submitAudition/", submitAuditionHandler)
+
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")

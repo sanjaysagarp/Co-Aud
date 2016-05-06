@@ -1,0 +1,33 @@
+$(document).ready(function(){
+	
+	$('#uploadInput').click(function() {
+		$('#auditionFile').trigger('click');
+	});
+
+	$('#auditionFile').change(function() {
+		var vals = $(this).val();
+		val = vals.length ? vals.split('\\').pop() : '';
+		$('#uploadInput').val(val);
+	});
+	
+$("#formAudition").submit(function(){
+
+	var formData = new FormData($(this)[0]);
+	formData.append("id", $('#roleCommentButton').data("id"));
+	$.ajax({
+		url: "/api/v1/submitAudition/",
+		type: 'POST',
+		data: formData,
+		async: false,
+		success: function (data) {
+			console.log(data);
+		},
+		cache: false,
+		contentType: false,
+		processData: false
+	});
+
+	return false;
+	});
+	
+});
