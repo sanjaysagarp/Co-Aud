@@ -6,7 +6,7 @@
 		<div class="col-md-8 col-md-offset-2 card">
 			<h3>Add Work</h3>
 			<hr>
-			<form action="/api/v1/publishWork/" method="post">
+			<form>
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" name="title" placeholder="Title">
@@ -31,11 +31,12 @@
 					<input type="button" class="btn btn-info" value="Add another cast member" id="addMoreCast">
 				</div>
 				<br/>
-				<button id="submitWork" type="submit" class="btn btn-default">Submit</button>
+				<button id="submitWork" type="submit" class="btn btn-default" data-id="{{ .Data.work.Id.Hex }}">Submit</button>
 			</form>
 		</div>
 	</div>
 	<div id="notification"></div>
+	
 </div>
 
 {{template "footer" .}}

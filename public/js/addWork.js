@@ -10,7 +10,7 @@ $(document).ready(function(){
 			castRoles.push(castRole);
 			
 		}
-		//e.preventDefault();
+		e.preventDefault();
 		$.ajax({
 				method: 'POST',
 				url: "/api/v1/publishWork/",
@@ -18,21 +18,21 @@ $(document).ready(function(){
 					castList : casts.toString(),
 					castRoles : castRoles.toString(),
 					title : $('[name="title"]').val(),
-					URL : $('[name="url"]').val(),
+					URL : $	('[name="url"]').val(),
 					description : $('[name="description"]').val(),
 					shortDescription : $('[name="shortDescription"]').val()
 				},
 				dataType: 'html',
-				success: function(data) {
-					window.location.href = "/projects/"
+				success: function(data) {	
 					if(data) {
 						$("#notification").css("display", "block");
 						$("#notification").addClass("alert alert-success");
-						$("#notification").html("Blah");
+						$("#notification").html("Project has been created!");
 						$("#notification").fadeOut( 3000 );
 						//location.href = "/seanTest/";
+						//window.location.href = "/castings.html/"
+						//"/project/id?=" + $('#submitWork').data("id")
 					} 
-					window.location.href = "/api/v1/publishWork/"
 					
 				},
 				failure: function(err) {
@@ -44,7 +44,7 @@ $(document).ready(function(){
 	$('#addMoreCast').on('click', function(e) {
 		counter++;
 		var newdiv = document.createElement('div');
-		newdiv.innerHTML = "Cast Member " + counter + " <br><input type='text' name='castEmail" + counter + "'>as<input type='text' name='castRole"+ counter +"'>";
+		newdiv.innerHTML = "Cast Member " + counter + "<br><input type='text' name='castEmail" + counter + "'> as <input type='text' name='castRole"+ counter +"'>";
 		document.getElementById("dynamicInput").appendChild(newdiv);
 	
 	});

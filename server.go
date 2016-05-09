@@ -137,13 +137,10 @@ func workHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	data := setDefaultData(w, r)
-	workId := r.URL.Query().Get("id")
-	work := work.FindWork(workId)
-	// URL := work.URL
-	// youtubeCode := getYoutubeID(URL)
+	workID := r.URL.Query().Get("id")
+	work := work.FindWork(workID)
 	//fmt.Println("check below this line")
-	// fmt.Println(youtubeCode[1])
-	// data["youtubeCode"] = youtubeCode[1] // causes error,need to find better way
+	data["youtubeCode"] = work.GetYoutubeID() // causes error,need to find better way
 	data["work"] = work
 	data["user"] = currentUser
 	//data["author"] = user.FindUser(work.UserEmail)
@@ -291,7 +288,8 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	//data := setDefaultData(w, r)
 	//submission := make(map[string]interface{})
-
+	fmt.Println(r.FormValue("castList"))
+	fmt.Println(r.FormValue("castRoles"))
 	castsAttendees := strings.Split(r.FormValue("castList"), ",")
 	castRoles := strings.Split(r.FormValue("castRoles"), ",")
 	fmt.Println(len(castsAttendees))
@@ -299,33 +297,20 @@ func seanTestHands(w http.ResponseWriter, r *http.Request) {
 
 	castContainer := make([]work.Cast, 0)
 	for i := 0; i < len(castsAttendees); i++ {
-		fmt.Println(castsAttendees[i])
-		fmt.Println(castRoles[i])
 		castUser := user.FindUser(castsAttendees[i])
 		newCast := work.NewCast(castUser, castRoles[i])
 		castContainer = append(castContainer, newCast)
 	}
 	
-	// data["castEmail"] = r.FormValue("castEmail")
-	// data["title"] = r.FormValue("title")
-	// data["URL"] = r.FormValue("URL")
-	// data["shortDescription"] = r.FormValue("shortDescription")
-	// data["description"] = r.FormValue("description")
-	// data["castHolder"] = castContainer
 	projectId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
-	
-	newWork := work.NewWork(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
 	work.InsertWork(newWork)
 	fmt.Println(newWork)
-	// data["form"] = r.Form
-	// data["submission"] = submission
-	
-	//w.Write([]byte("updated"))
 	//display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
 	urlParts := []string{"/work/?id=", projectId.Hex()}
 	url := strings.Join(urlParts, "")
-	// redirect to role page
+	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 //gets the numbers of the pages that will be shown in pagination given the max page, current page,
