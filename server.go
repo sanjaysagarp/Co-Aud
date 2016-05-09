@@ -71,6 +71,15 @@ func display(w http.ResponseWriter, tmpl string, data interface{}) {
 //The handlers.
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
+	
+	//get roles
+	roleList, totalRolesCount := role.FindRoles(nil, 0, 16)
+	projectList, totalProjectList := work.FindWorks(nil, 0, 6)
+	
+	fmt.Println("total number of projects: ", totalProjectList)
+	data["totalRolesCount"] = totalRolesCount
+	data["roles"] = roleList
+	data["projects"] = projectList
 	display(w, "home", &Page{Title: "Home!", Data: data})
 }
 
@@ -123,17 +132,18 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: role.Title, Data: data})
 }
+
 func workHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	data := setDefaultData(w, r)
 	workId := r.URL.Query().Get("id")
 	work := work.FindWork(workId)
-	URL := work.URL
-	youtubeCode := strings.Split(URL, "=")
+	// URL := work.URL
+	// youtubeCode := getYoutubeID(URL)
 	//fmt.Println("check below this line")
-	fmt.Println(youtubeCode)
-	data["youtubeCode"] = youtubeCode[1] // causes error,need to find better way
+	// fmt.Println(youtubeCode[1])
+	// data["youtubeCode"] = youtubeCode[1] // causes error,need to find better way
 	data["work"] = work
 	data["user"] = currentUser
 	//data["author"] = user.FindUser(work.UserEmail)
@@ -144,10 +154,17 @@ func workHandler(w http.ResponseWriter, r *http.Request) {
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	projectAmount := 16
+	pageAmount := 5
 	
 	//pagination
-	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page"))
-	data["currentPage"] = pageNumber
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page")) //used for getting roles
+	currentPage := pageNumber //used for getting page list
+	if currentPage <= 0 {
+		currentPage = 1
+	}
+	data["currentPage"] = currentPage
+	data["prevPage"] = currentPage - 1
+	data["nextPage"] = currentPage + 1
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -155,15 +172,16 @@ func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	if pageNumber != 0 {
 		pageNumber --
 	}
-	//get roles
-	projectList, projectCount := work.FindWorks(nil, (pageNumber)*projectAmount, projectAmount)
 	
-	//get max page number
+	//get projects
+	projectList, projectCount := work.FindWorks(nil, (pageNumber)*projectAmount, projectAmount)
+	fmt.Println(projectList)
+	//more params for pagination
 	maxPage := int(math.Ceil(float64(projectCount)/float64(projectAmount)))
+	pageList := getPageList(maxPage, currentPage, pageAmount)
 	
 	data["works"] = projectList
-	data["workCount"] = projectCount
-	data["workAmount"] = projectAmount
+	data["pageList"] = pageList
 	data["maxPage"] = maxPage
 	
 	display(w, "projects", &Page{Title: "Projects", Data: data})
@@ -246,6 +264,8 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 		currentPage = 1
 	}
 	data["currentPage"] = currentPage
+	data["prevPage"] = currentPage - 1
+	data["nextPage"] = currentPage + 1
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -262,12 +282,8 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	pageList := getPageList(maxPage, currentPage, pageAmount)
 	
 	data["roles"] = roleList
-	data["rolesCount"] = rolesCount
-	data["roleAmount"] = roleAmount
 	data["maxPage"] = maxPage
 	data["pageList"] = pageList
-	fmt.Println(maxPage)
-	fmt.Println(data["currentPage"])
 	display(w, "castings", &Page{Title: "Casting List", Data: data})
 }
 
@@ -490,6 +506,28 @@ func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("updated"))
 }
 
+func getRoleHandler(w http.ResponseWriter, r *http.Request) {
+	//need to get form fields web page
+	page, err := strconv.Atoi(r.FormValue("page"))
+	fmt.Println(page)
+	if(err != nil) {
+		panic(err)
+	}
+	
+	//create a new user struct
+	roles, rolesCount := role.FindRoles(nil, page*16, 16)
+	fmt.Println(rolesCount)
+	var html string
+	if len(roles) != 0 {
+		for index, role := range roles {
+			html += "<div class=\"thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3\"><a href=\"/role/?id=" + role.Id.Hex() + "\"><h2>" + role.Title + "</h2><img class=\"img-responsive\" src=\"/public/img/placeholder.png\"></a></div>"
+			fmt.Println(index)
+		}
+	}
+	w.Write([]byte(html))
+	
+}
+
 func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface{} {
 	data := make(map[string]interface{})
 	s := redis_session.Session(w, r)
@@ -549,6 +587,7 @@ func main() {
 	http.HandleFunc("/api/v1/submitComment/", submitRoleCommentHandler)
 	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
 	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
+	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")

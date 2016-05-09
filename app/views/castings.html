@@ -29,7 +29,7 @@
 	  <ul class="pagination">
 	    {{ if not (or (eq .Data.currentPage 1) (eq .Data.currentPage 0))}}
 				<li>
-					<a href="/castings/?page=1" aria-label="Previous">
+					<a href="/castings/?page={{.Data.prevPage}}" aria-label="Previous">
 						<span aria-hidden="true">&laquo;</span>
 					</a>
 				</li>
@@ -45,7 +45,7 @@
 	    
 			{{ if not (eq .Data.currentPage .Data.maxPage)}}
 				<li>
-					<a href="/castings/?page=2" aria-label="Next">
+					<a href="/castings/?page={{.Data.nextPage}}" aria-label="Next">
 						<span aria-hidden="true">&raquo;</span>
 					</a>
 				</li>

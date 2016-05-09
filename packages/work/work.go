@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	"strings"
 )
 
 //Cast struct
@@ -26,6 +27,11 @@ type Work struct {
 	Cast []Cast // [] Return to the original later **
 	PostedDate time.Time
 	User *user.User
+}
+
+func (w *Work) GetYoutubeID() string {
+	youtubeCode := strings.Split(w.URL, "=")
+    return youtubeCode[1]
 }
 
 //NewWork creates a new instance of work
