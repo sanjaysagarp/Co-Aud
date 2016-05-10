@@ -150,7 +150,7 @@ func FindWorks(q interface{}, skip int, limit int) ([]Work, int) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("works")
 	result := []Work{}
-	err = c.Find(q).Skip(skip).Limit(limit).Sort("-timestamp").All(&result)
+	err = c.Find(q).Skip(skip).Limit(limit).Sort("-posteddate").All(&result)
 	if err != nil {
 		panic(err)
 	}
