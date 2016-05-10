@@ -37,7 +37,7 @@ func NewChangeUser(displayName string, title string, aboutMe string, personalWeb
 
 //FindUser searches for the user
 func FindUser(email string) *User {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	//fmt.Println("connected")
 	if err != nil {
@@ -58,7 +58,7 @@ func FindUser(email string) *User {
 
 //FindUser searches for the user
 func FindUserById(id string) *User {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func FindUserById(id string) *User {
 
 //InsertUser adds the user to the db
 func InsertUser(user *User) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -96,7 +96,7 @@ func InsertUser(user *User) {
 
 //UpdateUser updates a user with the given id and handler made struct 
 func UpdateUser(id string, user *User) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}

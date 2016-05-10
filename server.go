@@ -49,7 +49,7 @@ var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 var (
 	googleOauthConfig = &oauth2.Config{
-		RedirectURL:    "http://localhost:8080/GoogleCallback",
+		RedirectURL:    "http://coaud.io/GoogleCallback",
 		ClientID:     "688463917821-p5u7nvg7eovcjr92o7e8986b3tl3qdlr.apps.googleusercontent.com",
 		ClientSecret: "nyIHJVB8Fzx76kSL7SMFFRFP",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
