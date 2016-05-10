@@ -6,25 +6,25 @@
 		<div class="col-md-8 col-md-offset-2 card">
 			<h3>Add Work</h3>
 			<hr>
-			<form action="/api/v1/publishWork/" method="post">
+			<form id ="workForm" action="/api/v1/publishWork/" method="post">
 				<div class="form-group">
 					<label>Title</label>
-					<input type="text" class="form-control" name="title" placeholder="Title">
+					<input type="text" class="form-control" id="title" name="title" placeholder="Title">
 				</div>
 				<div class="form-group">
 					<label>Youtube URL</label>
-					<input type="text" class="form-control" name="url" placeholder="Example: youtubeblahblahblah">
+					<input type="text" class="form-control" id="url" name="url" placeholder="Example: youtubeblahblahblah">
 				</div>
 				<div class="form-group">
 					<label>Short Description</label>
-					<input type="text" class="form-control" name="shortDescription" placeholder="Short Description (140 characters)" maxlength="140">
+					<input type="text" class="form-control" name="shortDescription" id="shortDescription" placeholder="Short Description (140 characters)" maxlength="140">
 				</div>
 				<div class="form-group">
 					<label>Description</label>
-					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
+					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description" id="description"></textarea>
 				</div>
 				<div class="form-group" id="dynamicInput">
-					Cast Member 1<br><input type="text" name="castEmail[]"/> as <input type="text" name="castRole[]"/>						
+					Cast Member 1<br><input type="text" id="castEmail[]" name="castEmail[]"/> as <input type="text" id="castRole[]" name="castRole[]"/>						
 				</div>
 				<div>
 					<br>
