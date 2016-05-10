@@ -288,12 +288,10 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	//data := setDefaultData(w, r)
 	//submission := make(map[string]interface{})
-	fmt.Println(r.FormValue("castList"))
-	fmt.Println(r.FormValue("castRoles"))
-	castsAttendees := strings.Split(r.FormValue("castList"), ",")
-	castRoles := strings.Split(r.FormValue("castRoles"), ",")
-	fmt.Println(len(castsAttendees))
-	fmt.Println(len(castRoles))
+	// **TOP
+	r.ParseForm()
+	castsAttendees := r.Form["castEmail[]"]
+	castRoles := r.Form["castRole[]"]
 
 	castContainer := make([]work.Cast, 0)
 	for i := 0; i < len(castsAttendees); i++ {
@@ -304,14 +302,16 @@ func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	
 	projectId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
-	newWork := work.NewWork(r.FormValue("title"), r.FormValue("URL"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	newWork := work.NewWork(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
 	work.InsertWork(newWork)
 	fmt.Println(newWork)
-	//display(w, "seanTest", &Page{Title: "LULULULU", Data: data})
+	
 	urlParts := []string{"/work/?id=", projectId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	
+	// ** Bottom
 }
 //gets the numbers of the pages that will be shown in pagination given the max page, current page,
 //and the amount of pages you want displayed
