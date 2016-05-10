@@ -6,7 +6,7 @@
 		<div class="col-md-8 col-md-offset-2 card">
 			<h3>Add Work</h3>
 			<hr>
-			<form>
+			<form action="/api/v1/publishWork/" method="post">
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" name="title" placeholder="Title">
@@ -23,8 +23,8 @@
 					<label>Description</label>
 					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
 				</div>
-				<div id="dynamicInput">
-					Cast Member 1<br><input type="text" name="castEmail1"> as <input type="text" name="castRole1">						
+				<div class="form-group" id="dynamicInput">
+					Cast Member 1<br><input type="text" name="castEmail[]"/> as <input type="text" name="castRole[]"/>						
 				</div>
 				<div>
 					<br>

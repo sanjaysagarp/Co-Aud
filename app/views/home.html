@@ -1,196 +1,51 @@
 {{define "home"}}
 {{template "header" .}}
-	<!-- Header Carousel -->
-	<header id="myCarousel" class="carousel slide">
-		<!-- Indicators -->
-		<ol class="carousel-indicators">
-			<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-			<li data-target="#myCarousel" data-slide-to="1"></li>
-			<li data-target="#myCarousel" data-slide-to="2"></li>
-		</ol>
-
-		<!-- Wrapper for slides -->
-		<div class="carousel-inner">
-			<div class="item active">
-				<div class="fill" style="background-image:url('https://scontent-sea1-1.xx.fbcdn.net/hphotos-xpf1/t31.0-8/s960x960/12967276_10206143505091891_807824696022361312_o.jpg');"></div>
-				<div class="carousel-caption">
-					<h2>Caption 1</h2>
-				</div>
-			</div>
-			<div class="item">
-				<div class="fill" style="background-image:url('https://scontent-sea1-1.xx.fbcdn.net/hphotos-frc1/v/t1.0-9/10152009_10201797868773699_6978440953335682669_n.jpg?oh=83506b9bfffb7d78d24f911beb166fc0&oe=5771C3AF');"></div>
-				<div class="carousel-caption">
-					<h2>Caption 2</h2>
-				</div>
-			</div>
-			<div class="item">
-				<div class="fill" style="background-image:url('http://placehold.it/1900x1080&text=Slide Three');"></div>
-				<div class="carousel-caption">
-					<h2>Caption 3</h2>
-				</div>
+<script src="/public/js/multiItemCarousel.js"></script>
+<script src="/public/js/infiniteScroll.js"></script>
+<div class="container">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="Search for...">
+				<span class="input-group-btn">
+					<button class="btn btn-default" type="button">
+						<span class="glyphicon glyphicon-search" aria-hidden="true"></span>Search
+					</button>
+				</span>
 			</div>
 		</div>
-
-		<!-- Controls -->
-		<a class="left carousel-control" href="#myCarousel" data-slide="prev">
-			<span class="icon-prev"></span>
-		</a>
-		<a class="right carousel-control" href="#myCarousel" data-slide="next">
-			<span class="icon-next"></span>
-		</a>
-	</header>
-
-	<!-- Page Content -->
-	<div class="container">
-
-		<!-- Marketing Icons Section -->
-		<div class="row">
-			<div class="col-lg-12">
-				<h1 class="page-header">
-					Welcome to Co-Aud
-				</h1>
-			</div>
-			<div class="col-md-4">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h4><i class="fa fa-fw fa-check"></i> News 1</h4>
-					</div>
-					<div class="panel-body">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque, optio corporis quae nulla aspernatur in alias at numquam rerum ea excepturi expedita tenetur assumenda voluptatibus eveniet incidunt dicta nostrum quod?</p>
-						<a href="#" class="btn btn-default">Learn More</a>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h4><i class="fa fa-fw fa-gift"></i> News 2</h4>
-					</div>
-					<div class="panel-body">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque, optio corporis quae nulla aspernatur in alias at numquam rerum ea excepturi expedita tenetur assumenda voluptatibus eveniet incidunt dicta nostrum quod?</p>
-						<a href="#" class="btn btn-default">Learn More</a>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h4><i class="fa fa-fw fa-compass"></i> News 3</h4>
-					</div>
-					<div class="panel-body">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque, optio corporis quae nulla aspernatur in alias at numquam rerum ea excepturi expedita tenetur assumenda voluptatibus eveniet incidunt dicta nostrum quod?</p>
-						<a href="#" class="btn btn-default">Learn More</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- /.row -->
-
-		<!-- Portfolio Section -->
-		<div class="row">
-			<div class="col-lg-12">
-				<h2 class="page-header">Apply for a Voice Acting gig!</h2>
-			</div>
-			<div class="col-md-4 col-sm-6">
-				<a href="/role/">
-					<img class="img-responsive img-portfolio img-hover" src="http://placehold.it/700x450" alt="">
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-6">
-				<a href="/role/">
-					<img class="img-responsive img-portfolio img-hover" src="http://placehold.it/700x450" alt="">
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-6">
-				<a href="/role/">
-					<img class="img-responsive img-portfolio img-hover" src="http://placehold.it/700x450" alt="">
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-6">
-				<a href="/role/">
-					<img class="img-responsive img-portfolio img-hover" src="http://placehold.it/700x450" alt="">
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-6">
-				<a href="/role/">
-					<img class="img-responsive img-portfolio img-hover" src="http://placehold.it/700x450" alt="">
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-6">
-				<a href="/role/">
-					<img class="img-responsive img-portfolio img-hover" src="http://placehold.it/700x450" alt="">
-				</a>
-			</div>
-		</div>
-		<!-- /.row -->
-
-		<!-- Features Section -->
-		<div class="row">
-			<div class="col-lg-12">
-				<h2 class="page-header">Monthly Contests</h2>
-			</div>
-			<div class="col-md-6">
-				<p>Group into Teams and bring your creativity to life</p>
-				<ul>
-					<li><strong>Collaboration</strong>
-					</li>
-					<li>Interaction</li>
-					<li>Creativity</li>
-					<li>Enthusiasm? How do you spell this word</li>
-				</ul>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis, omnis doloremque non cum id reprehenderit, quisquam totam aspernatur tempora minima unde aliquid ea culpa sunt. Reiciendis quia dolorum ducimus unde.</p>
-			</div>
-			<div class="col-md-6">
-				<img class="img-responsive" src="http://placehold.it/700x450" alt="">
-			</div>
-		</div>
-		<!-- /.row -->
-		<hr>
-		<div class="well">
-			<div class="row">
-				<div class="col-md-8">
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Molestias, expedita, saepe, vero rerum deleniti beatae veniam harum neque nemo praesentium cum alias asperiores commodi.</p>
-				</div>
-				<div class="col-md-4">
-					<a href="/contestMain/" class="btn btn-lg btn-default btn-block" href="#">Join a Team today!</a>
-				</div>
-			</div>
-		</div>
-		<hr>
 	</div>
-	<!-- /.container -->
-	
-		<!-- Call to Action Section -->
-
-
-
-
-	<!-- Script to Activate the Carousel -->
-	<script>
-	$('.carousel').carousel({
-		interval: 5000 //changes the speed
-	})
-	</script>
-
-<style>
-	#navbar-block {
-		margin-bottom:0;
-	}
-	
-	footer {
-		margin-top: 50px 0;
-	}
-	hr { background-color: white; 
-		height: 1px; 
-		border: 0; 
-	} 
-	.page-header {
-		border-bottom:1px solid white;
-	}
-	.navbar-default {
-		border:0;
-	}
-
-</style>
+	<div class="row">
+		<div class="jcarousel-wrapper">
+			<div class="jcarousel" data-jcarousel="true">
+				<ul style="left: -600px; top: 0px;">
+					{{ range .Data.projects }}
+						<li style="width: 200px;"><a href="/work/?id={{ .Id.Hex }}"><img src="/public/img/placeholder.png"></a></li>
+					{{ end }}
+				</ul>
+			</div>
+			<a href="#" class="jcarousel-control-prev" data-jcarouselcontrol="true">‹</a>
+			<a href="#" class="jcarousel-control-next" data-jcarouselcontrol="true">›</a>
+			<p class="jcarousel-pagination" data-jcarouselpagination="true">
+				<a href="#1" class="">1</a>
+				<a href="#2" class="">2</a>
+				<a href="#3" class="">3</a>
+				<a href="#4" class="">4</a>
+				<a href="#5" class="">5</a>
+				<a href="#6" class="">6</a>
+			</p>
+		</div>
+	</div>
+	<div id="home-page-roles" class="row" style="margin-top: 50px;">
+		{{ range .Data.roles }}
+			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
+				<a href="/role/?id={{ .Id.Hex }}">
+					<h2>{{ .Title }}</h2>
+					<img class="img-responsive" src="/public/img/placeholder.png">
+				</a>
+			</div>
+		{{ end }}
+	</div>
+</div>
 {{template "footer" .}}
 {{end}}

@@ -1,6 +1,5 @@
 {{define "projects"}}
 {{template "header" .}}
-
 <script src="/public/js/affixSubmit.js"></script>
 <div class="container">
 	<div class="row">
@@ -21,7 +20,8 @@
 			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 				<a href="/work/?id={{ .Id.Hex }}">
 					<h2>{{ .Title }}</h2>
-					<img class="img-responsive" src="/public/img/placeholder.png">
+					<img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg
+">
 				</a>
 			</div>
 		{{ end }}
@@ -30,16 +30,23 @@
 	  <ul class="pagination">
 	    {{ if not (or (eq .Data.currentPage 1) (eq .Data.currentPage 0))}}
 				<li>
-					<a href="/work/?page=1" aria-label="Previous">
+					<a href="/projects/?page={{.Data.prevPage}}" aria-label="Previous">
 						<span aria-hidden="true">&laquo;</span>
 					</a>
 				</li>
 			{{end}}
-	    <li class="active"><a href="/work/?page=1">1 <span class="sr-only">(current)</span></a></li>
-	    <li><a href="/work/?page=2">2</a></li>
-	    {{ if not (eq .Data.currentPage .Data.maxPage)}}
+			{{$currentPage := .Data.currentPage}}
+			{{ range .Data.pageList }}	
+				{{if eq . $currentPage }}
+					<li class="active"><a href="/projects/?page={{.}}">{{.}} <span class="sr-only">(current)</span></a></li>
+				{{else}}
+					<li><a href="/projects/?page={{.}}">{{.}}</a></li>
+				{{end}}
+			{{end}}
+	    
+			{{ if not (eq .Data.currentPage .Data.maxPage)}}
 				<li>
-					<a href="/work/?page=2" aria-label="Next">
+					<a href="/projects/?page={{.Data.nextPage}}" aria-label="Next">
 						<span aria-hidden="true">&raquo;</span>
 					</a>
 				</li>
@@ -49,9 +56,9 @@
 </div>
 
 {{if .Data.currentUser}}
-	<div id="submit-button" class="search-side-nav">
-			<a href="/addWork/" class="btn btn-lg btn-default">Submit a Project</a>
-	</div>
+<div id="submit-button" class="search-side-nav">
+		<a href="/addWork/" class="btn btn-lg btn-default">Submit a Project</a>
+</div>
 {{end}}
 {{template "footer" .}}
 {{end}}
