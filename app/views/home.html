@@ -20,7 +20,8 @@
 			<div class="jcarousel" data-jcarousel="true">
 				<ul style="left: -600px; top: 0px;">
 					{{ range .Data.projects }}
-						<li style="width: 200px;"><a href="/work/?id={{ .Id.Hex }}"><img src="/public/img/placeholder.png"></a></li>
+						<!--Only supports youtube noe-->
+						<li style="width: 200px;"><a href="/work/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a></li>
 					{{ end }}
 				</ul>
 			</div>
@@ -41,7 +42,7 @@
 			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
 				<a href="/role/?id={{ .Id.Hex }}">
 					<h2>{{ .Title }}</h2>
-					<img class="img-responsive" src="/public/img/placeholder.png">
+					<img class="img-responsive" src="{{.ImageUrl}}">
 				</a>
 			</div>
 		{{ end }}

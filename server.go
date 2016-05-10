@@ -277,10 +277,10 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
 
 		urlParts := []string{"/role/?id=", newRole.Id.Hex()}
 		url := strings.Join(urlParts, "")
-		// redirect to role page - KEEPS CRASHING
+		
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	} else {
-		//handle response?
+		//handle response if greater than 6 megabytes! -- NEED TO MAKE RESPONSIVE
 		w.Write([]byte("rejected"))
 	}
 	

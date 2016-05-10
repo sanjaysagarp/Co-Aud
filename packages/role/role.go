@@ -70,7 +70,7 @@ func NewComment(user *user.User, message string) *Comment {
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewRole(title string, user *user.User, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId, imageUrl string,) *Role {
+func NewRole(title string, user *user.User, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId, imageUrl string) *Role {
 	return &Role{Title: title, User: user, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl, Id: id}
 }
 
