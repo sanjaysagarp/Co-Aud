@@ -2,10 +2,11 @@
 {{template "header" .}}
 <script src="/public/js/role.js"></script>
 <script src="/public/js/submitComment.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.2.43/jquery.form-validator.min.js"></script>
 <div class="container">
 	<div class="row">
 		<div class="col-md-3">
-			<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
+			<img class="img-circle img-responsive" src="{{.Data.role.ImageUrl}}">
 		</div>
 		<div class="col-md-6">
 			<h2>{{ .Data.role.Title }}</h2>
@@ -42,11 +43,11 @@
 					<div class="form-group">
 						<label class="col-md-2 control-label" for="uploadInput">Your audition:</label>
 						<div class="col-md-8">
-							<input type="text" class="form-control" id="uploadInput" name="auditionName" placeholder="Choose File" >
-							<input type="file" id="auditionFile" name="auditionFile" accept=".mp3,audio/*">
+							<input type="text" class="form-control" id="uploadInput" name="auditionName" placeholder="Choose File">
+							<input type="file" id="auditionFile" name="auditionFile" accept=".mp3,audio/*" data-validation="size" data-validation-max-size="6M">
 						</div>	
 						<div class="col-md-2">	
-							<button id="auditionSubmit" type="submit" class="btn btn-default" data-id="{{ .Data.role.Id.Hex }}">Upload</button>
+							<button id="auditionSubmit" type="submit" class="btn btn-default" data-id="{{ .Data.role.Id.Hex }}">Submit</button>
 						</div>	
 					</div>
 				</form>
@@ -55,12 +56,12 @@
 				{{ range .Data.role.Audition }}
 					<li class="audition media">
 					<div class="media-left">
-						<a href="/profile/">
+						<a href="/profile/?id={{.User.Id.Hex}}">
 							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
 						</a>
 					</div>
 					<div class="media-body">
-						<h4 class="media-heading">{{.User.Email}}</h4>
+						<h4 class="media-heading">{{.User.DisplayName}}</h4>
 						<p>Title goes here
 							<!--<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
 							<span class="pull-right">234</span>-->

@@ -216,16 +216,59 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
       fmt.Println(err)
       return
   	}
-	  
+	
+	// need to get image
+	file, handler, err := r.FormFile("photo")
+	defer file.Close()
+	if err != nil {
+		fmt.Printf("err opening audition file: %s", err)
+		return
+	}
+	
+	bytes, err := file.Seek(0,2)
+	if err != nil {
+		panic(err)
+	}
+	
+	//get file size in kilobytes and megabytes
+	var kilobytes int64
+	kilobytes = (bytes / 1024)
+	
+	var megabytes float64
+	megabytes = (float64)(kilobytes / 1024)
+	
 	// adding new role into db
 	roleID := bson.NewObjectId()
-	newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID)
-	role.InsertRole(newRole)
+	
+	//TODO: add appropriate size limit
+	if(megabytes < 6) {
+		attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
+	
+		uploader := s3manager.NewUploader(session.New())
+		result, err := uploader.Upload(&s3manager.UploadInput{
+			Body:   file,
+			Bucket: aws.String("coaud"),
+			Key:    aws.String(attachmentURL),
+		})
+		
+		if err != nil {
+			log.Fatalln("Failed to upload", err)
+		}
 
-	urlParts := []string{"/role/?id=", roleID.Hex()}
-	url := strings.Join(urlParts, "")
-	// redirect to role page
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		log.Println("Successfully uploaded to", result.Location)
+		
+		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, result.Location)
+		role.InsertRole(newRole)
+
+		urlParts := []string{"/role/?id=", newRole.Id.Hex()}
+		url := strings.Join(urlParts, "")
+		// redirect to role page - KEEPS CRASHING
+		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	} else {
+		//handle response?
+		w.Write([]byte("rejected"))
+	}
+	
 }
 
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -408,16 +451,14 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
     }
 	
 	file, handler, err := r.FormFile("auditionFile")
-	if(err != nil) {
-		fmt.Printf("err opening file1: %s", err)
-	}
 	defer file.Close()
 	if err != nil {
+		fmt.Printf("err opening audition file: %s", err)
 		return
 	}
 
 	bytes, err := file.Seek(0,2)
-	if(err != nil) {
+	if err != nil {
 		panic(err)
 	}
 	
