@@ -20,7 +20,7 @@
 			<div class="jcarousel" data-jcarousel="true">
 				<ul style="left: -600px; top: 0px;">
 					{{ range .Data.projects }}
-						<!--Only supports youtube noe-->
+						<!--Only supports youtube now-->
 						<li style="width: 200px;"><a href="/work/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a></li>
 					{{ end }}
 				</ul>
