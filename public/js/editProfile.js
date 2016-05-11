@@ -22,6 +22,7 @@ $(document).ready(function(){
 						$("#notification").addClass("alert alert-success");
 						$("#notification").html("User profile updated!");
 						$("#notification").fadeOut( 3000 );
+						window.location.href = "/profile/edit"
 					} 
 					
 				},
