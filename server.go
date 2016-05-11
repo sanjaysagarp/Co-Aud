@@ -579,7 +579,6 @@ func main() {
 	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
 	http.HandleFunc("/api/v1/submitAuditionComment/", submitAuditionCommentHandler)
 	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
-	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
 
 	//Listen on port 80

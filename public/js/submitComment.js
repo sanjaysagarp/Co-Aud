@@ -7,7 +7,7 @@ $(document).ready(function(){
 				url: "/api/v1/submitRoleComment/",
 				data: {
 					//disable comment section
-					content: $('[name="roleCommentContent"]').val(),
+					content: $('#roleCommentContent').val(),
 					id: $('#roleCommentButton').data("id")
 				},
 				dataType: 'html',
@@ -58,7 +58,7 @@ $(document).ready(function(){
 	// 	});
 	// });
 	
-	
+	//ON CLICK 
 	// <li class="comment-submission media">
 	// 	<div class="media-left">
 	// 		<a href="/profile/">

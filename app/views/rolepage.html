@@ -67,7 +67,7 @@
 							<span class="pull-right">{{.TimeStamp}}</span>
 						</p>
 						<audio controls>
-							<source src="{{ .AttachmentUrl}}" type="audio/mpeg">
+							<source src="{{ .AttachmentUrl }}" type="audio/mpeg">
 						</audio>
 						<ul class="comment-section media-list">
 							{{range .Comment}}
@@ -114,7 +114,7 @@
 					</div>
 					<div class="media-body">
 						<form>
-							<textarea name="roleCommentContent" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
+							<textarea id="roleCommentContent" name="roleCommentContent" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
 							<button id="roleCommentButton" type="submit" class="btn btn-default pull-right" data-id="{{ .Data.role.Id.Hex }}">Post</button>
 						</form>
 					</div>
