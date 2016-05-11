@@ -32,6 +32,7 @@ type Team struct {
 type Role struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
+	ImageUrl string
 	User *user.User
 	Traits []string
 	Description string
@@ -69,8 +70,8 @@ func NewComment(user *user.User, message string) *Comment {
 
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewRole(title string, user *user.User, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId) *Role {
-	return &Role{Title: title, User: user, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, Id: id}
+func NewRole(title string, user *user.User, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId, imageUrl string) *Role {
+	return &Role{Title: title, User: user, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl, Id: id}
 }
 
 //NewTeam creates an instance of a new role and returns it
@@ -218,7 +219,7 @@ func InsertRole(role *Role) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
 
-	err = c.Insert(&Role{Title: role.Title,User: role.User,Description: role.Description,Script: role.Script,TimeStamp: role.TimeStamp,Deadline: role.Deadline,Traits: role.Traits, Gender: role.Gender, Age: role.Age, Id: role.Id})
+	err = c.Insert(role)
 	if err != nil {
 		panic(err)
 	}
