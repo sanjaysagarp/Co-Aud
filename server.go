@@ -129,7 +129,6 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	
 	data["author"] = user.FindUser(role.User.Email)
-	fmt.Println(role.Comment)
 	display(w, "rolepage", &Page{Title: role.Title, Data: data})
 }
 
@@ -512,7 +511,8 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Successfully uploaded to", result.Location)
 		
 		//create a new audition and add the link
-		audition := role.NewAudition(user.FindUser(s.Get("Email")), result.Location)
+		auditionID := bson.NewObjectId()
+		audition := role.NewAudition(user.FindUser(s.Get("Email")), result.Location, auditionID)
 		curRole := role.FindRole(roleID)
 		role.InsertAudition(audition, curRole)
 		
@@ -526,28 +526,24 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
-	submitCommentHandler(w, r, "roles")
+	submitCommentHandler(w, r, "roles", true)
 }
 
 func submitAuditionCommentHandler(w http.ResponseWriter, r *http.Request) {
-	submitCommentHandler(w, r, "roles.audition")
+	submitCommentHandler(w, r, "auditions", false)
 }
 
-func submitCommentHandler(w http.ResponseWriter, r *http.Request, collection string) {
+func submitCommentHandler(w http.ResponseWriter, r *http.Request, collection string, recentOrder bool) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	
 	message := r.FormValue("content")
-	roleID := r.FormValue("id")
+	id := r.FormValue("id")
 	
-	
-	newComment := role.NewComment(currentUser, message)
-	curRole := role.FindRole(roleID)
+	commentID := bson.NewObjectId()
+	newComment := role.NewComment(currentUser, message, commentID)
 
-	role.InsertComment(newComment, collection, curRole.Id.Hex())
-	
-	a := role.FindRole(roleID)
-	fmt.Println(a)
+	role.InsertComment(newComment, collection, id, recentOrder)
 	
 	w.Write([]byte("updated"))
 }

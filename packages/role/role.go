@@ -41,8 +41,48 @@ type Role struct {
 	Age int
 	TimeStamp time.Time
 	Deadline time.Time
-	Comment []*Comment
-	Audition []Audition
+	Comment []*mgo.DBRef
+	Audition []*mgo.DBRef
+}
+
+func (r *Role) GetComments() []*Comment {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := []*Comment{}
+	for i, c := range r.Comment {
+		oneResult := &Comment{}
+		err = session.FindRef(c).One(oneResult)
+		if err != nil {
+			fmt.Println("error happened at index: ", i)
+			panic(err)
+		}
+		result = append(result, oneResult)
+	}
+    return result
+}
+
+func (r *Role) GetAuditions() []*Audition {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := []*Audition{}
+	for i, a := range r.Audition {
+		oneResult := &Audition{}
+		err = session.FindRef(a).One(oneResult)
+		if err != nil {
+			fmt.Println("error happened at index: ", i)
+			panic(err)
+		}
+		result = append(result, oneResult)
+	}
+    return result
 }
 
 //Comment struct - Maybe include audio clip
@@ -51,21 +91,57 @@ type Audition struct {
 	User *user.User
 	AttachmentUrl string
 	TimeStamp time.Time
-	Comment []*Comment
+	Comment []*mgo.DBRef
+}
+
+func (a *Audition) GetComments() []*Comment {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := []*Comment{}
+	for i, c := range a.Comment {
+		oneResult := &Comment{}
+		err = session.FindRef(c).One(oneResult)
+		if err != nil {
+			fmt.Println("error happened at index: ", i)
+			panic(err)
+		}
+		result = append(result, oneResult)
+	}
+    return result
 }
 
 //Comment struct - Maybe include audio clip
 type Comment struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	User *user.User
+	User *mgo.DBRef
 	Message string
 	TimeStamp time.Time
 }
 
+func (c *Comment) GetUser() *user.User {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := &user.User{}
+	err = session.FindRef(c.User).One(result)
+	if err != nil {
+		panic(err)
+	}
+    return result
+}
+
 //NewComment creates an instance of a new comment and returns it
 //TODO: FILL OUT FIELDS
-func NewComment(user *user.User, message string) *Comment {
-	return &Comment{User : user, Message : message, TimeStamp : time.Now()}
+func NewComment(user *user.User, message string, id bson.ObjectId) *Comment {
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	return &Comment{User : dbRefUser, Message : message, TimeStamp : time.Now(), Id: id}
 }
 
 //NewRole creates an instance of a new role and returns it
@@ -96,8 +172,8 @@ func NewTeam(users []*user.User, teamName string, contestId string) *Team {
 
 }
 
-func NewAudition(user *user.User, attachmentUrl string) *Audition {
-	return &Audition{User: user, AttachmentUrl: attachmentUrl, TimeStamp: time.Now()}
+func NewAudition(user *user.User, attachmentUrl string, id bson.ObjectId) *Audition {
+	return &Audition{User: user, AttachmentUrl: attachmentUrl, TimeStamp: time.Now(), Id: id}
 }
 
 //NewContest creates an instance of a new role and returns it
@@ -111,7 +187,7 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 
 //GENERIC INSERT COMMENT
 //
-func InsertComment(comment *Comment, collection string, id string) {
+func InsertComment(comment *Comment, collection string, id string, recentOrder bool) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -121,20 +197,26 @@ func InsertComment(comment *Comment, collection string, id string) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("comments")
 
-	err = c.Insert(Comment{User: comment.User, Message: comment.Message, TimeStamp: comment.TimeStamp})
+	err = c.Insert(comment)
 	if err != nil {
 		panic(err)
 	}
 	
 	c = session.DB("CoAud").C(collection)
 	
+	dbRefComment := &mgo.DBRef{Collection: "comments", Id: comment.Id, Database: "CoAud"}
+
 	// store comment into slice so we can push it to the top in mongo
 	// $push with $position requires $each which requires an array/slice
-	var newComment []*Comment
-	newComment = append(newComment, comment)
-	change := bson.M{"$push": bson.M{"comment": bson.M{"$each": newComment, "$position": 0}}}
-	
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	var newComment []*mgo.DBRef
+	newComment = append(newComment, dbRefComment)
+	if recentOrder {
+		change := bson.M{"$push": bson.M{"comment": bson.M{"$each": newComment, "$position": 0}}}
+		err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	} else {
+		change := bson.M{"$push": bson.M{"comment": bson.M{"$each": newComment}}}
+		err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	}
 }
 
 //InsertAudition inserts audition into db
@@ -146,9 +228,23 @@ func InsertAudition(audition *Audition, role *Role) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("roles")
 	
-	change := bson.M{"$push": bson.M{"audition": audition}}
+	//insert new audition
+	c := session.DB("CoAud").C("auditions")
+
+	err = c.Insert(audition)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("audition.Id: ")
+	fmt.Println(audition.Id)
+	
+	//reference audition to role
+	c = session.DB("CoAud").C("roles")
+	
+	dbRefAudition := &mgo.DBRef{Collection: "auditions", Id: audition.Id, Database: "CoAud"}
+	
+	change := bson.M{"$push": bson.M{"audition": dbRefAudition}}
 	err = c.Update(bson.M{"_id": role.Id}, change)
 	if err != nil {
 		panic(err)
