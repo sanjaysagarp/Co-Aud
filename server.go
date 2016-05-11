@@ -49,7 +49,7 @@ var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 var (
 	googleOauthConfig = &oauth2.Config{
-		RedirectURL:    "http://coaud.io/GoogleCallback",
+		RedirectURL:    "http://localhost:8080/GoogleCallback",
 		ClientID:     "688463917821-p5u7nvg7eovcjr92o7e8986b3tl3qdlr.apps.googleusercontent.com",
 		ClientSecret: "nyIHJVB8Fzx76kSL7SMFFRFP",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
@@ -233,56 +233,68 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
   	}
 	
 	// need to get image
-	file, handler, err := r.FormFile("photo")
-	defer file.Close()
-	if err != nil {
-		fmt.Printf("err opening audition file: %s", err)
-		return
-	}
-	
-	bytes, err := file.Seek(0,2)
-	if err != nil {
-		panic(err)
-	}
-	
-	//get file size in kilobytes and megabytes
-	var kilobytes int64
-	kilobytes = (bytes / 1024)
-	
-	var megabytes float64
-	megabytes = (float64)(kilobytes / 1024)
-	
-	// adding new role into db
-	roleID := bson.NewObjectId()
-	
-	//TODO: add appropriate size limit
-	if(megabytes < 6) {
-		attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
-	
-		uploader := s3manager.NewUploader(session.New())
-		result, err := uploader.Upload(&s3manager.UploadInput{
-			Body:   file,
-			Bucket: aws.String("coaud"),
-			Key:    aws.String(attachmentURL),
-		})
-		
+	if (len(r.FormValue("photo")) > 1) {
+		file, handler, err := r.FormFile("photo")
+		defer file.Close()
 		if err != nil {
-			log.Fatalln("Failed to upload", err)
+			fmt.Printf("err opening image file: %s", err)
+			return
 		}
-
-		log.Println("Successfully uploaded to", result.Location)
 		
-		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, result.Location)
+		bytes, err := file.Seek(0,2)
+		if err != nil {
+			panic(err)
+		}
+		
+		//get file size in kilobytes and megabytes
+		var kilobytes int64
+		kilobytes = (bytes / 1024)
+		
+		var megabytes float64
+		megabytes = (float64)(kilobytes / 1024)
+		
+		// adding new role into db
+		roleID := bson.NewObjectId()
+		
+		//TODO: add appropriate size limit
+		if(megabytes < 6) {
+			attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
+		
+			uploader := s3manager.NewUploader(session.New())
+			result, err := uploader.Upload(&s3manager.UploadInput{
+				Body:   file,
+				Bucket: aws.String("coaud"),
+				Key:    aws.String(attachmentURL),
+			})
+			
+			if err != nil {
+				log.Fatalln("Failed to upload", err)
+			}
+
+			log.Println("Successfully uploaded to", result.Location)
+			
+			newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, result.Location)
+			role.InsertRole(newRole)
+
+			urlParts := []string{"/role/?id=", newRole.Id.Hex()}
+			url := strings.Join(urlParts, "")
+			
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		} else {
+			//handle response if greater than 6 megabytes! -- NEED TO MAKE RESPONSIVE
+			w.Write([]byte("rejected"))
+		}
+	} else {
+		roleID := bson.NewObjectId()
+		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, "/public/img/default_role_pic.png")
 		role.InsertRole(newRole)
 
 		urlParts := []string{"/role/?id=", newRole.Id.Hex()}
 		url := strings.Join(urlParts, "")
 		
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-	} else {
-		//handle response if greater than 6 megabytes! -- NEED TO MAKE RESPONSIVE
-		w.Write([]byte("rejected"))
 	}
+	
 	
 }
 
@@ -457,12 +469,14 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 //Submits an audition in auditions/{auditionid}
 func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
-	roleID := r.FormValue("id")
+	fmt.Println(r.Form)
 	err := r.ParseMultipartForm(32 << 20)
     if err != nil {
         log.Printf("%s", err)
     }
 	
+	roleID := r.FormValue("id")
+	fmt.Println(r.Form)
 	file, handler, err := r.FormFile("auditionFile")
 	defer file.Close()
 	if err != nil {

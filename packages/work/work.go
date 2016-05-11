@@ -46,7 +46,7 @@ func NewCast(user *user.User, role string) Cast {
 
 //InsertWork inserts a work into the works collection
 func InsertWork(work *Work) {
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -63,7 +63,7 @@ func InsertWork(work *Work) {
 
 //InsertCast inserts a new cast into a work
 func InsertCast(cast *Cast) {
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
 	if err != nil {
 			panic(err)
 	}
@@ -80,7 +80,7 @@ func InsertCast(cast *Cast) {
 
 //FindCast finds casting for work
 func FindCast(work *Work) []Cast{
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -100,7 +100,7 @@ func FindCast(work *Work) []Cast{
 
 //FindWorks finds works for all selected
 func FindWork(id string) *Work{
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -141,7 +141,7 @@ func FindWork(id string) *Work{
 // FindRoles searches for all roles
 // Optional param: q = nil, skip = 0, limit = -1
 func FindWorks(q interface{}, skip int, limit int) ([]Work, int) {
-	session, err := mgo.Dial("127.0.0.1")
+	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
