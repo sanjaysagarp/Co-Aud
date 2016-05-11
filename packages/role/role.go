@@ -109,7 +109,8 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 //TODO: insert comment to role (db)
 
 //GENERIC INSERT COMMENT
-func InsertComment(commentList []*Comment, comment *Comment, collection string, id string) {
+//
+func InsertComment(comment *Comment, collection string, id string) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {

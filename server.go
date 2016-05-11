@@ -470,12 +470,18 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
-
 func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
+	submitCommentHandler(w, r, "roles")
+}
+
+func submitAuditionCommentHandler(w http.ResponseWriter, r *http.Request) {
+	submitCommentHandler(w, r, "roles.audition")
+}
+
+func submitCommentHandler(w http.ResponseWriter, r *http.Request, collection string) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	
-	collection := "roles"
 	message := r.FormValue("content")
 	roleID := r.FormValue("id")
 	
@@ -483,13 +489,14 @@ func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
 	newComment := role.NewComment(currentUser, message)
 	curRole := role.FindRole(roleID)
 
-	role.InsertComment(curRole.Comment, newComment, collection, curRole.Id.Hex())
+	role.InsertComment(newComment, collection, curRole.Id.Hex())
 	
 	a := role.FindRole(roleID)
 	fmt.Println(a)
 	
 	w.Write([]byte("updated"))
 }
+
 
 func getRoleHandler(w http.ResponseWriter, r *http.Request) {
 	//need to get form fields web page
@@ -569,7 +576,8 @@ func main() {
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
 	http.HandleFunc("/api/v1/submitAudition/", submitAuditionHandler)
-	http.HandleFunc("/api/v1/submitComment/", submitRoleCommentHandler)
+	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
+	http.HandleFunc("/api/v1/submitAuditionComment/", submitAuditionCommentHandler)
 	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
 	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
