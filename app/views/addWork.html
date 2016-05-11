@@ -24,11 +24,14 @@
 					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description" id="description"></textarea>
 				</div>
 				<div class="form-group" id="dynamicInput">
-					Cast Member 1<br><input type="text" id="castEmail[]" name="castEmail[]"/> as <input type="text" id="castRole[]" name="castRole[]"/>						
+					<div>
+						Cast Member 1<br><div class="form-group castForm"><input type="text" class="castEmails form-control" name="castEmail[]" placeholder="UserEmail@CoAud.io"/></div> as <div class="form-group castForm"><input type="text" class="castRoles form-control" name="castRole[]" placeholder="Animator"/></div>		
+					</div>			
 				</div>
 				<div>
 					<br>
 					<input type="button" class="btn btn-info" value="Add another cast member" id="addMoreCast">
+					<input type="button" class="btn btn-danger" value="Remove cast member" style="display:none;" id="removeCast">
 				</div>
 				<br/>
 				<button id="submitWork" type="submit" class="btn btn-default" data-id="{{ .Data.work.Id.Hex }}">Submit</button>
@@ -38,6 +41,15 @@
 	<div id="notification"></div>
 	
 </div>
+
+<style>
+	.castForm {
+    	display: inline-block;
+	}
+	.subtract {
+		display: inline-block;
+	}
+</style>
 
 {{template "footer" .}}
 {{end}}
