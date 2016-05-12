@@ -33,7 +33,7 @@ type Role struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
 	ImageUrl string
-	User *user.User
+	User *mgo.DBRef
 	Traits []string
 	Description string
 	Script string
@@ -65,6 +65,21 @@ func (r *Role) GetComments() []*Comment {
     return result
 }
 
+func (r *Role) GetUser() *user.User {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := &user.User{}
+	err = session.FindRef(r.User).One(result)
+	if err != nil {
+		panic(err)
+	}
+    return result
+}
+
 func (r *Role) GetAuditions() []*Audition {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
@@ -88,7 +103,7 @@ func (r *Role) GetAuditions() []*Audition {
 //Comment struct - Maybe include audio clip
 type Audition struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	User *user.User
+	User *mgo.DBRef
 	AttachmentUrl string
 	TimeStamp time.Time
 	Comment []*mgo.DBRef
@@ -110,6 +125,21 @@ func (a *Audition) GetComments() []*Comment {
 			panic(err)
 		}
 		result = append(result, oneResult)
+	}
+    return result
+}
+
+func (a *Audition) GetUser() *user.User {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := &user.User{}
+	err = session.FindRef(a.User).One(result)
+	if err != nil {
+		panic(err)
 	}
     return result
 }
@@ -147,7 +177,8 @@ func NewComment(user *user.User, message string, id bson.ObjectId) *Comment {
 //NewRole creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
 func NewRole(title string, user *user.User, description string, script string, deadline time.Time, traits []string, age int, gender string, id bson.ObjectId, imageUrl string) *Role {
-	return &Role{Title: title, User: user, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl, Id: id}
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	return &Role{Title: title, User: dbRefUser, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl, Id: id}
 }
 
 //NewTeam creates an instance of a new role and returns it
@@ -173,7 +204,8 @@ func NewTeam(users []*user.User, teamName string, contestId string) *Team {
 }
 
 func NewAudition(user *user.User, attachmentUrl string, id bson.ObjectId) *Audition {
-	return &Audition{User: user, AttachmentUrl: attachmentUrl, TimeStamp: time.Now(), Id: id}
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	return &Audition{User: dbRefUser, AttachmentUrl: attachmentUrl, TimeStamp: time.Now(), Id: id}
 }
 
 //NewContest creates an instance of a new role and returns it

@@ -38,7 +38,7 @@
 	<div class="tab-content">
 		<!--Audition section-->
 		<div id="auditions" class="tab-pane fade in active">
-			{{if .Data.currentUser}}
+			{{if and .Data.currentUser (not (eq .Data.currentUser.Id.Hex .Data.author.Id.Hex)) }}
 				<form id="formAudition" enctype="multipart/form-data" class="role-form form-horizontal" action="/api/v1/submitAudition/" method="POST">
 					<div class="form-group">
 						<label class="col-md-2 control-label" for="uploadInput">Your audition:</label>
@@ -54,14 +54,15 @@
 			{{end}}
 			<ul class="audition-section media-list">
 				{{ range .Data.role.GetAuditions }}
+					{{ $user := .GetUser }}
 					<li class="audition media">
 					<div class="media-left">
-						<a href="/profile/?id={{.User.Id.Hex}}">
+						<a href="/profile/?id={{$user.Id.Hex}}">
 							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
 						</a>
 					</div>
 					<div class="media-body">
-						<h4 class="media-heading">{{.User.DisplayName}}</h4>
+						<a href="/profile/?id={{$user.Id.Hex}}"><h4 class="media-heading">{{$user.DisplayName}}</h4></a>
 						<p>Title goes here
 							<!--<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
 							<span class="pull-right">234</span>-->
@@ -81,7 +82,7 @@
 								</div>
 								<div class="media-body">
 									<a href="/profile/?id={{.User.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
-									<p>{{ .Message }}</p>
+									<p class="comment-message">{{ .Message }}</p>
 								</div>
 							</li>
 							{{end}}
@@ -89,19 +90,6 @@
 							<li>
 								<a class="auditionCommentButton" data-audition-id="{{ .Id.Hex }}">Comment</a>
 							</li>
-						<!--<li class="comment-submission media">
-								<div class="media-left">
-									<a href="/profile/">
-										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-									</a>
-								</div>
-								<div class="media-body">
-									<form>
-										<textarea class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
-										<button type="submit" class="btn btn-default pull-right">Post</button>
-									</form>
-								</div>
-							</li>-->
 						</ul>
 					</div>
 					</li>
@@ -120,14 +108,14 @@
 					</div>
 					<div class="media-body">
 						<form>
-							<textarea id="roleCommentContent" name="roleCommentContent" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
-							<button id="roleCommentButton" type="submit" class="btn btn-default pull-right" data-id="{{ .Data.role.Id.Hex }}">Post</button>
+							<textarea id="role-comment-content" name="role-comment-content" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
+							<button id="role-comment-button" type="submit" class="btn btn-default pull-right" data-id="{{ .Data.role.Id.Hex }}">Post</button>
 						</form>
 					</div>
 				</div>
 			{{end}}
 			
-			<ul class="comment-section media-list">
+			<ul id="role-comment-section" class="comment-section media-list">
 				{{ range .Data.role.GetComments }}
 					<li class="comment-posted media">
 						<div class="media-left">
@@ -138,7 +126,7 @@
 						</div>
 						<div class="media-body">
 							<a href="/profile/?id={{ $user.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
-							<p>{{ .Message }}</p>
+							<p class="comment-message">{{ .Message }}</p>
 						</div>
 					</li>
 				{{ end }}

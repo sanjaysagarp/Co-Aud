@@ -7,7 +7,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
-	"strings"
+	// "strings"
+	"regexp"
 )
 
 //Cast struct
@@ -30,8 +31,8 @@ type Work struct {
 }
 
 func (w *Work) GetYoutubeID() string {
-	youtubeCode := strings.Split(w.URL, "=")
-    return youtubeCode[1]
+    r, _ := regexp.Compile(`^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*`)
+    return r.FindAllStringSubmatch(w.URL, -1)[0][7]
 }
 
 //NewWork creates a new instance of work

@@ -84,9 +84,6 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //FOR TESTING PURPOSES ONLY=================================================================================================================================
-func theoTestPageHandler(w http.ResponseWriter, r *http.Request) {
-
-}
 
 func uploadTestHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
@@ -128,7 +125,7 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	// 	audition.TempUrl = temp
 	// }
 	
-	data["author"] = user.FindUser(role.User.Email)
+	data["author"] = role.GetUser()
 	display(w, "rolepage", &Page{Title: role.Title, Data: data})
 }
 
@@ -545,7 +542,7 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request, collection str
 
 	role.InsertComment(newComment, collection, id, recentOrder)
 	
-	w.Write([]byte("updated"))
+	w.Write([]byte(`<li class="comment-posted media"><div class="media-left"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><h4 class="media-heading">` + currentUser.DisplayName + `</h4></a><p class="comment-message">` + message + `</p></div></li>`))
 }
 
 
@@ -618,7 +615,6 @@ func main() {
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
 	http.HandleFunc("/castings/", castingsHandler)
-	http.HandleFunc("/theoTestPage/", theoTestPageHandler)
 	http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
 	//http.HandleFunc("/seanTest/", seanTestHands)
