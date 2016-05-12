@@ -88,7 +88,7 @@ $(document).ready(
 					//div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback"></span>');
 				}
 			})
-			if(checker == 6 + counter) {
+			if(checker == (4 + (counter * 2))) {
 				$("form#workForm").submit();
 			} else {
 				return false;
@@ -111,11 +111,10 @@ $(document).ready(
 				$(inputs[inputs.length - 1]).remove();
 					document.getElementById("removeCast").style.display = 'none';
 				return false;
-				
 			}
 			counter--;
 			var inputs = $(".pair");
 			 $(inputs[inputs.length - 1]).remove();
-		});
-		
-});	
+		});	
+	}
+);	
