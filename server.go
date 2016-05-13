@@ -228,15 +228,10 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
       return
   	}
 	
-	// need to get image
-	if (len(r.FormValue("photo")) > 1) {
-		file, handler, err := r.FormFile("photo")
+	file, handler, err := r.FormFile("photo")
+	
+	if (err == nil) {
 		defer file.Close()
-		if err != nil {
-			fmt.Printf("err opening image file: %s", err)
-			return
-		}
-		
 		bytes, err := file.Seek(0,2)
 		if err != nil {
 			panic(err)
@@ -281,6 +276,8 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("rejected"))
 		}
 	} else {
+		fmt.Printf("err opening image file: %s", err)
+		fmt.Println("Placing default image..")
 		roleID := bson.NewObjectId()
 		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, "/public/img/default_role_pic.png")
 		role.InsertRole(newRole)

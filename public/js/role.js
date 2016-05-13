@@ -23,7 +23,7 @@ $(document).ready(function(){
 		var formData = new FormData(this);
 		
 		formData.append('id', id);
-		// formData.append('auditionFile', $('input[id="auditionFile"]')[0].files[0]);
+		formData.append('auditionFile', $('input[id="auditionFile"]')[0].files[0]);
 		
 		console.log(formData);
 		$.ajax({
