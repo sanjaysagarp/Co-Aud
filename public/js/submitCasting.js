@@ -12,27 +12,33 @@ function validateText(id) {
 		div.addClass("has-success");
 		div.addClass("has-feedback");
 		$("#glypcn"+id).remove();
-		div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+		div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback" style=display:inline;></span>');
 		return true;
 	}
 }
 $(document).ready(
 	function(){
-		$("#submitWork").click(function() {
+		$("#castSubmission").click(function() {
 			var checker = 0;
 			if(validateText("name")) {
 				checker++;
 			}
-			if(validateYoutube("url")) {
+			if(validateText("date")) {
 				checker++;
 			}
-			if(validateText("shortDescription")) {
+			if(validateText("age")) {
+				checker++;
+			}
+			if(validateText("traits")) {
 				checker++;
 			}
 			if(validateText("description")) {
 				checker++;
 			}
-			if(checker == 6 + counter) {
+			if(validateText("script")) {
+				checker++;
+			}
+			if(checker == 6) {
 				$("form#castingForm").submit();
 			} else {
 				return false;

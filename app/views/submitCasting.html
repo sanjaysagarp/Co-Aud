@@ -7,16 +7,18 @@
 			<div class="col-md-3 card">
 				<div class="form-group">
 					<label>Name</label>
-					<input type="text" class="form-control input-lg" name="title" placeholder="Name">
+					<input type="text" id="name" class="form-control input-lg" name="title" placeholder="Name">
 				</div>
 				<div class="form-group">
 					<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
 					<label class="upload">Upload new photo</label>
-					<input type="file" accept="image/*" name="photo">
+					<div>
+						<input class="form-control" id="photoUpload" type="file" accept="image/*" name="photo">
+					</div>
 				</div>
 				<div class="form-group">
 					<label>Deadline</label>
-					<input class="form-control" type="date" name="deadline">
+					<input id="date" class="form-control" type="date" name="deadline">
 				</div>
 			</div>
 			<div class="col-md-8 col-md-offset-1 card">
@@ -38,17 +40,17 @@
 				</div>
 				<div class="form-group">
 					<label>Traits</label>
-					<input type="text" class="form-control" name="traits" placeholder="Grumpy, Bubbly, Arrogant, etc...">
+					<input type="text" id="traits" class="form-control" name="traits" placeholder="Grumpy, Bubbly, Arrogant, etc...">
 				</div>
 				<div class="form-group">
 					<label>Description</label>
-					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
+					<textarea id="description" type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
 				</div>
 				<div class="form-group">
 					<label>Script</label>
-					<textarea type="text-area" rows="6" class="form-control" name="script" placeholder="Script"></textarea>
+					<textarea id="script" type="text-area" rows="6" class="form-control" name="script" placeholder="Script"></textarea>
 				</div>
-				<input type="submit">
+				<input id ="castSubmission" type="submit">
 			</div>		
 		</div>  
 	</div>	
