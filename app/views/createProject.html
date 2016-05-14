@@ -1,12 +1,12 @@
-{{define "addWork"}}
+{{define "createProject"}}
 {{template "header" .}}
-<script src="/public/js/addWork.js"></script>
+<script src="/public/js/submitProject.js"></script>
 <div class="container">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2 card">
-			<h3>Add Work</h3>
+			<h3>Add Project</h3>
 			<hr>
-			<form id ="workForm" action="/api/v1/publishWork/" method="post">
+			<form id ="projectForm" action="/api/v1/submitProject/" method="post">
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" id="title" name="title" placeholder="Title">
@@ -34,7 +34,7 @@
 					<input type="button" class="btn btn-danger" value="Remove cast member" style="display:none;" id="removeCast">
 				</div>
 				<br/>
-				<button id="submitWork" type="submit" class="btn btn-default" data-id="{{ .Data.work.Id.Hex }}">Submit</button>
+				<button id="submitProject" type="submit" class="btn btn-default" data-id="{{ .Data.project.Id.Hex }}">Submit</button>
 			</form>
 		</div>
 	</div>

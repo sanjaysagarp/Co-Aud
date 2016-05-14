@@ -40,7 +40,7 @@ function validateYoutube(id) {
 
 $(document).ready(
 	function(){
-		$("#submitWork").click(function() {
+		$("#submitProject").click(function() {
 			var checker = 0;
 			if(validateText("title")) {
 				checker++;
@@ -89,7 +89,7 @@ $(document).ready(
 				}
 			})
 			if(checker == (4 + (counter * 2))) {
-				$("form#workForm").submit();
+				$("form#projectForm").submit();
 			} else {
 				return false;
 			}
