@@ -188,6 +188,11 @@ func createProjectHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "createProject", &Page{Title: "Create Project", Data: data})
 }
 
+func createTeamHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	display(w, "createTeam", &Page{Title: "Create Team", Data: data})
+}
+
 func contestMainHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	display(w, "viewContest", &Page{Title: "Contest", Data: data})
@@ -353,6 +358,32 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	
 	// ** Bottom
 }
+
+func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
+	//data := setDefaultData(w, r)
+	//submission := make(map[string]interface{})
+	// **TOP
+	r.ParseForm()
+	teamMembers := r.Form["teamEmails"]
+
+	teamContainer := make([]user.User, 0)
+	for i := 0; i < len(teamMembers); i++ {
+		newUser := user.FindUser(teamMembers[i])
+		teamContainer = append(teamContainer, newUser)
+	}
+	
+	projectId := bson.NewObjectId()
+	//s := redis_session.Session(w, r)
+	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	project.InsertProject(newProject)
+	fmt.Println(newProject)
+	
+	urlParts := []string{"/team/?id=", projectId.Hex()}
+	url := strings.Join(urlParts, "")
+	// redirect to project page
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 //gets the numbers of the pages that will be shown in pagination given the max page, current page,
 //and the amount of pages you want displayed
 func getPageList(maxPage int, curPage int, amount int) []int{
@@ -506,10 +537,9 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.Write([]byte("rejected"))
 	}
-	
-	
-	
 }
+
+
 
 func submitRoleCommentHandler(w http.ResponseWriter, r *http.Request) {
 	submitCommentHandler(w, r, "roles", true)
@@ -600,6 +630,7 @@ func main() {
 	//http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/projects/create", createProjectHandler)
 	http.HandleFunc("/contest/", contestMainHandler)
+	http.HandleFunc("/teams/create", createTeamHandler)
 	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
@@ -617,6 +648,7 @@ func main() {
 	http.HandleFunc("/api/v1/submitProject/", submitProjectHandler)
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
 	http.HandleFunc("/api/v1/submitProject", submitProjectHandler)
+	http.HandleFunc("/api/v1/submitTeam/", submitTeamHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")

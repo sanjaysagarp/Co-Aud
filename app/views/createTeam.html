@@ -1,0 +1,45 @@
+{{define "createTeam"}}
+{{template "header" .}}
+<script src="/public/js/createTeam.js"></script>
+<div class="container">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 card">
+			<h3>Create your Team</h3>
+			<hr>
+			<form id="teamForm" action="/api/v1/submitTeam/" method="post">
+				<div class="form-group">
+					<label>Team Name</label>
+					<input type="text" class="form-control" id="teamName" name="teamName" placeholder="Team Name">
+				</div>
+				<div class="form-group">
+					<label>Team Motto</label>
+					<input type="text" class="form-control" name="shortDescription" id="motto" placeholder="Team Motto (140 characters)" maxlength="140">
+				</div>
+				<div class="form-group" id="dynamicInput">
+					<div>
+						Team Member 1<br><div class="form-group castForm"><input type="text" class="teamEmails form-control" name="teamEmails" placeholder="UserEmail@CoAud.io"/></div>	
+					</div>			
+				</div>
+				<div>
+					<br>
+					<input type="button" class="btn btn-info" value="Add another Team member" id="addMoreTeam">
+					<input type="button" class="btn btn-danger" value="Remove Team member" style="display:none;" id="removeTeam">
+				</div>
+				<br/>
+				<button id="submitTeam" type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+<style>
+	.castForm {
+    	display: inline-block;
+	}
+	.subtract {
+		display: inline-block;
+	}
+</style>
+
+{{template "footer" .}}
+{{end}}
