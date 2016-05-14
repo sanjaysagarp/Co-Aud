@@ -1,4 +1,4 @@
-{{define "castings"}}
+{{define "browseAuditions"}}
 {{template "header" .}}
 <script src="/public/js/affixSubmit.js"></script>
 <div class="container">
@@ -18,7 +18,7 @@
 	<div class="row">
 		{{ range .Data.roles }}
 			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
-				<a href="/role/?id={{ .Id.Hex }}">
+				<a href="/auditions/?id={{ .Id.Hex }}">
 					<h2>{{ .Title }}</h2>
 					<img class="img-responsive" src="{{.ImageUrl}}">
 				</a>
@@ -29,7 +29,7 @@
 	  <ul class="pagination">
 	    {{ if not (or (eq .Data.currentPage 1) (eq .Data.currentPage 0))}}
 				<li>
-					<a href="/castings/?page={{.Data.prevPage}}" aria-label="Previous">
+					<a href="/auditions/?page={{.Data.prevPage}}" aria-label="Previous">
 						<span aria-hidden="true">&laquo;</span>
 					</a>
 				</li>
@@ -37,15 +37,15 @@
 			{{$currentPage := .Data.currentPage}}
 			{{ range .Data.pageList }}	
 				{{if eq . $currentPage }}
-					<li class="active"><a href="/castings/?page={{.}}">{{.}} <span class="sr-only">(current)</span></a></li>
+					<li class="active"><a href="/auditions/?page={{.}}">{{.}} <span class="sr-only">(current)</span></a></li>
 				{{else}}
-					<li><a href="/castings/?page={{.}}">{{.}}</a></li>
+					<li><a href="/auditions/?page={{.}}">{{.}}</a></li>
 				{{end}}
 			{{end}}
 	    
 			{{ if not (eq .Data.currentPage .Data.maxPage)}}
 				<li>
-					<a href="/castings/?page={{.Data.nextPage}}" aria-label="Next">
+					<a href="/auditions/?page={{.Data.nextPage}}" aria-label="Next">
 						<span aria-hidden="true">&raquo;</span>
 					</a>
 				</li>
@@ -56,7 +56,7 @@
 
 {{if .Data.currentUser}}
 	<div id="submit-button" class="search-side-nav">
-		<a href="/submitCasting/" class="btn btn-lg btn-default">Submit a role!</a>
+		<a href="/auditions/create" class="btn btn-lg btn-default">Submit a role!</a>
 	</div>
 {{end}}
 {{template "footer" .}}

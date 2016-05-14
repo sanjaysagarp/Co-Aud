@@ -1,4 +1,4 @@
-{{define "profile"}}
+{{define "viewProfile"}}
 {{template "header" .}}
 <!--{{if .Data.currentUser }}
 	{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
@@ -46,10 +46,10 @@
 					</p>
 				</div>
 				<div class="row">
-					<h1>My Works</h1>
-					{{ range .Data.postedWorks }}
+					<h1>My Projects</h1>
+					{{ range .Data.postedProjects }}
 					<div class="thumbnail col-md-4">
-						<a href="/work/?id={{ .Id.Hex }}">
+						<a href="/project/?id={{ .Id.Hex }}">
 							<h2>{{.Title}}</h2>
 							<img class="img-responsive" src="/public/img/placeholder.png">
 						</a>

@@ -1,4 +1,4 @@
-package work
+package project
 // //127.0.0.1:27018
 import (
 	// "log"
@@ -18,8 +18,8 @@ type Cast struct {
 	Role string
 }
 
-//Work struct defines a person's personal work
-type Work struct {
+//Project struct defines a person's personal project
+type Project struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
 	URL string
@@ -30,14 +30,14 @@ type Work struct {
 	User *user.User
 }
 
-func (w *Work) GetYoutubeID() string {
+func (w *Project) GetYoutubeID() string {
     r, _ := regexp.Compile(`^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*`)
     return r.FindAllStringSubmatch(w.URL, -1)[0][7]
 }
 
-//NewWork creates a new instance of work
-func NewWork(title string, url string, shortDescription string, description string, cast []Cast, user *user.User, id bson.ObjectId) *Work {
-	return &Work{Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: cast, PostedDate: time.Now(), User : user, Id: id}
+//NewProject creates a new instance of project
+func NewProject(title string, url string, shortDescription string, description string, cast []Cast, user *user.User, id bson.ObjectId) *Project {
+	return &Project{Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: cast, PostedDate: time.Now(), User : user, Id: id}
 }
 
 //NewCast creates a new instance of cast
@@ -45,8 +45,8 @@ func NewCast(user *user.User, role string) Cast {
 	return Cast{User: user, Role: role}
 }
 
-//InsertWork inserts a work into the works collection
-func InsertWork(work *Work) {
+//InsertProject inserts a project into the projects collection
+func InsertProject(project *Project) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -54,15 +54,15 @@ func InsertWork(work *Work) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("works")
-	err = c.Insert(&Work{Title: work.Title, URL: work.URL, ShortDescription: work.ShortDescription, Description: work.Description, Cast: work.Cast, PostedDate: work.PostedDate, User: work.User, Id: work.Id})
+	c := session.DB("CoAud").C("projects")
+	err = c.Insert(&Project{Title: project.Title, URL: project.URL, ShortDescription: project.ShortDescription, Description: project.Description, Cast: project.Cast, PostedDate: project.PostedDate, User: project.User, Id: project.Id})
 	
 	if err != nil {
 		panic(err)
 	}
 }
 
-//InsertCast inserts a new cast into a work
+//InsertCast inserts a new cast into a project
 func InsertCast(cast *Cast) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	if err != nil {
@@ -79,8 +79,8 @@ func InsertCast(cast *Cast) {
 	}
 }
 
-//FindCast finds casting for work
-func FindCast(work *Work) []Cast{
+//FindCast finds casting for project
+func FindCast(project *Project) []Cast{
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -88,10 +88,10 @@ func FindCast(work *Work) []Cast{
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("works")
+	c := session.DB("CoAud").C("projects")
 	
 	result := []Cast{}
-	err = c.Find(bson.M{"Id": work.Id}).All(&result)
+	err = c.Find(bson.M{"Id": project.Id}).All(&result)
 	if err != nil {
 		fmt.Println("Work now found")
 		return nil
@@ -99,8 +99,8 @@ func FindCast(work *Work) []Cast{
 	return result
 }
 
-//FindWorks finds works for all selected
-func FindWork(id string) *Work{
+//FindProjects finds projects for all selected
+func FindProject(id string) *Project{
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -108,12 +108,12 @@ func FindWork(id string) *Work{
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("works")
+	c := session.DB("CoAud").C("projects")
 	
-	result := &Work{}
+	result := &Project{}
 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 	if err != nil {
-		fmt.Println("Work now found")
+		fmt.Println("Project now found")
 		panic(err)
 	}
 	return result
@@ -141,7 +141,7 @@ func FindWork(id string) *Work{
 
 // FindRoles searches for all roles
 // Optional param: q = nil, skip = 0, limit = -1
-func FindWorks(q interface{}, skip int, limit int) ([]Work, int) {
+func FindProjects(q interface{}, skip int, limit int) ([]Project, int) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -149,8 +149,8 @@ func FindWorks(q interface{}, skip int, limit int) ([]Work, int) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	c := session.DB("CoAud").C("works")
-	result := []Work{}
+	c := session.DB("CoAud").C("projects")
+	result := []Project{}
 	err = c.Find(q).Skip(skip).Limit(limit).Sort("-posteddate").All(&result)
 	if err != nil {
 		panic(err)

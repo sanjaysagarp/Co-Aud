@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"github.com/sanjaysagarp/Co-Aud/packages/role"
-	"github.com/sanjaysagarp/Co-Aud/packages/work"
+	"github.com/sanjaysagarp/Co-Aud/packages/project"
 	"github.com/aaudis/GoRedisSession"
 	"fmt"
 	"strings"
@@ -74,7 +74,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//get roles
 	roleList, totalRolesCount := role.FindRoles(nil, 0, 16)
-	projectList, totalProjectList := work.FindWorks(nil, 0, 6)
+	projectList, totalProjectList := project.FindProjects(nil, 0, 6)
 	
 	fmt.Println("total number of projects: ", totalProjectList)
 	data["totalRolesCount"] = totalRolesCount
@@ -83,26 +83,18 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "home", &Page{Title: "Home!", Data: data})
 }
 
-//FOR TESTING PURPOSES ONLY=================================================================================================================================
-
-func uploadTestHandler(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	display(w, "information", &Page{Title: "Upload pls!", Data: data})
-}
-//==========================================================================================================================================================
-
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
 	postedRoles, rolesCount := role.FindRoles(bson.M{"user.email": user.Email}, 0, 3)
-	postedWorks, workCount := work.FindWorks(bson.M{"user.email": user.Email}, 0, 3)
+	postedProjects, projectCount := project.FindProjects(bson.M{"user.email": user.Email}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
-	data["postedWorks"] = postedWorks
-	data["workCount"] = workCount
-	display(w, "profile", &Page{Title: user.DisplayName, Data: data})
+	data["postedProjectss"] = postedProjects
+	data["projectCount"] = projectCount
+	display(w, "viewProfile", &Page{Title: user.DisplayName, Data: data})
 }
 
 func rolePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -126,22 +118,22 @@ func rolePageHandler(w http.ResponseWriter, r *http.Request) {
 	// }
 	
 	data["author"] = role.GetUser()
-	display(w, "rolepage", &Page{Title: role.Title, Data: data})
+	display(w, "viewRole", &Page{Title: role.Title, Data: data})
 }
 
-func workHandler(w http.ResponseWriter, r *http.Request) {
+func projectHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	data := setDefaultData(w, r)
-	workID := r.URL.Query().Get("id")
-	work := work.FindWork(workID)
+	projectID := r.URL.Query().Get("id")
+	project := project.FindProject(projectID)
 	//fmt.Println("check below this line")
-	data["youtubeCode"] = work.GetYoutubeID() // causes error,need to find better way
-	data["work"] = work
+	data["youtubeCode"] = project.GetYoutubeID() // causes error,need to find better way
+	data["project"] = project
 	data["user"] = currentUser
-	//data["author"] = user.FindUser(work.UserEmail)
+	//data["author"] = user.FindUser(project.UserEmail)
 	//fmt.Println(role.Comment)
-	display(w, "seanTest", &Page{Title: "Work", Data: data})
+	display(w, "viewProject", &Page{Title: "Project", Data: data})
 }
 
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
@@ -167,17 +159,17 @@ func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//get projects
-	projectList, projectCount := work.FindWorks(nil, (pageNumber)*projectAmount, projectAmount)
+	projectList, projectCount := project.FindProjects(nil, (pageNumber)*projectAmount, projectAmount)
 	fmt.Println(projectList)
 	//more params for pagination
 	maxPage := int(math.Ceil(float64(projectCount)/float64(projectAmount)))
 	pageList := getPageList(maxPage, currentPage, pageAmount)
 	
-	data["works"] = projectList
+	data["projects"] = projectList
 	data["pageList"] = pageList
 	data["maxPage"] = maxPage
 	
-	display(w, "projects", &Page{Title: "Projects", Data: data})
+	display(w, "browseProjects", &Page{Title: "Projects", Data: data})
 }
 
 func editProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -185,27 +177,28 @@ func editProfileHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "editProfile", &Page{Title: "Edit Profile", Data: data})
 }
 
-func projectPageHandler(w http.ResponseWriter, r *http.Request) {
-	data := setDefaultData(w, r)
-	display(w, "projectPage", &Page{Title: "Project Page", Data: data})
-}
+// This was for testing purposes
+// func projectPageHandler(w http.ResponseWriter, r *http.Request) {
+// 	data := setDefaultData(w, r)
+// 	display(w, "projectPage", &Page{Title: "Project Page", Data: data})
+// }
 
-func addWorkHandler(w http.ResponseWriter, r *http.Request) {
+func createProjectHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	display(w, "addWork", &Page{Title: "Add Work", Data: data})
+	display(w, "createProject", &Page{Title: "Create Project", Data: data})
 }
 
 func contestMainHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	display(w, "contestMain", &Page{Title: "Contest", Data: data})
+	display(w, "viewContest", &Page{Title: "Contest", Data: data})
 }
 
-func submitCastingHandler(w http.ResponseWriter, r *http.Request) {
+func createRoleHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	display(w, "submitCasting", &Page{Title: "Submit Casting", Data: data})
+	display(w, "createRole", &Page{Title: "Create Role", Data: data})
 }
 
-func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
+func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 
@@ -288,7 +281,6 @@ func publishCastingHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	}
 	
-	
 }
 
 func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -296,7 +288,7 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func castingsHandler(w http.ResponseWriter, r *http.Request) {
+func rolesHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	//params for pagination
 	roleAmount := 16
@@ -329,11 +321,11 @@ func castingsHandler(w http.ResponseWriter, r *http.Request) {
 	data["roles"] = roleList
 	data["maxPage"] = maxPage
 	data["pageList"] = pageList
-	display(w, "castings", &Page{Title: "Casting List", Data: data})
+	display(w, "browseAuditions", &Page{Title: "Roles", Data: data})
 }
 
-
-func seanTestHands(w http.ResponseWriter, r *http.Request) {
+//api call for submitting project
+func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//data := setDefaultData(w, r)
 	//submission := make(map[string]interface{})
 	// **TOP
@@ -341,20 +333,20 @@ func seanTestHands(w http.ResponseWriter, r *http.Request) {
 	castsAttendees := r.Form["castEmail[]"]
 	castRoles := r.Form["castRole[]"]
 
-	castContainer := make([]work.Cast, 0)
+	castContainer := make([]project.Cast, 0)
 	for i := 0; i < len(castsAttendees); i++ {
 		castUser := user.FindUser(castsAttendees[i])
-		newCast := work.NewCast(castUser, castRoles[i])
+		newCast := project.NewCast(castUser, castRoles[i])
 		castContainer = append(castContainer, newCast)
 	}
 	
 	projectId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
-	newWork := work.NewWork(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
-	work.InsertWork(newWork)
-	fmt.Println(newWork)
+	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	project.InsertProject(newProject)
+	fmt.Println(newProject)
 	
-	urlParts := []string{"/work/?id=", projectId.Hex()}
+	urlParts := []string{"/project/?id=", projectId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -601,29 +593,30 @@ func main() {
 		http.FileServer(http.Dir(path.Join(rootdir, "public/")))))
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/profile/", profileHandler)
-	http.HandleFunc("/role/", rolePageHandler)
-	http.HandleFunc("/work/", workHandler)
-	http.HandleFunc("/projects/", projectsHandler)
+	//http.HandleFunc("/role/", rolePageHandler)
+	http.HandleFunc("/project/", projectHandler)
+	http.HandleFunc("/projects/browse", projectsHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
-	http.HandleFunc("/projectPage/", projectPageHandler)
-	http.HandleFunc("/addWork/", addWorkHandler)
-	http.HandleFunc("/contestMain/", contestMainHandler)
-	http.HandleFunc("/submitCasting/", submitCastingHandler)
+	//http.HandleFunc("/projectPage/", projectPageHandler)
+	http.HandleFunc("/projects/create", createProjectHandler)
+	http.HandleFunc("/contest/", contestMainHandler)
+	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
-	http.HandleFunc("/castings/", castingsHandler)
-	http.HandleFunc("/upload/", uploadTestHandler)
+	http.HandleFunc("/auditions/browse", rolesHandler)
+	http.HandleFunc("/auditions/", rolePageHandler)
+	//http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
-	//http.HandleFunc("/seanTest/", seanTestHands)
 	
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
-	http.HandleFunc("/api/v1/publishCasting/", publishCastingHandler)
+	http.HandleFunc("/api/v1/submitRole/", submitRoleHandler)
 	http.HandleFunc("/api/v1/submitAudition/", submitAuditionHandler)
 	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
 	http.HandleFunc("/api/v1/submitAuditionComment/", submitAuditionCommentHandler)
-	http.HandleFunc("/api/v1/publishWork/", seanTestHands)
+	http.HandleFunc("/api/v1/submitProject/", submitProjectHandler)
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
+	http.HandleFunc("/api/v1/submitProject", submitProjectHandler)
 
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
