@@ -50,8 +50,8 @@ var configFile, _ = ioutil.ReadFile("./secret/config.json")
 var (
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:    "http://localhost:8080/GoogleCallback",
-		ClientID:     "688463917821-p5u7nvg7eovcjr92o7e8986b3tl3qdlr.apps.googleusercontent.com",
-		ClientSecret: "nyIHJVB8Fzx76kSL7SMFFRFP",
+		ClientID:     os.Getenv("GOOGLEKEY"),
+		ClientSecret: os.Getenv("GOOGLESECRET"),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile",
 					"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
@@ -481,7 +481,7 @@ func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	megabytes = (float64)(kilobytes / 1024)
 	
 	if(megabytes < 6) {
-		attachmentURL := "/roles/" + roleID + "/" + s.Get("Email") + "/" + handler.Filename
+		attachmentURL := "/auditions/" + roleID + "/" + s.Get("Email") + "/" + handler.Filename
 	
 		uploader := s3manager.NewUploader(session.New())
 		result, err := uploader.Upload(&s3manager.UploadInput{
