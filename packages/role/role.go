@@ -26,7 +26,6 @@ type Team struct {
 	Users []*mgo.DBRef
 	TeamName string
 	Motto string
-	Contest *mgo.DBRef
 }
 
 //Role struct - posting
@@ -184,7 +183,7 @@ func NewRole(title string, user *user.User, description string, script string, d
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewTeam(users []*user.User, teamName string, motto string, contest Contest) *Team {
+func NewTeam(users []*user.User, teamName string, motto string) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	
 	//session, err := mgo.Dial("127.0.0.1")
@@ -197,8 +196,8 @@ func NewTeam(users []*user.User, teamName string, motto string, contest Contest)
 		dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
 		dbRefUsers = append(dbRefUsers, dbRefUser)
 	}
-	dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.id, Database: "CoAud"}
-	team := &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto, Contest: dbRefContest}
+	//dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.id, Database: "CoAud"}
+	team := &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto}
 	
 	
 	session.SetMode(mgo.Monotonic, true)
@@ -375,10 +374,13 @@ func (contest *Contest) InsertTeam(team *Team) {
 	
 	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
 	//box.AddItem(item1)
-	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
+	//change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
 	
 	dbRefTeam:= &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
+	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeam}}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
+	
+	
 	
 	err = c.Insert(dbRefTeam)
 	
@@ -387,10 +389,10 @@ func (contest *Contest) InsertTeam(team *Team) {
 	}
 }
 
-// func (contest *Contest) AddItem(team Team) []Team {
-//     contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
-//     return contest.ParticipatingTeams
-// }
+func (contest *Contest) AddItem(team Team) []Team {
+    contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
+    return contest.ParticipatingTeams
+}
 
 // FindRoles searches for all roles
 // Optional param: q = nil, skip = 0, limit = -1
