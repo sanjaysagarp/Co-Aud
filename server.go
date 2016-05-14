@@ -275,7 +275,7 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, "/public/img/default_role_pic.png")
 		role.InsertRole(newRole)
 
-		urlParts := []string{"/role/?id=", newRole.Id.Hex()}
+		urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
 		url := strings.Join(urlParts, "")
 		
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
