@@ -372,10 +372,10 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 		teamContainer = append(teamContainer, newUser)
 	}
 	
-	projectId := bson.NewObjectId()
+	teamId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
-	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
-	project.InsertProject(newProject)
+	newTeam := role.NewTeam(teamMembers, r.FormValue("teamName"), r.FormValue("motto"))
+	role.InsertTeam(newTeam)
 	fmt.Println(newProject)
 	
 	urlParts := []string{"/team/?id=", projectId.Hex()}
