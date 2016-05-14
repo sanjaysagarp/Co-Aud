@@ -380,10 +380,6 @@ func (contest *Contest) InsertTeam(team *Team) {
 	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeam}}}
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
 	
-	
-	
-	err = c.Insert(dbRefTeam)
-	
 	if err != nil {
 		panic(err)
 	}
