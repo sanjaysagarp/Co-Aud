@@ -14,7 +14,7 @@ type Contest struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Title string
 	Description string
-	ParticipatingTeams []Team
+	ParticipatingTeams []*mgo.DBRef
 	ImageUrl string
 	StartDate time.Time
 	EndDate time.Time
@@ -23,9 +23,10 @@ type Contest struct {
 //Team struct
 type Team struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Users []*user.User
+	Users []*mgo.DBRef
 	TeamName string
-	ContestId string
+	Motto string
+	Contest *mgo.DBRef
 }
 
 //Role struct - posting
@@ -183,14 +184,22 @@ func NewRole(title string, user *user.User, description string, script string, d
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewTeam(users []*user.User, teamName string, contestId string) *Team {
+func NewTeam(users []*user.User, teamName string, motto string, contest Contest) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
-	team := &Team{Users: users, TeamName: teamName, ContestId: contestId}
+	
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 			panic(err)
 	}
 	defer session.Close()
+	var dbRefUsers []*mgo.DBRef
+	for _,user := range users {
+		dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+		dbRefUsers = append(dbRefUsers, dbRefUser)
+	}
+	dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.id, Database: "CoAud"}
+	team := &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto, Contest: dbRefContest}
+	
 	
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("teams")
@@ -353,28 +362,30 @@ func InsertRole(role *Role) {
 	}
 }
 
-// func InsertTeam(contest *Contest, team *Team) {
-// 	session, err := mgo.Dial("127.0.0.1:27018")
-// 	fmt.Println("connected")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer session.Close()
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("contest")
-// 	// Find contest, then insert into contest by contest name
+func (contest *Contest) InsertTeam(team *Team) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("contests")
+	// Find contest, then insert into contest by contest name
 	
-// 	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
-// 	//box.AddItem(item1)
-// 	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
-// 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
-
-// 	err = c.Insert(&Team{Users: team.Users,TeamName: team.teamName})
+	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
+	//box.AddItem(item1)
+	change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
 	
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
+	dbRefTeam:= &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
+	
+	err = c.Insert(dbRefTeam)
+	
+	if err != nil {
+		panic(err)
+	}
+}
 
 // func (contest *Contest) AddItem(team Team) []Team {
 //     contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
