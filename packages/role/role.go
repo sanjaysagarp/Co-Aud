@@ -183,7 +183,7 @@ func NewRole(title string, user *user.User, description string, script string, d
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func NewTeam(users []*user.User, teamName string, motto string) *Team {
+func InsertNewTeam(users []*user.User, teamName string, motto string) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	
 	//session, err := mgo.Dial("127.0.0.1")
@@ -378,16 +378,11 @@ func (contest *Contest) InsertTeam(team *Team) {
 	
 	dbRefTeam:= &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
 	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeam}}}
-	err = c.Update(bson.M{"_id": bson.ObjectIdHex(contest.Id)}, change)
+	err = c.Update(bson.M{"_id": contest.Id}, change)
 	
 	if err != nil {
 		panic(err)
 	}
-}
-
-func (contest *Contest) AddItem(team Team) []Team {
-    contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
-    return contest.ParticipatingTeams
 }
 
 // FindRoles searches for all roles

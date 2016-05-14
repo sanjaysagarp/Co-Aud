@@ -366,7 +366,7 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	teamMembers := r.Form["teamEmails"]
 
-	teamContainer := make([]user.User, 0)
+	var teamContainer []*user.User
 	for i := 0; i < len(teamMembers); i++ {
 		newUser := user.FindUser(teamMembers[i])
 		teamContainer = append(teamContainer, newUser)
@@ -374,11 +374,9 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	
 	teamId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
-	newTeam := role.NewTeam(teamMembers, r.FormValue("teamName"), r.FormValue("motto"))
-	role.InsertTeam(newTeam)
-	fmt.Println(newProject)
+	role.InsertNewTeam(teamContainer, r.FormValue("teamName"), r.FormValue("motto"))
 	
-	urlParts := []string{"/team/?id=", projectId.Hex()}
+	urlParts := []string{"/team/?id=", teamId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
