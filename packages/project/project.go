@@ -14,7 +14,7 @@ import (
 //Cast struct
 type Cast struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	User *user.User
+	User *mgo.DBRef
 	Role string
 }
 
@@ -25,7 +25,7 @@ type Project struct {
 	URL string
 	ShortDescription string
 	Description string
-	Cast []Cast // [] Return to the original later **
+	Cast []*mgo.DBRef // [] Return to the original later **
 	PostedDate time.Time
 	User *user.User
 }
@@ -36,13 +36,19 @@ func (w *Project) GetYoutubeID() string {
 }
 
 //NewProject creates a new instance of project
-func NewProject(title string, url string, shortDescription string, description string, cast []Cast, user *user.User, id bson.ObjectId) *Project {
-	return &Project{Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: cast, PostedDate: time.Now(), User : user, Id: id}
+func NewProject(title string, url string, shortDescription string, description string, casts []Cast, user *user.User, id bson.ObjectId) *Project {
+	var dbRefCasts []*mgo.DBRef
+	for _, cast := range casts {
+		dbRefCast := &mgo.DBRef{Collection: "casts", Id: cast.Id, Database: "CoAud"}
+		dbRefCasts = append(dbRefCasts, dbRefCast)
+	}
+	return &Project{Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: dbRefCasts, PostedDate: time.Now(), User : user, Id: id}
 }
 
 //NewCast creates a new instance of cast
 func NewCast(user *user.User, role string) Cast {
-	return Cast{User: user, Role: role}
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	return Cast{User: dbRefUser, Role: role}
 }
 
 //InsertProject inserts a project into the projects collection
@@ -72,7 +78,7 @@ func InsertCast(cast *Cast) {
 	
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("casts")
-	err = c.Insert(&Cast{User: cast.User, Role: cast.Role})
+	err = c.Insert(cast)
 	
 	if err != nil {
 		panic(err)
