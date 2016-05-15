@@ -23,7 +23,7 @@
 				<ul style="left: -600px; top: 0px;">
 					{{ range .Data.projects }}
 						<!--Only supports youtube now-->
-						<li style="width: 200px;"><a href="/project/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a></li>
+						<li style="width: 200px;"><a href="/projects/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a></li>
 					{{ end }}
 				</ul>
 			</div>
@@ -43,7 +43,7 @@
 	<div id="home-page-roles" class="row" style="margin-top: 50px;">
 		{{ range .Data.roles }}
 			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
-				<a href="/role/?id={{ .Id.Hex }}">
+				<a href="/auditions/?id={{ .Id.Hex }}">
 					<h2>{{ .Title }}</h2>
 					<img class="img-responsive" src="{{.ImageUrl}}">
 				</a>

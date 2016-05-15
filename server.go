@@ -97,7 +97,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "viewProfile", &Page{Title: user.DisplayName, Data: data})
 }
 
-func rolePageHandler(w http.ResponseWriter, r *http.Request) {
+func roleHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	roleID := r.URL.Query().Get("id")
 	role := role.FindRole(roleID)
@@ -136,7 +136,7 @@ func projectHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "viewProject", &Page{Title: "Project", Data: data})
 }
 
-func projectsHandler(w http.ResponseWriter, r *http.Request) {
+func projectBrowseHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	projectAmount := 16
 	pageAmount := 5
@@ -293,7 +293,7 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func rolesHandler(w http.ResponseWriter, r *http.Request) {
+func roleBrowseHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	//params for pagination
 	roleAmount := 16
@@ -351,7 +351,7 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	project.InsertProject(newProject)
 	fmt.Println(newProject)
 	
-	urlParts := []string{"/project/?id=", projectId.Hex()}
+	urlParts := []string{"/projects/?id=", projectId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -622,8 +622,8 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/profile/", profileHandler)
 	//http.HandleFunc("/role/", rolePageHandler)
-	http.HandleFunc("/project/", projectHandler)
-	http.HandleFunc("/projects/browse", projectsHandler)
+	http.HandleFunc("/projects/", projectHandler)
+	http.HandleFunc("/projects/browse", projectBrowseHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
 	//http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/projects/create", createProjectHandler)
@@ -632,8 +632,8 @@ func main() {
 	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
-	http.HandleFunc("/auditions/browse", rolesHandler)
-	http.HandleFunc("/auditions/", rolePageHandler)
+	http.HandleFunc("/auditions/browse", roleBrowseHandler)
+	http.HandleFunc("/auditions/", roleHandler)
 	//http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
 	
