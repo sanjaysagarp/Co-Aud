@@ -21,13 +21,13 @@ type Cast struct {
 //Project struct defines a person's personal project
 type Project struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Title string
+	Title string 
 	URL string
 	ShortDescription string
 	Description string
-	Cast []*mgo.DBRef // [] Return to the original later **
+	Cast []*Cast // [] Return to the original later ** 
 	PostedDate time.Time
-	User *user.User
+	User *mgo.DBRef
 }
 
 func (w *Project) GetYoutubeID() string {
@@ -36,19 +36,21 @@ func (w *Project) GetYoutubeID() string {
 }
 
 //NewProject creates a new instance of project
-func NewProject(title string, url string, shortDescription string, description string, casts []Cast, user *user.User, id bson.ObjectId) *Project {
+func NewProject(title string, url string, shortDescription string, description string, casts []*Cast, user *user.User, id bson.ObjectId) *Project {
 	var dbRefCasts []*mgo.DBRef
 	for _, cast := range casts {
+		fmt.Println("Cast ID: " + cast.Id.Hex())
 		dbRefCast := &mgo.DBRef{Collection: "casts", Id: cast.Id, Database: "CoAud"}
 		dbRefCasts = append(dbRefCasts, dbRefCast)
 	}
-	return &Project{Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: dbRefCasts, PostedDate: time.Now(), User : user, Id: id}
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: casts, PostedDate: time.Now(), User : dbRefUser}
 }
 
 //NewCast creates a new instance of cast
-func NewCast(user *user.User, role string) Cast {
+func NewCast(user *user.User, role string, id bson.ObjectId) *Cast {
 	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-	return Cast{User: dbRefUser, Role: role}
+	return &Cast{Id: id, User: dbRefUser, Role: role}
 }
 
 //InsertProject inserts a project into the projects collection
@@ -59,10 +61,10 @@ func InsertProject(project *Project) {
 		panic(err)
 	}
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
+	session.SetMode(mgo.Strong, true)
 	c := session.DB("CoAud").C("projects")
-	err = c.Insert(&Project{Title: project.Title, URL: project.URL, ShortDescription: project.ShortDescription, Description: project.Description, Cast: project.Cast, PostedDate: project.PostedDate, User: project.User, Id: project.Id})
-	
+	fmt.Println(project)
+	err = c.Insert(project)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +74,7 @@ func InsertProject(project *Project) {
 func InsertCast(cast *Cast) {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	

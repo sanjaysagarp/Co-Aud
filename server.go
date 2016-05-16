@@ -265,7 +265,7 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 			newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, result.Location)
 			role.InsertRole(newRole)
 
-			urlParts := []string{"/role/?id=", newRole.Id.Hex()}
+			urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
 			url := strings.Join(urlParts, "")
 			
 			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -338,14 +338,20 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	castsAttendees := r.Form["castEmail[]"]
 	castRoles := r.Form["castRole[]"]
 
-	castContainer := make([]project.Cast, 0)
+	var castContainer []*project.Cast
+	var newCast *project.Cast
 	for i := 0; i < len(castsAttendees); i++ {
+		
+		castId := bson.NewObjectId()
 		castUser := user.FindUser(castsAttendees[i])
-		newCast := project.NewCast(castUser, castRoles[i])
+		//fmt.Println("ARWAREWARNEW " + castUser.Email)
+		newCast = project.NewCast(castUser, castRoles[i], castId)
+		//project.InsertCast(newCast)
 		castContainer = append(castContainer, newCast)
 	}
 	
 	projectId := bson.NewObjectId()
+	fmt.Println("ID :::: " + projectId.Hex())
 	//s := redis_session.Session(w, r)
 	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
 	project.InsertProject(newProject)
@@ -645,7 +651,6 @@ func main() {
 	http.HandleFunc("/api/v1/submitAuditionComment/", submitAuditionCommentHandler)
 	http.HandleFunc("/api/v1/submitProject/", submitProjectHandler)
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
-	http.HandleFunc("/api/v1/submitProject", submitProjectHandler)
 	http.HandleFunc("/api/v1/submitTeam/", submitTeamHandler)
 
 	//Listen on port 80
