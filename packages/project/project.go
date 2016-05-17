@@ -25,7 +25,7 @@ type Project struct {
 	URL string
 	ShortDescription string
 	Description string
-	Cast []*Cast // [] Return to the original later ** 
+	Cast []*mgo.DBRef
 	PostedDate time.Time
 	User *mgo.DBRef
 }
@@ -39,12 +39,14 @@ func (w *Project) GetYoutubeID() string {
 func NewProject(title string, url string, shortDescription string, description string, casts []*Cast, user *user.User, id bson.ObjectId) *Project {
 	var dbRefCasts []*mgo.DBRef
 	for _, cast := range casts {
-		fmt.Println("Cast ID: " + cast.Id.Hex())
+		fmt.Println("Cast ID: " + cast.Id)
 		dbRefCast := &mgo.DBRef{Collection: "casts", Id: cast.Id, Database: "CoAud"}
 		dbRefCasts = append(dbRefCasts, dbRefCast)
 	}
 	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description : description, Cast: casts, PostedDate: time.Now(), User : dbRefUser}
+	fmt.Println(dbRefUser)
+	fmt.Println("project id: ", id)
+	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description: description, Cast: dbRefCasts, PostedDate: time.Now(), User: dbRefUser}
 }
 
 //NewCast creates a new instance of cast
@@ -56,16 +58,18 @@ func NewCast(user *user.User, role string, id bson.ObjectId) *Cast {
 //InsertProject inserts a project into the projects collection
 func InsertProject(project *Project) {
 	session, err := mgo.Dial("127.0.0.1:27018")
-	fmt.Println("connected")
 	if err != nil {
+		fmt.Println("not connected")
 		panic(err)
 	}
+	fmt.Println("connected")
+
 	defer session.Close()
-	session.SetMode(mgo.Strong, true)
+	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("projects")
-	fmt.Println(project)
 	err = c.Insert(project)
 	if err != nil {
+		fmt.Println("insert project fails")
 		panic(err)
 	}
 }

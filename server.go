@@ -244,7 +244,6 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		
 		// adding new role into db
 		roleID := bson.NewObjectId()
-		
 		//TODO: add appropriate size limit
 		if(megabytes < 6) {
 			attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
@@ -277,9 +276,10 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("err opening image file: %s", err)
 		fmt.Println("Placing default image..")
 		roleID := bson.NewObjectId()
+
 		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, "/public/img/default_role_pic.png")
 		role.InsertRole(newRole)
-
+		fmt.Println(newRole)
 		urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
 		url := strings.Join(urlParts, "")
 		
@@ -334,6 +334,9 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//data := setDefaultData(w, r)
 	//submission := make(map[string]interface{})
 	// **TOP
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	
 	r.ParseForm()
 	castsAttendees := r.Form["castEmail[]"]
 	castRoles := r.Form["castRole[]"]
@@ -346,16 +349,16 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 		castUser := user.FindUser(castsAttendees[i])
 		//fmt.Println("ARWAREWARNEW " + castUser.Email)
 		newCast = project.NewCast(castUser, castRoles[i], castId)
-		//project.InsertCast(newCast)
+		project.InsertCast(newCast)
 		castContainer = append(castContainer, newCast)
 	}
 	
 	projectId := bson.NewObjectId()
-	fmt.Println("ID :::: " + projectId.Hex())
+	fmt.Println("ID :::: ", projectId)
 	//s := redis_session.Session(w, r)
 	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	fmt.Println("new project: ", newProject.Id)
 	project.InsertProject(newProject)
-	fmt.Println(newProject)
 	
 	urlParts := []string{"/projects/?id=", projectId.Hex()}
 	url := strings.Join(urlParts, "")
