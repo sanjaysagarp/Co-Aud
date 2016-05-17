@@ -76,6 +76,10 @@ Media title text: #eedd75*/
     padding-top: 30px
 }
 
+.navbar-right {
+    margin-top: 10px;
+}
+
 body {
 	background-color: #edeaed;
 	padding-bottom: 60px;
@@ -255,7 +259,7 @@ hr {
 
 #logout {
     margin-left: 15px;
-    margin-top: 14px;
+    margin-top: 24px;
 }
 
 .tab-content {
