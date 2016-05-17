@@ -245,7 +245,9 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		// adding new role into db
 		roleID := bson.NewObjectId()
 		//TODO: add appropriate size limit
-		if(megabytes < 6) {
+		// sss := strconv.FormatFloat(megabytes, 'f', 6, 64)
+		// fmt.Println("Size: " + sss )
+		if(megabytes < 4) {
 			attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
 		
 			uploader := s3manager.NewUploader(session.New())
@@ -264,12 +266,12 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 			newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, result.Location)
 			role.InsertRole(newRole)
 
-			urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
-			url := strings.Join(urlParts, "")
-			
-			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			// urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
+			// url := strings.Join(urlParts, "")
+			w.Write([]byte(newRole.Id.Hex()))
+			//http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 		} else {
-			//handle response if greater than 6 megabytes! -- NEED TO MAKE RESPONSIVE
+			//handle response if greater than 4 megabytes! -- NEED TO MAKE RESPONSIVE
 			w.Write([]byte("rejected"))
 		}
 	} else {
@@ -280,10 +282,11 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, "/public/img/default_role_pic.png")
 		role.InsertRole(newRole)
 		fmt.Println(newRole)
-		urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
-		url := strings.Join(urlParts, "")
+		// urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
+		// url := strings.Join(urlParts, "")
 		
-		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		// http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		w.Write([]byte(newRole.Id.Hex()))
 	}
 	
 }

@@ -68,6 +68,14 @@ Media title text: #eedd75*/
     color: #D2C884;
 }
 
+.nav-icon {
+    max-height: 40px
+}
+
+.navbar-brand {
+    padding-top: 30px
+}
+
 body {
 	background-color: #edeaed;
 	padding-bottom: 60px;
@@ -225,6 +233,7 @@ textarea {
     background-color: #F32E06;
     color: white;
     border-color: black;
+    margin-top: 20px;
 }
 
 hr {
