@@ -1,0 +1,51 @@
+{{define "viewTeam"}}
+{{template "header" .}}
+
+<div class="container">
+	
+	<div class="row">
+		<div class="col-md-12">
+			<h1>{{ .Data.team.TeamName }}</h1>
+			<p>{{ .Data.team.Motto }}</h1>
+		</div>
+		<div id="cast" class="col-md-3">
+			<ul>
+				{{ range .Data.team.Users }}
+				<li class="media">
+				  <div class="media-left">
+				    <a href="/profile/">
+				      <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+				    </a>
+				  </div>
+				  <div class="media-body">
+				    <a href="/profile/"><h4 class="media-heading">{{ .User.DisplayName }}</h4></a>
+				  </div>
+				</li>
+				{{ end }}
+			</ul>	
+		</div>
+	</div>
+
+</div>
+
+<!--<style>
+	iframe {
+		float:left
+	}
+	#profile #cast {
+		float:left
+	}
+	li > img {
+		float:left
+	}
+	li > p {
+		float:left
+	}
+	li > img {
+		margin-bottom:8px
+		
+	}
+</style>-->
+
+{{template "footer" .}}
+{{end}}

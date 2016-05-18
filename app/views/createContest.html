@@ -1,0 +1,37 @@
+{{define "createContest"}}
+{{template "header" .}}
+<div class="container">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 card">
+			<h3>Create a Contest</h3>
+			<hr>
+			<form id ="contestForm" action="/api/v1/submitContest/" method="post">
+				<div class="form-group">
+					<label>Title</label>
+					<input type="text" class="form-control" id="title" name="title" placeholder="Title">
+				</div>
+				<div class="form-group">
+					<label>Description</label>
+					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description" id="description"></textarea>
+				</div>
+				<br/>
+				<div class="form-group">
+					<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
+					<label class="upload">Upload new photo</label>
+					<div>
+						<input class="form-control" id="photoUpload" type="file" accept="image/*" name="photo">
+					</div>
+				</div>
+				<div class="form-group">
+					<label>Deadline</label>
+					<input id="date" class="form-control" type="date" name="deadline">
+				</div>
+				<button id="submitContest" type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+	</div>
+	
+</div>
+
+{{template "footer" .}}
+{{end}}

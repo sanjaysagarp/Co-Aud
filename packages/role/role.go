@@ -181,9 +181,19 @@ func NewRole(title string, user *user.User, description string, script string, d
 	return &Role{Title: title, User: dbRefUser, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl, Id: id}
 }
 
+func NewTeam(users []*user.User, teamName string, motto string, id bson.ObjectId) *Team {
+	var dbRefUsers []*mgo.DBRef
+	for _,user := range users {
+		dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+		dbRefUsers = append(dbRefUsers, dbRefUser)
+	}
+	
+	return &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto, Id : id}
+}
+
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
-func InsertNewTeam(users []*user.User, teamName string, motto string) *Team {
+func InsertNewTeam(team *Team) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	
 	//session, err := mgo.Dial("127.0.0.1")
@@ -191,13 +201,8 @@ func InsertNewTeam(users []*user.User, teamName string, motto string) *Team {
 			panic(err)
 	}
 	defer session.Close()
-	var dbRefUsers []*mgo.DBRef
-	for _,user := range users {
-		dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-		dbRefUsers = append(dbRefUsers, dbRefUser)
-	}
 	//dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.id, Database: "CoAud"}
-	team := &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto}
+	
 	
 	
 	session.SetMode(mgo.Monotonic, true)
@@ -217,8 +222,8 @@ func NewAudition(user *user.User, attachmentUrl string, id bson.ObjectId) *Audit
 }
 
 //NewContest creates an instance of a new role and returns it
-func NewContest(title string, description string, imageUrl string, endDate time.Time) *Contest {
-	return &Contest{Title: title,Description: description,ImageUrl: imageUrl,StartDate: time.Now(),EndDate: endDate}
+func NewContest(title string, description string, imageUrl string, endDate time.Time, id bson.ObjectId) *Contest {
+	return &Contest{Title: title,Description: description,ImageUrl: imageUrl,StartDate: time.Now(),EndDate: endDate, Id: id}
 }
 
 //InsertComment takes a role and inserts a comment into the role's comment array
@@ -337,7 +342,7 @@ func InsertContest(contest *Contest) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("contests")
 
-	err = c.Insert(&Contest{Title: contest.Title, Description: contest.Description, ImageUrl: contest.ImageUrl, StartDate: contest.StartDate, EndDate: contest.EndDate})
+	err = c.Insert(&Contest{Title: contest.Title, Description: contest.Description, ImageUrl: contest.ImageUrl, StartDate: contest.StartDate, EndDate: contest.EndDate, Id: contest.Id})
 	if err != nil {
 		panic(err)
 	}
@@ -375,9 +380,10 @@ func (contest *Contest) InsertTeam(team *Team) {
 	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
 	//box.AddItem(item1)
 	//change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
-	
-	dbRefTeam:= &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
-	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeam}}}
+	var dbRefTeams []*mgo.DBRef
+	dbRefTeam := &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
+	dbRefTeams = append(dbRefTeams, dbRefTeam)
+	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeams}}}
 	err = c.Update(bson.M{"_id": contest.Id}, change)
 	
 	if err != nil {
@@ -430,6 +436,25 @@ func FindRole(id string) *Role {
 	return result
 }
 
+func FindContest(id string) *Contest {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("contests")
+	
+	result := &Contest{}
+	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
+	if err != nil {
+		fmt.Println("Contest not found")
+		panic(err)
+	}
+	return result
+}
+
 //FindContests searches for all contests
 //TODO: query db for contests and add to result, then return contests
 func FindContests(title string) []Contest {
@@ -448,6 +473,25 @@ func FindContests(title string) []Contest {
 		panic(err)
 	}
 	
+	return result
+}
+
+func FindTeam(id string) *Team{
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("teams")
+	
+	result := &Team{}
+	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
+	if err != nil {
+		fmt.Println("Team now found")
+		panic(err)
+	}
 	return result
 }
 

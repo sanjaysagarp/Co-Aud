@@ -136,6 +136,19 @@ func projectHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "viewProject", &Page{Title: "Project", Data: data})
 }
 
+func teamHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	data := setDefaultData(w, r)
+	teamID := r.URL.Query().Get("id")
+	//fmt.Println(teamID)
+	team := role.FindTeam(teamID)
+	fmt.Println(team)
+	data["team"] = team
+	data["user"] = currentUser
+	display(w, "viewTeam", &Page{Title: "Team", Data: data})
+}
+
 func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	projectAmount := 16
@@ -172,6 +185,44 @@ func projectsHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "browseProjects", &Page{Title: "Projects", Data: data})
 }
 
+func browseTeamsHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	projectAmount := 16
+	pageAmount := 5
+	
+	//pagination
+	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page")) //used for getting roles
+	currentPage := pageNumber //used for getting page list
+	if currentPage <= 0 {
+		currentPage = 1
+	}
+	data["currentPage"] = currentPage
+	data["prevPage"] = currentPage - 1
+	data["nextPage"] = currentPage + 1
+	if err != nil {
+		fmt.Println(err)
+	}
+	//zero index page number for skip calculation when querying mongo
+	if pageNumber != 0 {
+		pageNumber --
+	}
+	
+	//get projects
+	projectList, projectCount := project.FindProjects(nil, (pageNumber)*projectAmount, projectAmount)
+	fmt.Println(projectList)
+	//more params for pagination
+	maxPage := int(math.Ceil(float64(projectCount)/float64(projectAmount)))
+	pageList := getPageList(maxPage, currentPage, pageAmount)
+	
+	data["projects"] = projectList
+	data["pageList"] = pageList
+	data["maxPage"] = maxPage
+	
+	display(w, "browseProjects", &Page{Title: "Projects", Data: data})
+}
+
+
+
 func editProfileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	display(w, "editProfile", &Page{Title: "Edit Profile", Data: data})
@@ -193,15 +244,29 @@ func createTeamHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "createTeam", &Page{Title: "Create Team", Data: data})
 }
 
+
 func contestMainHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
 	data := setDefaultData(w, r)
+	contestId := r.URL.Query().Get("id")
+	contest := role.FindContest(contestId)
+	data["contest"] = contest
+	data["user"] = currentUser
 	display(w, "viewContest", &Page{Title: "Contest", Data: data})
 }
+
 
 func createRoleHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	display(w, "createRole", &Page{Title: "Create Role", Data: data})
 }
+
+func createContestHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	display(w, "createContest", &Page{Title: "Create Contest", Data: data})
+}
+
 
 func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
@@ -365,20 +430,51 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	// **TOP
 	r.ParseForm()
 	teamMembers := r.Form["teamEmails"]
-
-	var teamContainer []*user.User
+	fmt.Println("JELLO")
+	fmt.Println(teamMembers)
+	currentContest := role.FindContest("573baf38ca2d7ce703db46c2")
+	teamContainer := make([]*user.User, 0)
 	for i := 0; i < len(teamMembers); i++ {
 		newUser := user.FindUser(teamMembers[i])
 		teamContainer = append(teamContainer, newUser)
 	}
-	
+	fmt.Println(teamContainer)
 	teamId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
-	role.InsertNewTeam(teamContainer, r.FormValue("teamName"), r.FormValue("motto"))
 	
-	urlParts := []string{"/team/?id=", teamId.Hex()}
+	// ****** CLEANING ********
+	newTeam := role.NewTeam(teamContainer, r.FormValue("teamName"), r.FormValue("motto"), teamId)
+	
+	role.InsertNewTeam(newTeam)
+	
+	currentContest.InsertTeam(newTeam)
+	
+
+	
+	urlParts := []string{"/teams/?id=", teamId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func submitContestHandler(w http.ResponseWriter, r *http.Request) {
+
+	contestId := bson.NewObjectId()
+	//s := redis_session.Session(w, r)
+	layout := "2006-01-02"
+
+	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	  
+	newContest := role.NewContest(r.FormValue("title"), r.FormValue("description"), r.FormValue("photo"), deadline, contestId)
+	
+	role.InsertContest(newContest)
+	
+	urlParts := []string{"/contest/?id=", contestId.Hex()}
+	url := strings.Join(urlParts, "")
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
@@ -624,11 +720,15 @@ func main() {
 	//http.HandleFunc("/role/", rolePageHandler)
 	http.HandleFunc("/project/", projectHandler)
 	http.HandleFunc("/projects/browse", projectsHandler)
+	http.HandleFunc("/teams/browse", browseTeamsHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
 	//http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/projects/create", createProjectHandler)
 	http.HandleFunc("/contest/", contestMainHandler)
+	http.HandleFunc("/teams/", teamHandler)
 	http.HandleFunc("/teams/create", createTeamHandler)
+	http.HandleFunc("/contest/create", createContestHandler)
+	
 	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
@@ -645,9 +745,8 @@ func main() {
 	http.HandleFunc("/api/v1/submitAuditionComment/", submitAuditionCommentHandler)
 	http.HandleFunc("/api/v1/submitProject/", submitProjectHandler)
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
-	http.HandleFunc("/api/v1/submitProject", submitProjectHandler)
 	http.HandleFunc("/api/v1/submitTeam/", submitTeamHandler)
-
+	http.HandleFunc("/api/v1/submitContest/", submitContestHandler)
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)

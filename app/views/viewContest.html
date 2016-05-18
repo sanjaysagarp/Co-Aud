@@ -15,14 +15,15 @@
 	
 	<div class="container">
 		</div>
-		<h3>Title of the Contest</h3>
+		<h3>{{ .Data.contest.Title }}</h3>
 		<p>
-			Description of the Contest Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum, ipsam, laboriosam. Sapiente quod pariatur aliquid numquam, libero, ipsum temporibus saepe fugiat nulla, doloremque exercitationem! Cupiditate provident aspernatur consectetur. Inventore, labore.
+			{{ .Data.contest.Description }}
 		</p>
 		<hr>
 		<div id="wrapper">
-			<button onclick="location.href='/teams/create';" class="btn btn-default contestButtons">Create Teams</button><button class="btn btn-info contestButtons">Browse Teams</button>
+			<button onclick="location.href='/teams/create';" class="btn btn-default contestButtons" data-id="{{ .Data.contest.Id.Hex }}">Create Teams</button><button class="btn btn-info contestButtons" data-id="{{ .Data.contest.Id.Hex }}">Browse Teams</button>
 		</div>
+		
 	</div>
 </div>
 	
