@@ -447,6 +447,7 @@ func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(result)
 	resultCount, err := c.Count()
 	if err != nil {
 		panic(err)

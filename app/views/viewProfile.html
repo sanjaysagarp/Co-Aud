@@ -11,61 +11,112 @@
 {{end}}-->
 	<div class="container">
 		<div class="row">
-			<div class="col-md-4">
-				<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
-				<h1>{{ .Data.user.DisplayName }}</h1>
-				<!--Username should go here <h3>{{ .Data.user.DisplayName }}</h3>-->
-				<hr>
-				<p>{{ .Data.user.Title }}</p>
-				<p>Joined on: {{ .Data.user.JoinDate }}</p>
-				{{if .Data.currentUser }}
-					{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-						<a href="/profile/edit/" class="btn btn-lg btn-default">Edit Profile</a>
+			<div class="col-md-5">
+				<div class="card-padding">
+					<div class="card">
+						<div class="col-md-6">
+							<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+						</div>
+						<div class="col-md-6">
+							<h3 id="profile-display-name">{{ .Data.user.DisplayName }}</h3>
+							<!--Username should go here <h3>{{ .Data.user.DisplayName }}</h3>-->
+							<hr id="profile-name" class="card-hr">
+							<p id="profile-title">{{ .Data.user.Title }}</p>
+							<p>Joined on: {{ .Data.user.JoinDate }}</p>
+							{{if .Data.currentUser }}
+								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+									<a href="/profile/edit/" class="btn btn-lg btn-default">Edit Profile</a>
+								{{end}}
+							{{end}}
+						</div>
+						<div class="user-contacts col-md-12">
+							{{if .Data.user.InstagramURL }}
+							<a href="{{ .Data.user.InstagramURL }}">
+								<img class="img-contact img-circle img-responsive" src="/public/img/instagram_icon.png">
+							</a>
+							{{end}}
+							{{if .Data.user.FacebookURL }}
+								<a href="{{ .Data.user.FacebookURL }}">
+									<img class="img-contact img-circle img-responsive" src="/public/img/facebook_icon.png">
+								</a>
+							{{end}}
+							{{if .Data.user.TwitterURL }}
+								<a href="{{ .Data.user.TwitterURL }}">
+									<img class="img-contact img-circle img-responsive" src="/public/img/twitter_icon.png">
+								</a>
+							{{end}}
+						</div>
+					</div>
+				</div>
+				{{if .Data.user.AboutMe}}
+				<div class="card-padding">
+					<div class="card">
+						<h3>About Me</h3>
+						<p>{{ .Data.user.AboutMe }}</p>	
+					</div>
+				</div>
+				{{else}}
+					{{if .Data.currentUser}}
+						{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+						<div class="card-padding">
+							<div class="card">
+								<h3>About Me</h3>
+								<p>Tell us more about yourself!</p>
+								<a href="/profile/edit/" class="btn btn-default">Edit</a>
+							</div>
+						</div>
+						{{end}}
 					{{end}}
 				{{end}}
-				<div class="user-contacts row">
-					<!--<a href="https://www.youtube.com/">
-						<img class="img-contact img-circle img-responsive" src="/public/img/youtube_icon.png">
-					</a>-->
-					{{if .Data.user.FacebookURL }}
-						<a href="{{ .Data.user.FacebookURL }}">
-							<img class="img-contact img-circle img-responsive" src="/public/img/facebook_icon.png">
-						</a>
-					{{end}}
-					{{if .Data.user.TwitterURL }}
-						<a href="{{ .Data.user.TwitterURL }}">
-							<img class="img-contact img-circle img-responsive" src="/public/img/twitter_icon.png">
-						</a>
-					{{end}}
-				</div>
 			</div>
-			<div class="col-md-8">
-				<div class="row">
-					<h1>About Me</h1>
-					<p>{{ .Data.user.AboutMe }} 
-					</p>
-				</div>
-				<div class="row">
-					<h1>My Projects</h1>
-					{{ range .Data.postedProjects }}
-					<div class="thumbnail col-md-4">
-						<a href="/project/?id={{ .Id.Hex }}">
-							<h2>{{.Title}}</h2>
-							<img class="img-responsive" src="/public/img/placeholder.png">
-						</a>
+			<div class="col-md-7">
+				<div class="card-padding row">
+					<div class="card">
+						<h3>Showcase</h3>
+						{{ if .Data.postedProjects }}
+							{{ range .Data.postedProjects }}
+							<div class="thumbnail col-md-4">
+								<a href="/project/?id={{ .Id.Hex }}">
+									<h2>{{.Title}}</h2>
+									<img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg">
+								</a>
+							</div>
+							{{ end }}
+						{{ else }}
+							{{if .Data.currentUser}}
+								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+								<p>Do you have something to show? Submit it to the showcase!</p>
+								<a href="/projects/create" class="btn btn-default">Submit A Project</a>
+								{{end}}
+							{{ else }}
+								<p>{{ .Data.user.DisplayName }} doesn't have any projects submitted.</p>
+							{{end}}
+						{{ end }}
 					</div>
-					{{ end }}
 				</div>
-				<div class="row">
-					<h1>Posted Roles</h1>
-					{{ range .Data.postedRoles }}
-						<div class="thumbnail col-md-4">
-							<a href="/role/?id={{ .Id.Hex }}">
-								<h2>{{.Title}}</h2>
-								<img class="img-responsive" src="/public/img/placeholder.png">
-							</a>
-						</div>
-					{{ end }}
+				<div class="card-padding row">
+					<div class="card">
+						<h3>Posted Auditions</h3>
+						{{ if .Data.postedRoles }}
+							{{ range .Data.postedRoles }}
+								<div class="thumbnail col-md-4">
+									<a href="/role/?id={{ .Id.Hex }}">
+										<h2>{{.Title}}</h2>
+										<img class="img-responsive" src="{{.ImageUrl}}">
+									</a>
+								</div>
+							{{ end }}
+							{{ else}}
+								{{if .Data.currentUser}}
+									{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+									<p>Do you need a voice actor? Request one now!</p>
+									<a href="/auditions/create" class="btn btn-default">Request an Audition</a>
+									{{end}}
+								{{ else }}
+									<p>{{ .Data.user.DisplayName }} doesn't have any auditions posted.</p>
+								{{end}}
+						{{ end }}
+					</div>
 				</div>
 			</div>
 		</div>

@@ -1,14 +1,3 @@
-/*Header, Card header: #1e223d
-Header text: #f6efc0
-Background, Title: #edeaed
-Card: #ffffff
-Card Shadow: #dcd9dc
-Card Title: #c3bbc3
-text: #8e8d8e
-buttons: #f8b72d #fce230 #53979c #36ced9
-media title bar: #86adb2
-Media title text: #eedd75*/
-
 @font-face {
     font-family: sfEspressoShack;
     src: url("/public/font/SF Espresso Shack.ttf");
@@ -95,6 +84,8 @@ h1 {
 	-moz-box-shadow: 10px 10px 0px 3px rgba(220,217,220,1);
 	box-shadow: 10px 10px 0px 3px rgba(220,217,220,1);
     padding: 20px;
+    overflow: auto;
+    height: 100%;
 }
 
 .card > h2 {
@@ -405,4 +396,56 @@ hr {
     -webkit-box-shadow: 0 0 2px #F0EFE7;
     -moz-box-shadow: 0 0 2px #F0EFE7;
     box-shadow: 0 0 2px #F0EFE7;
+}
+
+/*Profile page*/
+#profile-display-name {
+    font-family: sfEspressoShack;
+    font-weight: bold;
+    color: #1e223d;
+}
+
+#profile-title {
+    color: #86adb2;
+    font-size: 13pt;
+}
+
+hr#profile-name {
+    border-color: #f6efc0;
+}
+
+#colorsssssssssssssssssssssssssss {
+    color: #1e223d;
+    color: #f6efc0;
+    color: #edeaed;
+    color: #ffffff;
+    color: #dcd9dc;
+    color: #c3bbc3;
+    color: #8e8d8e;
+    color: #f8b72d #fce230 #53979c #36ced9;
+    color: #86adb2;
+    color: #eedd75;
+}
+
+.card-padding {
+    padding: 20px;
+}
+
+.card > h3 {
+    margin-top: 0px;
+    font-family: whitePine;
+    color: #eedd75;
+}
+
+.card-hr {
+    margin-top: 0px;
+}
+
+.user-contacts {
+    margin-top: 20px;
+}
+
+.thumbnail > a > h2 {
+    font-family: sfEspressoShack;
+    color: #f6efc0;
 }

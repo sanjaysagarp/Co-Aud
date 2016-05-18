@@ -20,6 +20,7 @@ import (
 	"math"
 	//"reflect"
 	"strconv"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/aws/aws-sdk-go/aws"
 	//"github.com/aws/aws-sdk-go/service/s3"
@@ -87,12 +88,13 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
-	postedRoles, rolesCount := role.FindRoles(bson.M{"user.email": user.Email}, 0, 3)
-	postedProjects, projectCount := project.FindProjects(bson.M{"user.email": user.Email}, 0, 3)
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user": dbRefUser}, 0, 3)
+	postedProjects, projectCount := project.FindProjects(bson.M{"user": dbRefUser}, 0, 3)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
-	data["postedProjectss"] = postedProjects
+	data["postedProjects"] = postedProjects
 	data["projectCount"] = projectCount
 	display(w, "viewProfile", &Page{Title: user.DisplayName, Data: data})
 }
@@ -720,7 +722,7 @@ func main() {
 	//http.HandleFunc("/role/", rolePageHandler)
 	http.HandleFunc("/teams/browse", browseTeamsHandler)
 	http.HandleFunc("/projects/", projectHandler)
-	http.HandleFunc("/projects/browse", projectBrowseHandler)
+	http.HandleFunc("/projects/browse/", projectBrowseHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
 	//http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/projects/create", createProjectHandler)
@@ -732,7 +734,7 @@ func main() {
 	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
-	http.HandleFunc("/auditions/browse", roleBrowseHandler)
+	http.HandleFunc("/auditions/browse/", roleBrowseHandler)
 	http.HandleFunc("/auditions/", roleHandler)
 	//http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)

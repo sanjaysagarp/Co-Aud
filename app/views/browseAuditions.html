@@ -29,7 +29,7 @@
 	  <ul class="pagination">
 	    {{ if not (or (eq .Data.currentPage 1) (eq .Data.currentPage 0))}}
 				<li>
-					<a href="/auditions/?page={{.Data.prevPage}}" aria-label="Previous">
+					<a href="/auditions/browse/?page={{.Data.prevPage}}" aria-label="Previous">
 						<span aria-hidden="true">&laquo;</span>
 					</a>
 				</li>
@@ -37,15 +37,15 @@
 			{{$currentPage := .Data.currentPage}}
 			{{ range .Data.pageList }}	
 				{{if eq . $currentPage }}
-					<li class="active"><a href="/auditions/?page={{.}}">{{.}} <span class="sr-only">(current)</span></a></li>
+					<li class="active"><a href="/auditions/browse/?page={{.}}">{{.}} <span class="sr-only">(current)</span></a></li>
 				{{else}}
-					<li><a href="/auditions/?page={{.}}">{{.}}</a></li>
+					<li><a href="/auditions/browse/?page={{.}}">{{.}}</a></li>
 				{{end}}
 			{{end}}
 	    
 			{{ if not (eq .Data.currentPage .Data.maxPage)}}
 				<li>
-					<a href="/auditions/?page={{.Data.nextPage}}" aria-label="Next">
+					<a href="/auditions/browse/?page={{.Data.nextPage}}" aria-label="Next">
 						<span aria-hidden="true">&raquo;</span>
 					</a>
 				</li>
