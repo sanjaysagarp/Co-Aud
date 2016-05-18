@@ -18,6 +18,21 @@ type Cast struct {
 	Role string
 }
 
+func (c *Cast) GetUser() *user.User {
+    session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := &user.User{}
+	err = session.FindRef(c.User).One(result)
+	if err != nil {
+		panic(err)
+	}
+    return result
+}
+
 //Project struct defines a person's personal project
 type Project struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
@@ -30,9 +45,45 @@ type Project struct {
 	User *mgo.DBRef
 }
 
-func (w *Project) GetYoutubeID() string {
+func (p *Project) GetYoutubeID() string {
     r, _ := regexp.Compile(`^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*`)
-    return r.FindAllStringSubmatch(w.URL, -1)[0][7]
+    return r.FindAllStringSubmatch(p.URL, -1)[0][7]
+}
+
+func (p *Project) GetCast() []*Cast {
+    session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := []*Cast{}
+	
+	for i, c := range p.Cast {
+		oneResult := &Cast{}
+		err = session.FindRef(c).One(oneResult)
+		if err != nil {
+			fmt.Println("error happened at index: ", i)
+			panic(err)
+		}
+		result = append(result, oneResult)
+	}
+    return result
+}
+
+func (p *Project) GetUser() *user.User {
+    session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := &user.User{}
+	err = session.FindRef(p.User).One(result)
+	if err != nil {
+		panic(err)
+	}
+    return result
 }
 
 //NewProject creates a new instance of project
