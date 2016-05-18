@@ -97,7 +97,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "viewProfile", &Page{Title: user.DisplayName, Data: data})
 }
 
-func rolePageHandler(w http.ResponseWriter, r *http.Request) {
+func roleHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	roleID := r.URL.Query().Get("id")
 	role := role.FindRole(roleID)
@@ -149,7 +149,8 @@ func teamHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "viewTeam", &Page{Title: "Team", Data: data})
 }
 
-func projectsHandler(w http.ResponseWriter, r *http.Request) {
+
+func projectBrowseHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	projectAmount := 16
 	pageAmount := 5
@@ -309,9 +310,10 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		
 		// adding new role into db
 		roleID := bson.NewObjectId()
-		
 		//TODO: add appropriate size limit
-		if(megabytes < 6) {
+		// sss := strconv.FormatFloat(megabytes, 'f', 6, 64)
+		// fmt.Println("Size: " + sss )
+		if(megabytes < 4) {
 			attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
 		
 			uploader := s3manager.NewUploader(session.New())
@@ -330,25 +332,27 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 			newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, result.Location)
 			role.InsertRole(newRole)
 
-			urlParts := []string{"/role/?id=", newRole.Id.Hex()}
-			url := strings.Join(urlParts, "")
-			
-			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			// urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
+			// url := strings.Join(urlParts, "")
+			w.Write([]byte(newRole.Id.Hex()))
+			//http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 		} else {
-			//handle response if greater than 6 megabytes! -- NEED TO MAKE RESPONSIVE
+			//handle response if greater than 4 megabytes! -- NEED TO MAKE RESPONSIVE
 			w.Write([]byte("rejected"))
 		}
 	} else {
 		fmt.Printf("err opening image file: %s", err)
 		fmt.Println("Placing default image..")
 		roleID := bson.NewObjectId()
+
 		newRole := role.NewRole(r.FormValue("title"), currentUser, r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), roleID, "/public/img/default_role_pic.png")
 		role.InsertRole(newRole)
-
-		urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
-		url := strings.Join(urlParts, "")
+		fmt.Println(newRole)
+		// urlParts := []string{"/auditions/?id=", newRole.Id.Hex()}
+		// url := strings.Join(urlParts, "")
 		
-		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		// http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		w.Write([]byte(newRole.Id.Hex()))
 	}
 	
 }
@@ -358,7 +362,7 @@ func googleLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func rolesHandler(w http.ResponseWriter, r *http.Request) {
+func roleBrowseHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	//params for pagination
 	roleAmount := 16
@@ -399,24 +403,33 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//data := setDefaultData(w, r)
 	//submission := make(map[string]interface{})
 	// **TOP
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	
 	r.ParseForm()
 	castsAttendees := r.Form["castEmail[]"]
 	castRoles := r.Form["castRole[]"]
 
-	castContainer := make([]project.Cast, 0)
+	var castContainer []*project.Cast
+	var newCast *project.Cast
 	for i := 0; i < len(castsAttendees); i++ {
+		
+		castId := bson.NewObjectId()
 		castUser := user.FindUser(castsAttendees[i])
-		newCast := project.NewCast(castUser, castRoles[i])
+		//fmt.Println("ARWAREWARNEW " + castUser.Email)
+		newCast = project.NewCast(castUser, castRoles[i], castId)
+		project.InsertCast(newCast)
 		castContainer = append(castContainer, newCast)
 	}
 	
 	projectId := bson.NewObjectId()
+	fmt.Println("ID :::: ", projectId)
 	//s := redis_session.Session(w, r)
 	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
+	fmt.Println("new project: ", newProject.Id)
 	project.InsertProject(newProject)
-	fmt.Println(newProject)
 	
-	urlParts := []string{"/project/?id=", projectId.Hex()}
+	urlParts := []string{"/projects/?id=", projectId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -718,9 +731,9 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/profile/", profileHandler)
 	//http.HandleFunc("/role/", rolePageHandler)
-	http.HandleFunc("/project/", projectHandler)
-	http.HandleFunc("/projects/browse", projectsHandler)
 	http.HandleFunc("/teams/browse", browseTeamsHandler)
+	http.HandleFunc("/projects/", projectHandler)
+	http.HandleFunc("/projects/browse", projectBrowseHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
 	//http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/projects/create", createProjectHandler)
@@ -732,8 +745,8 @@ func main() {
 	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
 	http.HandleFunc("/GoogleCallback", googleCallbackHandler)
-	http.HandleFunc("/auditions/browse", rolesHandler)
-	http.HandleFunc("/auditions/", rolePageHandler)
+	http.HandleFunc("/auditions/browse", roleBrowseHandler)
+	http.HandleFunc("/auditions/", roleHandler)
 	//http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
 	

@@ -357,7 +357,7 @@ func InsertRole(role *Role) {
 		panic(err)
 	}
 	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
+	session.SetMode(mgo.Strong, true)
 	c := session.DB("CoAud").C("roles")
 
 	err = c.Insert(role)

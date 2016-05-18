@@ -42,7 +42,7 @@ $(document).ready(function(){
 					$("#notification").fadeOut( 3000 );
 				}
 				if(data == "uploaded") {
-					window.location.href = "/role/?id=" + id
+					window.location.href = "/auditions/?id=" + id
 				}
 			}
 		});

@@ -68,6 +68,18 @@ Media title text: #eedd75*/
     color: #D2C884;
 }
 
+.nav-icon {
+    max-height: 40px
+}
+
+.navbar-brand {
+    padding-top: 30px
+}
+
+.navbar-right {
+    margin-top: 10px;
+}
+
 body {
 	background-color: #edeaed;
 	padding-bottom: 60px;
@@ -225,6 +237,7 @@ textarea {
     background-color: #F32E06;
     color: white;
     border-color: black;
+    margin-top: 20px;
 }
 
 hr {
@@ -246,7 +259,7 @@ hr {
 
 #logout {
     margin-left: 15px;
-    margin-top: 14px;
+    margin-top: 24px;
 }
 
 .tab-content {
