@@ -381,7 +381,7 @@ func (contest *Contest) InsertTeam(team *Team) {
 	//box.AddItem(item1)
 	//change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
 	var dbRefTeams []*mgo.DBRef
-	dbRefTeam := &mgo.DBRef{Collection: "contests", Id: team.Id, Database: "CoAud"}
+	dbRefTeam := &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
 	dbRefTeams = append(dbRefTeams, dbRefTeam)
 	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeams}}}
 	err = c.Update(bson.M{"_id": contest.Id}, change)
@@ -459,24 +459,24 @@ func FindRole(id string) *Role {
 
 //FindContests searches for all contests
 //TODO: query db for contests and add to result, then return contests
-// func FindContests(title string) []Contest {
-// 	session, err := mgo.Dial("127.0.0.1:27018")
-// 	fmt.Println("connected")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer session.Close()
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("contests")
+func FindContests() []Contest {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("contests")
 	
-// 	result := []Contest{}
-// 	err = c.Find(nil).All(&result)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	result := []Contest{}
+	err = c.Find(nil).All(&result)
+	if err != nil {
+		panic(err)
+	}
 	
-// 	return result
-// }
+	return result
+}
 
 func FindContest(id string) *Contest{
 	session, err := mgo.Dial("127.0.0.1:27018")
