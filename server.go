@@ -188,38 +188,14 @@ func projectBrowseHandler(w http.ResponseWriter, r *http.Request) {
 
 func browseTeamsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
-	projectAmount := 16
-	pageAmount := 5
-	
-	//pagination
-	pageNumber, err := strconv.Atoi(r.URL.Query().Get("page")) //used for getting roles
-	currentPage := pageNumber //used for getting page list
-	if currentPage <= 0 {
-		currentPage = 1
-	}
-	data["currentPage"] = currentPage
-	data["prevPage"] = currentPage - 1
-	data["nextPage"] = currentPage + 1
-	if err != nil {
-		fmt.Println(err)
-	}
-	//zero index page number for skip calculation when querying mongo
-	if pageNumber != 0 {
-		pageNumber --
-	}
 	
 	//get projects
-	projectList, projectCount := project.FindProjects(nil, (pageNumber)*projectAmount, projectAmount)
-	fmt.Println(projectList)
-	//more params for pagination
-	maxPage := int(math.Ceil(float64(projectCount)/float64(projectAmount)))
-	pageList := getPageList(maxPage, currentPage, pageAmount)
+	contestList := role.FindContest("573baf38ca2d7ce703db46c2")
+	fmt.Println(contestList)
 	
-	data["projects"] = projectList
-	data["pageList"] = pageList
-	data["maxPage"] = maxPage
+	data["contests"] = contestList
 	
-	display(w, "browseProjects", &Page{Title: "Projects", Data: data})
+	display(w, "browseTeams", &Page{Title: "Teams", Data: data})
 }
 
 
@@ -444,13 +420,16 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	teamMembers := r.Form["teamEmails"]
 	fmt.Println("JELLO")
-	fmt.Println(teamMembers)
+	//fmt.Println(teamMembers)
 	currentContest := role.FindContest("573baf38ca2d7ce703db46c2")
+	
 	teamContainer := make([]*user.User, 0)
 	for i := 0; i < len(teamMembers); i++ {
 		newUser := user.FindUser(teamMembers[i])
 		teamContainer = append(teamContainer, newUser)
 	}
+	
+	fmt.Println("jk below this")
 	fmt.Println(teamContainer)
 	teamId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
@@ -461,7 +440,8 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	role.InsertNewTeam(newTeam)
 	
 	currentContest.InsertTeam(newTeam)
-	
+	fmt.Println("Below this")
+	fmt.Println(currentContest.ParticipatingTeams)
 
 	
 	urlParts := []string{"/teams/?id=", teamId.Hex()}

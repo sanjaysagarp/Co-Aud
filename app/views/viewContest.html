@@ -21,7 +21,8 @@
 		</p>
 		<hr>
 		<div id="wrapper">
-			<button onclick="location.href='/teams/create';" class="btn btn-default contestButtons" data-id="{{ .Data.contest.Id.Hex }}">Create Teams</button><button class="btn btn-info contestButtons" data-id="{{ .Data.contest.Id.Hex }}">Browse Teams</button>
+			<button onclick="location.href='/teams/create';" class="btn btn-default contestButtons" data-id="{{ .Data.contest.Id.Hex }}">Create Teams</button><button onclick="location.href='/teams/browse';" class="btn btn-info contestButtons" data-id="{{ .Data.contest.Id.Hex }}">Browse Teams</button>
+			
 		</div>
 		
 	</div>
