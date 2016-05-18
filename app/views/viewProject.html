@@ -20,15 +20,15 @@
 		<div id="cast" class="col-md-3">
 			<h1>Cast:</h1>
 			<ul class="media-list">
-				{{ range .Data.project.Cast }}
+				{{ range .Data.project.GetCast }}
 				<li class="media">
 				  <div class="media-left">
-				    <a href="/profile/">
+				    <a href="/profile/?id={{ .GetUser.Id.Hex }}">
 				      <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
 				    </a>
 				  </div>
 				  <div class="media-body">
-				    <a href="/profile/"><h4 class="media-heading">{{ .User.DisplayName }}</h4></a>
+				    <a href="/profile/?id={{ .GetUser.Id.Hex }}"><h4 class="media-heading">{{ .GetUser.DisplayName }}</h4></a>
 				    <p>{{ .Role }}</p>
 				  </div>
 				</li>
