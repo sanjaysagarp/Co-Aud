@@ -190,8 +190,8 @@ func browseTeamsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	
 	//get projects
-	contestList := role.FindContest("573baf38ca2d7ce703db46c2")
-	fmt.Println(contestList)
+	contestList := role.FindContest("573bf4949689f12e80167d61")
+	fmt.Println(contestList.GetTeams())
 	
 	data["contests"] = contestList
 	
@@ -421,7 +421,7 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	teamMembers := r.Form["teamEmails"]
 	fmt.Println("JELLO")
 	//fmt.Println(teamMembers)
-	currentContest := role.FindContest("573baf38ca2d7ce703db46c2")
+	currentContest := role.FindContest("573bf4949689f12e80167d61")
 	
 	teamContainer := make([]*user.User, 0)
 	for i := 0; i < len(teamMembers); i++ {

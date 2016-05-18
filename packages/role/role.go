@@ -20,12 +20,52 @@ type Contest struct {
 	EndDate time.Time
 }
 
+func (c *Contest) GetTeams() []*Team {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := []*Team{}
+	for i, t := range c.ParticipatingTeams {
+		oneResult := &Team{}
+		err = session.FindRef(t).One(oneResult)
+		if err != nil {
+			fmt.Println("error happened at index: ", i)
+			panic(err)
+		}
+		result = append(result, oneResult)
+	}
+    return result
+}
+
 //Team struct
 type Team struct {
 	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Users []*mgo.DBRef
 	TeamName string
 	Motto string
+}
+
+func (t *Team) GetMembers() []*user.User {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	//session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+			panic(err)
+	}
+	defer session.Close()
+	result := []*user.User{}
+	for i, u := range t.Users {
+		oneResult := &user.User{}
+		err = session.FindRef(u).One(oneResult)
+		if err != nil {
+			fmt.Println("error happened at index: ", i)
+			panic(err)
+		}
+		result = append(result, oneResult)
+	}
+    return result
 }
 
 //Role struct - posting
@@ -381,9 +421,9 @@ func (contest *Contest) InsertTeam(team *Team) {
 	//box.AddItem(item1)
 	//change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
 	var dbRefTeams []*mgo.DBRef
-	dbRefTeam := &mgo.DBRef{Collection: "contests", Id: team.Id, Database: "CoAud"}
+	dbRefTeam := &mgo.DBRef{Collection: "teams", Id: team.Id, Database: "CoAud"}
 	dbRefTeams = append(dbRefTeams, dbRefTeam)
-	change := bson.M{"$push": bson.M{"ParticipatingTeams": bson.M{"$each": dbRefTeams}}}
+	change := bson.M{"$push": bson.M{"participatingteams": bson.M{"$each": dbRefTeams}}}
 	err = c.Update(bson.M{"_id": contest.Id}, change)
 	
 	if err != nil {
@@ -487,11 +527,11 @@ func FindContest(id string) *Contest{
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("contests")
-	
+	fmt.Println(id)
 	result := &Contest{}
 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 	if err != nil {
-		fmt.Println("Contest now found")
+		fmt.Println("Contest not found")
 		panic(err)
 	}
 	return result
