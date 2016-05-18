@@ -499,24 +499,24 @@ func FindRole(id string) *Role {
 
 //FindContests searches for all contests
 //TODO: query db for contests and add to result, then return contests
-// func FindContests(title string) []Contest {
-// 	session, err := mgo.Dial("127.0.0.1:27018")
-// 	fmt.Println("connected")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer session.Close()
-// 	session.SetMode(mgo.Monotonic, true)
-// 	c := session.DB("CoAud").C("contests")
+func FindContests() []Contest {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	fmt.Println("connected")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("contests")
 	
-// 	result := []Contest{}
-// 	err = c.Find(nil).All(&result)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	result := []Contest{}
+	err = c.Find(nil).All(&result)
+	if err != nil {
+		panic(err)
+	}
 	
-// 	return result
-// }
+	return result
+}
 
 func FindContest(id string) *Contest{
 	session, err := mgo.Dial("127.0.0.1:27018")

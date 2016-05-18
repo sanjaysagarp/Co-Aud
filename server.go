@@ -189,9 +189,10 @@ func projectBrowseHandler(w http.ResponseWriter, r *http.Request) {
 func browseTeamsHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	
-	//get projects
-	contestList := role.FindContest("573bf4949689f12e80167d61")
-	fmt.Println(contestList.GetTeams())
+	newContest := role.FindContests()
+	contestList := role.FindContest(newContest[0].Id.Hex())
+	
+	fmt.Println(contestList)
 	
 	data["contests"] = contestList
 	
@@ -226,7 +227,15 @@ func contestMainHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 	data := setDefaultData(w, r)
+	
+	// newContest := role.FindContests()
+	// currentContest := role.FindContest(newContest[0].Id.Hex())
+	
 	contestId := r.URL.Query().Get("id")
+	if (contestId == "") {
+		newContest := role.FindContests()
+		contestId = newContest[0].Id.Hex()
+	} 
 	contest := role.FindContest(contestId)
 	data["contest"] = contest
 	data["user"] = currentUser
@@ -419,9 +428,9 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	// **TOP
 	r.ParseForm()
 	teamMembers := r.Form["teamEmails"]
-	fmt.Println("JELLO")
-	//fmt.Println(teamMembers)
-	currentContest := role.FindContest("573bf4949689f12e80167d61")
+	
+	newContest := role.FindContests()
+	currentContest := role.FindContest(newContest[0].Id.Hex())
 	
 	teamContainer := make([]*user.User, 0)
 	for i := 0; i < len(teamMembers); i++ {
@@ -441,9 +450,7 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	
 	currentContest.InsertTeam(newTeam)
 	fmt.Println("Below this")
-	fmt.Println(currentContest.ParticipatingTeams)
 
-	
 	urlParts := []string{"/teams/?id=", teamId.Hex()}
 	url := strings.Join(urlParts, "")
 	// redirect to project page
