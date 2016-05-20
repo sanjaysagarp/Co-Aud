@@ -18,13 +18,26 @@
   <hr>
 	<div class="row">
 		{{ range .Data.contests.GetTeams }}
-			<div class="col-sm-12 col-lg-8 col-xs-12 col-md-8">
-				<h2>{{ .TeamName }}</h2>
-				<h4>{{ .Motto }}</h4>
-				{{ range .GetMembers }}
-					<p>{{.DisplayName}}</p>
-				{{end}}
+		<div class="col-md-12 col-lg-10 col-lg-offset-1">
+			<div class="card-padding">
+				<div class="card">
+					<h3 class="team-name">{{ .TeamName }}</h3>
+					{{if .Motto}}
+						<p class="team-motto">"{{ .Motto }}"</p>
+					{{end}}
+					{{ range .GetMembers }}
+					<ul class="team-member-list">
+						<li class="team-member-list-item">
+							<a href="/profile/?id={{.Id.Hex}}">
+								<img class="img-profile img-circle" src="/public/img/default_profile_pic.png">
+								<p>{{.DisplayName}}</p>
+							</a>
+						</li>
+					</ul>
+					{{end}}
+				</div>
 			</div>
+		</div>
 		{{ end }}
 	</div>
 
@@ -32,7 +45,7 @@
 
 {{if .Data.currentUser}}
 <div id="submit-button" class="search-side-nav">
-		<a href="/teams/create" class="btn btn-lg btn-default">Create your own Team</a>
+		<a href="/teams/create" class="blue-btn-color btn btn-lg btn-default">Create your own Team</a>
 </div>
 {{end}}
 

@@ -263,7 +263,15 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Form)
 
 	// converting data to valid format
-	traits := strings.Split(r.FormValue("traits"), " ")
+	rawTraits := strings.Split(r.FormValue("traits"), ",")
+	var traits []string
+	//clean traits
+	for i := 0; i < len(rawTraits); i++ {
+		s := strings.TrimSpace(rawTraits[i])
+		if (s != "") {
+			traits = append(traits, s)
+		}
+	}
 
   	layout := "2006-01-02"
 

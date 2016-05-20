@@ -6,133 +6,172 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-3">
-			<img class="img-circle img-responsive" src="{{.Data.role.ImageUrl}}">
-		</div>
-		<div class="col-md-6">
-			<h2>{{ .Data.role.Title }}</h2>
-			<ul> 
-				<li>Age: {{ .Data.role.Age }}</li>
-				<li>Gender: {{ .Data.role.Gender }}</li>
-				<li>Traits: {{ .Data.role.Traits }}</li>
-				<li>Description: {{ .Data.role.Description }}</li>
-				<li>Script: {{ .Data.role.Script }}</li>
-			</ul>
-		</div>
-		<div class="col-md-3">
-			<p><strong>Posted by:</strong></p>
-			<a href="/profile/?id={{.Data.author.Id.Hex}}">
-				<p>{{ .Data.author.DisplayName }}</p>
-			</a>
-			<p><strong>Deadline:</strong></p>
-			<p>{{ .Data.role.Deadline }}</p>
-		</div>
-	</div>
-
-	<br>
-	
-	<ul class="nav nav-tabs">
-		<li class="active"><a data-toggle="tab" href="#auditions">Auditions</a></li>
-		<li><a data-toggle="tab" href="#comments">Comments</a></li>
-	</ul>
-
-	<div class="tab-content">
-		<!--Audition section-->
-		<div id="auditions" class="tab-pane fade in active">
-			{{if and .Data.currentUser (not (eq .Data.currentUser.Id.Hex .Data.author.Id.Hex)) }}
-				<form id="formAudition" enctype="multipart/form-data" class="role-form form-horizontal" action="/api/v1/submitAudition/" method="POST">
-					<div class="form-group">
-						<label class="col-md-2 control-label" for="uploadInput">Your audition:</label>
-						<div class="col-md-8">
-							<input type="text" class="form-control" id="uploadInput" name="auditionName" placeholder="Choose File">
-							<input type="file" id="auditionFile" name="auditionFile" accept=".mp3,audio/*" data-validation="size" data-validation-max-size="6M">
-						</div>	
-						<div class="col-md-2">	
-							<button id="auditionSubmit" type="submit" class="btn btn-default" data-id="{{ .Data.role.Id.Hex }}">Submit</button>
-						</div>	
-					</div>
-				</form>
-			{{end}}
-			<ul class="audition-section media-list">
-				{{ range .Data.role.GetAuditions }}
-					{{ $user := .GetUser }}
-					<li class="audition media">
+			<div class="card-padding">
+				<div class="card">
+					<img class="img-circle img-responsive" src="{{.Data.role.ImageUrl}}">
+					<h3 id="audition-name">{{ .Data.role.Title }}</h3>
+				</div>
+			</div>
+			<div class="card-padding">
+				<div class="card">
+					<p><strong>Posted by:</strong></p>
 					<div class="media-left">
-						<a href="/profile/?id={{$user.Id.Hex}}">
+						<a href="/profile/?id={{.Data.author.Id.Hex}}">
 							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
 						</a>
 					</div>
-					<div class="media-body">
-						<a href="/profile/?id={{$user.Id.Hex}}"><h4 class="media-heading">{{$user.DisplayName}}</h4></a>
-						<p>Title goes here
-							<!--<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
-							<span class="pull-right">234</span>-->
-							<span class="pull-right">{{.TimeStamp}}</span>
-						</p>
-						<audio controls>
-							<source src="{{ .AttachmentUrl }}" type="audio/mpeg">
-						</audio>
-						<ul class="comment-section media-list">
-							{{range .GetComments }}
-							{{ $user := .GetUser }}
-							<li class="comment-posted media">
+					<div class="media-body vertical-align">
+						<a href="/profile/?id={{.Data.author.Id.Hex}}"><p>{{ .Data.author.DisplayName }}</p></a>
+					</div>
+					<br>
+					<p><strong>Deadline:</strong></p>
+					<p>{{ .Data.role.Deadline }}</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
+			<div class="card-padding" id="character-bio">
+				<div class="card">
+					<h3>Character Bio</h3>
+					<hr>
+					<p><strong>Age:</strong> {{ .Data.role.Age }}</p>
+					<p><strong>Gender:</strong> {{ .Data.role.Gender }}</p>
+					<p><strong>Traits:</strong></p>
+					<p>{{ range .Data.role.Traits }}<span class="badge-traits">{{.}}</span>{{end}}</p>
+					<p><strong>Description:</strong></p>
+					<p class="format-text">{{ .Data.role.Description }}</p>
+					<p><strong>Script:</strong></p>
+					<blockquote>
+						<p class="format-text">"{{ .Data.role.Script }}"</p>
+					</blockquote>
+				</div>
+			</div>
+			<br>
+	
+			<ul class="nav nav-tabs">
+				<li class="active"><a data-toggle="tab" href="#auditions">Auditions</a></li>
+				<li><a data-toggle="tab" href="#comments">Comments</a></li>
+			</ul>
+
+			<div class="tab-content">
+				<!--Audition section-->
+				<div id="auditions" class="tab-pane fade in active">
+					<div class="card">
+						{{if .Data.currentUser }}
+							{{ if not (eq .Data.currentUser.Id.Hex .Data.author.Id.Hex) }}
+							<form id="formAudition" enctype="multipart/form-data" class="role-form form-horizontal" action="/api/v1/submitAudition/" method="POST">
+								<div class="form-group">
+									<label class="col-md-2 control-label" for="uploadInput">Your audition:</label>
+									<div class="col-md-8">
+										<div class="input-group">
+											<input type="text" class="form-control" id="uploadInput" name="auditionName" placeholder="Choose File">
+											<span class="input-group-btn">
+												<button id="auditionSubmit" type="submit" class="orange-btn-color btn btn-default" data-id="{{ .Data.role.Id.Hex }}">Submit</button>
+											</span>
+										</div>
+										<input type="file" id="auditionFile" name="auditionFile" accept=".mp3,audio/*" data-validation="size" data-validation-max-size="6M">
+									</div>	
+								</div>
+							</form>
+							{{end}}
+						{{end}}
+						{{if .Data.role.GetAuditions}}
+							<ul class="audition-section media-list">
+								{{ range .Data.role.GetAuditions }}
+									{{ $user := .GetUser }}
+									<li class="audition media">
+										<hr>
+										<div class="media-left">
+											<a href="/profile/?id={{$user.Id.Hex}}">
+												<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+											</a>
+										</div>
+										<div class="media-body">
+											<a href="/profile/?id={{$user.Id.Hex}}"><h4 class="media-heading">{{$user.DisplayName}}</h4></a>
+											<p>Title goes here
+												<!--<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
+												<span class="pull-right">234</span>-->
+												<span class="pull-right">{{.TimeStamp}}</span>
+											</p>
+											<audio controls>
+												<source src="{{ .AttachmentUrl }}" type="audio/mpeg">
+											</audio>
+											<ul class="comment-section media-list">
+												{{range .GetComments }}
+												{{ $user := .GetUser }}
+												<li class="comment-posted media">
+													<div class="media-left">
+														<a href="/profile/?id={{ $user.Id.Hex}}">
+															<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+														</a>
+													</div>
+													<div class="media-body">
+														<a href="/profile/?id={{.User.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
+														<p class="comment-message">{{ .Message }}</p>
+													</div>
+												</li>
+												{{end}}
+												<!--add comment section-->
+												<li>
+													<a class="auditionCommentButton" data-audition-id="{{ .Id.Hex }}">Comment</a>
+												</li>
+											</ul>
+										</div>
+									</li>
+								{{ end }}
+							</ul>
+						{{else}}
+						<p>There are no auditions yet. {{if .Data.currentUser}}{{if not (eq .Data.currentUser.Id.Hex .Data.author.Id.Hex)}}Be the first to audition!{{end}}{{end}}</p>
+						{{end}}
+					</div>
+				</div>
+				
+				<!--Comment section-->
+				<div id="comments" class="tab-pane fade">
+					<div class="card">
+						{{if .Data.currentUser}}
+							<div class="role-form comment-submission media">
 								<div class="media-left">
-									<a href="/profile/?id={{ $user.Id.Hex}}">
+									<a href="/profile/?id={{.Data.currentUser.Id.Hex}}">
 										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
 									</a>
 								</div>
 								<div class="media-body">
-									<a href="/profile/?id={{.User.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
-									<p class="comment-message">{{ .Message }}</p>
+									<form>
+										<textarea id="role-comment-content" name="role-comment-content" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
+										<button id="role-comment-button" type="submit" class="blue-btn-color btn btn-default pull-right" data-id="{{ .Data.role.Id.Hex }}">Post</button>
+									</form>
 								</div>
-							</li>
+							</div>
+						{{end}}
+						<ul id="role-comment-section" class="comment-section media-list">
+							{{if .Data.role.GetComments}}
+								{{ range .Data.role.GetComments }}
+								<li class="comment-posted media">
+									<hr>
+									<div class="media-left">
+										{{ $user := .GetUser }}
+										<a href="/profile/?id={{ $user.Id.Hex}}">
+											<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+										</a>
+									</div>
+									<div class="media-body">
+										<a href="/profile/?id={{ $user.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
+										<p class="comment-message">{{ .Message }}</p>
+									</div>
+								</li>
+								{{ end }}
+							{{else}}
+								<li id="no-comment-message">There are no comments yet.</li>
 							{{end}}
-							<!--add comment section-->
-							<li>
-								<a class="auditionCommentButton" data-audition-id="{{ .Id.Hex }}">Comment</a>
-							</li>
 						</ul>
 					</div>
-					</li>
-				{{ end }}
-			</ul>
-		</div>
-		
-		<!--Comment section-->
-		<div id="comments" class="tab-pane fade">
-			{{if .Data.currentUser}}
-				<div class="role-form comment-submission media">
-					<div class="media-left">
-						<a href="/profile/?id={{.Data.currentUser.Id.Hex}}">
-							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-						</a>
-					</div>
-					<div class="media-body">
-						<form>
-							<textarea id="role-comment-content" name="role-comment-content" class="form-control" rows="3" placeholder="Leave a comment..."></textarea>
-							<button id="role-comment-button" type="submit" class="btn btn-default pull-right" data-id="{{ .Data.role.Id.Hex }}">Post</button>
-						</form>
-					</div>
 				</div>
-			{{end}}
+			</div>
 			
-			<ul id="role-comment-section" class="comment-section media-list">
-				{{ range .Data.role.GetComments }}
-					<li class="comment-posted media">
-						<div class="media-left">
-							{{ $user := .GetUser }}
-							<a href="/profile/?id={{ $user.Id.Hex}}">
-								<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
-							</a>
-						</div>
-						<div class="media-body">
-							<a href="/profile/?id={{ $user.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
-							<p class="comment-message">{{ .Message }}</p>
-						</div>
-					</li>
-				{{ end }}
-			</ul>
 		</div>
 	</div>
+
 	
 	<br>
 

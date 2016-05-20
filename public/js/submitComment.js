@@ -15,8 +15,10 @@ $(document).ready(function(){
 					success: function(data) {
 						if(data) {
 							$('#role-comment-section').prepend(data);
+							$('#role-comment-section li:first-child').prepend("<hr>");
 							$('#role-comment-content').val("");
-							$('#role-comment-content').css("height", "60");
+							$('#role-comment-content').css("height", "74");
+							$('#no-comment-message').remove();
 						} 
 						
 					},
@@ -44,7 +46,7 @@ $(document).ready(function(){
 		$('#auditionCommentSection').remove();
 		var thisCommentButton = $(this);
 		var auditionId = $(thisCommentButton).data("auditionId");
-		var html = '<li id="auditionCommentSection" class="comment-submission media"><div class="media-left"><a href="/profile/"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><form><textarea id="auditionCommentContent" class="form-control" rows="3" placeholder="Leave a comment..."></textarea><button id="submitAuditionCommentButton" type="submit" class="btn btn-default pull-right" data-id="' + auditionId + '">Post</button></form></div></li>';
+		var html = '<li id="auditionCommentSection" class="comment-submission media"><div class="media-left"><a href="/profile/"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><form><textarea id="auditionCommentContent" class="form-control" rows="3" placeholder="Leave a comment..."></textarea><button id="submitAuditionCommentButton" type="submit" class="blue-btn-color btn btn-default pull-right" data-id="' + auditionId + '">Post</button></form></div></li>';
 		$(html).insertBefore(thisCommentButton.parent());
 		
 		//hide comment button
