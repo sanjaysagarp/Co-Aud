@@ -1,0 +1,18 @@
+{{define "editProject"}}
+{{template "header" .}}
+	<div id="ProfileForm" class="container">
+		<div class="card profile-project">
+			<h3>Edit Projects</h3>
+				{{ range .Data.postedProjects }}
+				<div class="thumbnail col-md-4">
+					<a href="/EditProject/?id={{ .Id.Hex }}">
+						<h2>{{.Title}}</h2>
+						<img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg">
+					</a>
+				</div>
+				{{ end }}
+		</div>		
+	</div>
+
+{{template "footer" .}}
+{{end}}

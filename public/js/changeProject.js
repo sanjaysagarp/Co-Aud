@@ -95,7 +95,7 @@ $(document).ready(
 			}
 		});
 		
-		var counter = 1;
+		var counter = {{ .Data.castLength }};
 		$('#addMoreCast').on('click', function(e) {
 			counter++;
 			var newdiv = document.createElement('div');

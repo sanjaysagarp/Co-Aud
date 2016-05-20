@@ -222,6 +222,5 @@ func FindProjects(q interface{}, skip int, limit int) ([]Project, int) {
 	if err != nil {
 		panic(err)
 	}
-	
 	return result, resultCount
 }

@@ -98,6 +98,40 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	data["projectCount"] = projectCount
 	display(w, "viewProfile", &Page{Title: user.DisplayName, Data: data})
 }
+func editAuditionHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	userID := r.URL.Query().Get("id")
+	user := user.FindUserById(userID)
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user": dbRefUser}, 0, 500)
+	data["user"] = user
+	data["postedRoles"] = postedRoles
+	data["rolesCount"] = rolesCount
+	display(w, "editAudition", &Page{Title: user.DisplayName, Data: data})
+}
+
+func editProjectHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	userID := r.URL.Query().Get("id")
+	user := user.FindUserById(userID)
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	postedProjects, projectCount := project.FindProjects(bson.M{"user": dbRefUser}, 0, 500)
+	data["user"] = user
+	data["postedProjects"] = postedProjects
+	data["projectCount"] = projectCount
+	display(w, "editProject", &Page{Title: user.DisplayName, Data: data})
+}
+
+func changeProjectHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	projectId := r.URL.Query().Get("id")
+	project := project.FindProject(projectId)
+	fmt.Println(project.Title)
+	data["project"] = project
+	data["castLength"] = len(project.Cast)
+	
+	display(w, "changeProject", &Page{Title: project.Title, Data: data})
+}
 
 func roleHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
@@ -730,6 +764,13 @@ func main() {
 	http.HandleFunc("/teams/", teamHandler)
 	http.HandleFunc("/teams/create", createTeamHandler)
 	http.HandleFunc("/contest/create", createContestHandler)
+	
+	//Edit functions for auditions and projects //START
+	http.HandleFunc("/project/edit/", editProjectHandler)
+	http.HandleFunc("/auditions/edit/", editAuditionHandler)
+	http.HandleFunc("/EditProject/", changeProjectHandler)
+	// http.HandleFunc("/EditAudition/", changeAuditionHandler)
+	//END
 	
 	http.HandleFunc("/auditions/create", createRoleHandler)
 	http.HandleFunc("/login", googleLoginHandler)
