@@ -706,7 +706,6 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
-<<<<<<< HEAD
 func updateUserPictureHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
@@ -767,7 +766,7 @@ func updateUserPictureHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Invalid File Type"))
 	}
 	
-=======
+}
 func updateProjectHandler(w http.ResponseWriter, r*http.Request) {
 	//s := redis_session.Session(w, r)
 	r.ParseForm()
@@ -794,7 +793,6 @@ func updateProjectHandler(w http.ResponseWriter, r*http.Request) {
 	urlParts := []string{"/projects/?id=", projectId, "#success"}
 	url := strings.Join(urlParts, "")
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
->>>>>>> d1c21d50daf3f909b7cf98fa98293b523073e977
 }
 
 //Submits an audition in auditions/{auditionid}
