@@ -1,5 +1,4 @@
 $(document).ready(function(){
-
 	$('#updateButton').on('click', function(e) {
 		e.preventDefault();
 		$.ajax({

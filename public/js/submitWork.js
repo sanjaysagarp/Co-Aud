@@ -100,7 +100,7 @@ $(document).ready(
 			counter++;
 			var newdiv = document.createElement('div');
 			newdiv.className = "pair";
-			newdiv.innerHTML = "Cast Member " + counter + "<br><div class='form-group castForm'><input type='text' class='castEmails form-control' name='castEmail[]'></div> as <div class='form-group castForm'><input type='text' name='castRole[]' class='castRoles form-control'></div>";
+			newdiv.innerHTML = "<br><div class='form-group castForm'><input type='text' class='castEmails form-control' name='castEmail[]'></div> as <div class='form-group castForm'><input type='text' name='castRole[]' class='castRoles form-control'></div>";
 			document.getElementById("dynamicInput").appendChild(newdiv);
 			document.getElementById("removeCast").style.display = 'inline';
 		});

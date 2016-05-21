@@ -9,7 +9,7 @@
 	</div>
 	{{end}}
 {{end}}-->
-	<div class="container">
+	<div id="ProfileForm" class="container">
 		<div class="row">
 			<div class="col-md-5">
 				<div class="card-padding">
@@ -49,7 +49,7 @@
 					</div>
 				</div>
 				{{if .Data.user.AboutMe}}
-				<div class="card-padding">
+				<div id="aboutMe" class="card-padding">
 					<div class="card">
 						<h3>About Me</h3>
 						<hr>
@@ -72,10 +72,10 @@
 				{{end}}
 			</div>
 			<div class="col-md-7">
-				<div class="card-padding row">
-					<div class="card">
+				<div id="projects" class="card-padding row">
+					<a href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Projects</button></a>
+					<div class="card profile-project">			
 						<h3>Showcase</h3>
-						<hr>
 						{{ if .Data.postedProjects }}
 							{{ range .Data.postedProjects }}
 							<div class="thumbnail col-md-4">
@@ -96,11 +96,12 @@
 							{{end}}
 						{{ end }}
 					</div>
+					
 				</div>
 				<div class="card-padding row">
+					<a href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Auditions</button></a>
 					<div class="card">
 						<h3>Posted Auditions</h3>
-						<hr>
 						{{ if .Data.postedRoles }}
 							{{ range .Data.postedRoles }}
 								<div class="thumbnail col-md-4">
@@ -125,5 +126,14 @@
 			</div>
 		</div>
 	</div>
+	
+	<style>
+		.edit {
+			float:right;
+		}
+		
+		
+		
+	</style>
 {{template "footer" .}}
 {{end}}

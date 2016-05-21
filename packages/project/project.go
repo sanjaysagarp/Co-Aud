@@ -45,6 +45,8 @@ type Project struct {
 	User *mgo.DBRef
 }
 
+
+
 func (p *Project) GetYoutubeID() string {
     r, _ := regexp.Compile(`^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*`)
     return r.FindAllStringSubmatch(p.URL, -1)[0][7]
@@ -86,18 +88,52 @@ func (p *Project) GetUser() *user.User {
     return result
 }
 
+func UpdateProject(id string, project *Project) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("projects")
+	
+	//this shit is erasing the fields? Need to check for consistency
+	change := bson.M{
+		"$set": bson.M{
+				"title": project.Title,
+				"url": project.URL, 
+				"shortdescription": project.ShortDescription,
+				"description" : project.Description,
+				"cast" : project.Cast}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	if err != nil {
+		panic(err)
+	}
+}
+
 //NewProject creates a new instance of project
 func NewProject(title string, url string, shortDescription string, description string, casts []*Cast, user *user.User, id bson.ObjectId) *Project {
 	var dbRefCasts []*mgo.DBRef
 	for _, cast := range casts {
-		fmt.Println("Cast ID: " + cast.Id)
+		//fmt.Println("Cast ID: " + cast.Id)
 		dbRefCast := &mgo.DBRef{Collection: "casts", Id: cast.Id, Database: "CoAud"}
 		dbRefCasts = append(dbRefCasts, dbRefCast)
 	}
 	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-	fmt.Println(dbRefUser)
-	fmt.Println("project id: ", id)
+	// fmt.Println(dbRefUser)
+	// fmt.Println("project id: ", id)
 	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description: description, Cast: dbRefCasts, PostedDate: time.Now(), User: dbRefUser}
+}
+
+func ChangedProject(title string, url string, shortDescription string, description string, casts []*Cast) *Project {
+	var dbRefCasts []*mgo.DBRef
+	for _, cast := range casts {
+		//fmt.Println("Cast ID: " + cast.Id)
+		dbRefCast := &mgo.DBRef{Collection: "casts", Id: cast.Id, Database: "CoAud"}
+		dbRefCasts = append(dbRefCasts, dbRefCast)
+	}
+	return &Project{Title: title, URL: url, ShortDescription: shortDescription, Description: description, Cast: dbRefCasts}
 }
 
 //NewCast creates a new instance of cast
@@ -222,7 +258,6 @@ func FindProjects(q interface{}, skip int, limit int) ([]Project, int) {
 	if err != nil {
 		panic(err)
 	}
-	
 	return result, resultCount
 }
 

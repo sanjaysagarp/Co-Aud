@@ -56,7 +56,7 @@ $(document).ready(
 			counter++;
 			var newdiv = document.createElement('div');
 			newdiv.className = "pair";
-			newdiv.innerHTML = "Team Member " + counter + "<br><div class='form-group castForm'><input type='text' class='teamEmails form-control' name='teamEmails'></div>";
+			newdiv.innerHTML = "<br><div class='form-group castForm'><input type='text' class='teamEmails form-control' name='teamEmails'></div>";
 			document.getElementById("dynamicInput").appendChild(newdiv);
 			document.getElementById("removeTeam").style.display = 'inline';
 		});

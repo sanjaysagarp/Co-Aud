@@ -1,0 +1,180 @@
+{{define "changeProject"}}
+{{template "header" .}}
+<!--<script src="/public/js/changeProject.js"></script>-->
+<div class="container">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 card">
+			<h3>Edit {{ .Data.project.Title }}</h3>
+			<hr>
+			<form id ="projectForm" action="/update/project/?id={{ .Data.project.Id.Hex }}" method="post">
+				<div class="form-group">
+					<label>Title</label>
+					<input type="text" class="form-control" id="title" name="title" value="{{ .Data.project.Title }}">
+				</div>
+				<div class="form-group">
+					<label>Youtube URL</label>
+					<input type="text" class="form-control" id="url" name="url" value="{{ .Data.project.URL }}">
+				</div>
+				<div class="form-group">
+					<label>Short Description</label>
+					<input type="text" class="form-control" name="shortDescription" id="shortDescription" value="{{ .Data.project.ShortDescription }}" maxlength="140">
+				</div>
+				<div class="form-group">
+					<label>Description</label>
+					<textarea type="text-area" rows="6" class="form-control" name="description" id="description"></textarea>
+				</div>
+				<div class="form-group" id="dynamicInput">
+					<label>Cast Members</label>
+					{{ range .Data.project.GetCast }}
+					<div class="pair">
+					<br><div class="form-group castForm"><input type="text" class="castEmails form-control" name="castEmail[]" value="{{ .GetUser.Email }}"/></div> as <div class="form-group castForm"><input type="text" class="castRoles form-control" name="castRole[]" value="{{ .Role }}"/></div>
+					</div>
+					{{ end }}
+				</div>
+				<div>
+					<br>
+					<input type="button" class="btn btn-info" value="Add another cast member" id="addMoreCast">
+					<input type="button" class="btn btn-danger" value="Remove cast member" id="removeCast">
+				</div>
+				<br/>
+				<button id="submitProject" type="submit" class="btn btn-default" data-id="{{ .Data.project.Id.Hex }}">Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+<style>
+	.castForm {
+    	display: inline-block;
+	}
+	.subtract {
+		display: inline-block;
+	}
+</style>
+
+<script>
+	function validateText(id) {
+		if ($("#"+id).val() == "") {
+			var div = $("#"+id).closest("div");
+			div.removeClass("has=success");
+			$("#glypcn"+id).remove();
+			div.addClass("has-error has-feedback");
+			div.append('<span id="glypcn'+id + '" class="glyphicon glyphicon-remove form-control-feedback"></span>');
+			return false;
+		} else {
+			var div = $("#"+id).closest("div");
+			div.removeClass("has-error");
+			div.addClass("has-success");
+			div.addClass("has-feedback");
+			$("#glypcn"+id).remove();
+			div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+			return true;
+		}
+	}
+
+	function validateYoutube(id) {
+		var url = $("#"+id).val();
+		var isyouTubeUrl = /^(https?:\/\/)?([^\/]*\.)?youtube\.com\/watch\?([^]*&)?v=\w+(&[^]*)?/i.test(url);
+		if(!isyouTubeUrl) {
+			var div = $("#"+id).closest("div");
+			div.removeClass("has-success");
+			$("#glypcn"+id).remove();
+			div.addClass("has-error has-feedback");
+			div.append('<span id="glypcn'+id + '" class="glyphicon glyphicon-remove form-control-feedback"></span>');
+			return false;	
+		} else {
+			var div = $("#"+id).closest("div");
+			div.removeClass("has-error");
+			div.addClass("has-success");
+			div.addClass("has-feedback");
+			$("#glypcn"+id).remove();
+			div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+			return true;
+		}
+	}
+
+	$(document).ready(
+		function(){
+			$("#description").val({{ .Data.project.Description }});
+			$("#submitProject").click(function() {
+				var checker = 0;
+				if(validateText("title")) {
+					checker++;
+				}
+				if(validateYoutube("url")) {
+					checker++;
+				}
+				if(validateText("shortDescription")) {
+					checker++;
+				}
+				if(validateText("description")) {
+					checker++;
+				}
+				$('.castEmails').each(function () {
+					if (this.value == null || this.value == "") {
+						var div = $(this).closest("div");
+						div.removeClass("has=success");
+						//$("#glypcn"+id).remove();
+						div.addClass("has-error has-feedback");
+						//div.append('<span id="glypcn'+id + '" class="glyphicon glyphicon-remove form-control-feedback"></span>');
+					} else {
+						var div = $(this).closest("div");
+						div.removeClass("has-error");
+						div.addClass("has-success");
+						div.addClass("has-feedback");
+						checker++;
+						//$("#glypcn"+id).remove();
+						//div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+					}
+				})
+				$('.castRoles').each(function () {
+					if (this.value == null || this.value == "") {
+						var div = $(this).closest("div");
+						div.removeClass("has=success");
+						//$("#glypcn"+id).remove();
+						div.addClass("has-error has-feedback");
+						//div.append('<span id="glypcn'+id + '" class="glyphicon glyphicon-remove form-control-feedback"></span>');
+					} else {
+						var div = $(this).closest("div");
+						div.removeClass("has-error");
+						div.addClass("has-success");
+						div.addClass("has-feedback");
+						checker++;
+						//$("#glypcn"+id).remove();
+						//div.append('<span id="glypcn'+id +'" class="glyphicon glyphicon-ok form-control-feedback"></span>');
+					}
+				})
+				if(checker == (4 + (counter * 2))) {
+					$("form#projectForm").submit();
+				} else {
+					return false;
+				}
+			});
+			
+			var counter = {{ .Data.castLength }};
+			$('#addMoreCast').on('click', function(e) {
+				counter++;
+				var newdiv = document.createElement('div');
+				newdiv.className = "pair";
+				newdiv.innerHTML = "<br><div class='form-group castForm'><input type='text' class='castEmails form-control' name='castEmail[]'></div> as <div class='form-group castForm'><input type='text' name='castRole[]' class='castRoles form-control'></div>";
+				document.getElementById("dynamicInput").appendChild(newdiv);
+				document.getElementById("removeCast").style.display = 'inline';
+			});
+			$('#removeCast').on('click', function(e) {
+				if(counter == 2) {
+					counter--;
+					var inputs = $(".pair");
+					$(inputs[inputs.length - 1]).remove();
+						document.getElementById("removeCast").style.display = 'none';
+					return false;
+				}
+				counter--;
+				var inputs = $(".pair");
+				$(inputs[inputs.length - 1]).remove();
+			});	
+		}
+	);	
+</script>
+
+
+{{template "footer" .}}
+{{end}}
