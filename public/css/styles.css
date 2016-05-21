@@ -598,3 +598,14 @@ hr#profile-name {
 .team-member-list-item {
     min-width: 125px;
 }
+
+#loading-indicator {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  z-index: 1;
+  position: absolute;
+  transform: translate(300%,250%);
+  -ms-transform: translate(300%,250%); /* IE 9 */
+  -webkit-transform: translate(300%,250%); /* Safari */
+}

@@ -15,7 +15,7 @@
 				<div class="card-padding">
 					<div class="card">
 						<div class="col-md-6">
-							<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
+							<img class="img-circle img-responsive" src="{{.Data.currentUser.ProfilePictureURL}}">
 						</div>
 						<div class="col-md-6">
 							<h3 id="profile-display-name">{{ .Data.user.DisplayName }}</h3>
@@ -79,7 +79,7 @@
 						{{ if .Data.postedProjects }}
 							{{ range .Data.postedProjects }}
 							<div class="thumbnail col-md-4">
-								<a href="/project/?id={{ .Id.Hex }}">
+								<a href="/projects/?id={{ .Id.Hex }}">
 									<h2>{{.Title}}</h2>
 									<img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg">
 								</a>
@@ -104,7 +104,7 @@
 						{{ if .Data.postedRoles }}
 							{{ range .Data.postedRoles }}
 								<div class="thumbnail col-md-4">
-									<a href="/role/?id={{ .Id.Hex }}">
+									<a href="/auditions/?id={{ .Id.Hex }}">
 										<h2>{{.Title}}</h2>
 										<img class="img-responsive" src="{{.ImageUrl}}">
 									</a>
