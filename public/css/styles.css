@@ -168,10 +168,6 @@ li.thumbnail {
     margin-top: -43px;
 }
 
-.thumbnail a {
-	text-decoration: none;
-}
-
 footer {
     margin-top: 100px;
 	width: 100%;
@@ -437,9 +433,11 @@ hr#profile-name {
     margin-top: 20px;
 }
 
-.thumbnail > a > h2 {
+.thumbnail > h2 > a {
     font-family: sfEspressoShack;
     color: #f6efc0;
+    display: block;
+    text-decoration: none;
 }
 
 #audition-name {
@@ -597,4 +595,10 @@ hr#profile-name {
 
 .team-member-list-item {
     min-width: 125px;
+}
+
+.timestamp {
+    color: #8e8d8e;
+    font-size: 10pt;
+    padding-left: 10px;
 }
