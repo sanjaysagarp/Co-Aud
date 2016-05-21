@@ -126,11 +126,17 @@ func changeProjectHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
 	projectId := r.URL.Query().Get("id")
 	project := project.FindProject(projectId)
-	fmt.Println(project.Title)
 	data["project"] = project
 	data["castLength"] = len(project.Cast)
-	
 	display(w, "changeProject", &Page{Title: project.Title, Data: data})
+}
+
+func changeAuditionHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	roleId := r.URL.Query().Get("id")
+	role := role.FindRole(roleId)
+	data["role"] = role
+	display(w, "changeAudition", &Page{Title: role.Title, Data: data})
 }
 
 func roleHandler(w http.ResponseWriter, r *http.Request) {
@@ -289,15 +295,104 @@ func createContestHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "createContest", &Page{Title: "Create Contest", Data: data})
 }
 
+func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	roleId := r.URL.Query().Get("id")
+	rawTraits := strings.Split(r.FormValue("traits"), ",")
+	var traits []string
+	for i := 0; i < len(rawTraits); i++ {
+		s := strings.TrimSpace(rawTraits[i])
+		if (s != "") {
+			traits = append(traits, s)
+		}
+	}
+	layout := "2006-01-02"
+	fmt.Println(r.FormValue("deadline"))
+	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	if err != nil {
+		fmt.Println(err)
+		return
+ 	 }
+	fmt.Println("Have we gotten this far")
+	age, err := strconv.Atoi(r.FormValue("age"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	file, handler, err := r.FormFile("photo")
+	if (err == nil) {
+		fmt.Println("success photo is in there")
+		defer file.Close()
+		bytes, err := file.Seek(0,2)
+		if err != nil {
+			panic(err)
+		}
+		var kilobytes int64
+		kilobytes = (bytes / 1024)
+		
+		var megabytes float64
+		megabytes = (float64)(kilobytes / 1024)
+		
+		roleID := bson.NewObjectId()
+
+		if(megabytes < 4) {
+			attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
+		
+			uploader := s3manager.NewUploader(session.New())
+			result, err := uploader.Upload(&s3manager.UploadInput{
+				Body:   file,
+				Bucket: aws.String("coaud"),
+				Key:    aws.String(attachmentURL),
+			})
+			
+			if err != nil {
+				log.Fatalln("Failed to upload", err)
+			}
+
+			log.Println("Successfully uploaded to", result.Location)
+			
+			editedRoleWithPhoto := role.ChangedRoleWithPhoto(r.FormValue("title"), r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"), result.Location)
+			
+			role.UpdateRoleWithPhoto(roleId, editedRoleWithPhoto)
+
+		urlParts := []string{"/auditions/edit/?id=", currentUser.Id.Hex(), "#success"}
+		url := strings.Join(urlParts, "")
+		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		} else {
+			urlParts := []string{"/auditions/edit/?id=", currentUser.Id.Hex(), "#failure"}
+			url := strings.Join(urlParts, "")
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		}
+	} else {
+		fmt.Println("No photo is in there")
+		editedRoleWithNoPhoto := role.ChangedRoleNoPhoto(r.FormValue("title"), r.FormValue("description"), r.FormValue("script"), deadline, traits, age, r.FormValue("gender"))
+		
+		role.UpdateRoleNoPhoto(roleId, editedRoleWithNoPhoto)
+		
+		urlParts := []string{"/auditions/edit/?id=", currentUser.Id.Hex(), "#success"}
+		url := strings.Join(urlParts, "")
+		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	}
+	
+}
+
 
 func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
 
-	fmt.Println(r.Form)
-
+	fmt.Println(r.FormValue("photo"))
 	// converting data to valid format
-	traits := strings.Split(r.FormValue("traits"), " ")
+	rawTraits := strings.Split(r.FormValue("traits"), ",")
+	var traits []string
+	//clean traits
+	for i := 0; i < len(rawTraits); i++ {
+		s := strings.TrimSpace(rawTraits[i])
+		if (s != "") {
+			traits = append(traits, s)
+		}
+	}
 
   	layout := "2006-01-02"
 
@@ -434,7 +529,6 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	var castContainer []*project.Cast
 	var newCast *project.Cast
 	for i := 0; i < len(castsAttendees); i++ {
-		
 		castId := bson.NewObjectId()
 		castUser := user.FindUser(castsAttendees[i])
 		//fmt.Println("ARWAREWARNEW " + castUser.Email)
@@ -447,7 +541,7 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("ID :::: ", projectId)
 	//s := redis_session.Session(w, r)
 	newProject := project.NewProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), r.FormValue("description"), castContainer, currentUser, projectId)
-	fmt.Println("new project: ", newProject.Id)
+	//fmt.Println("new project: ", newProject.Id)
 	project.InsertProject(newProject)
 	
 	urlParts := []string{"/projects/?id=", projectId.Hex()}
@@ -612,6 +706,34 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
+func updateProjectHandler(w http.ResponseWriter, r*http.Request) {
+	//s := redis_session.Session(w, r)
+	r.ParseForm()
+	//currentUser := user.FindUser(s.Get("Email"))
+	castsAttendees := r.Form["castEmail[]"]
+	//fmt.Println(castsAttendees)
+	castRoles := r.Form["castRole[]"]
+	//fmt.Println(castRoles)
+	projectId := r.URL.Query().Get("id")
+	var castContainer []*project.Cast
+	var newCast *project.Cast
+	for i := 0; i < len(castsAttendees); i++ {
+		castId := bson.NewObjectId()
+		//fmt.Println(castId)
+		castUser := user.FindUser(castsAttendees[i])
+		//fmt.Println(castUser)
+		newCast = project.NewCast(castUser, castRoles[i], castId)
+		project.InsertCast(newCast)
+		castContainer = append(castContainer, newCast)
+	}
+	editedProject := project.ChangedProject(r.FormValue("title"), r.FormValue("url"), r.FormValue("shortDescription"), r.FormValue("description"), castContainer)
+	project.UpdateProject(projectId, editedProject)
+
+	urlParts := []string{"/projects/?id=", projectId, "#success"}
+	url := strings.Join(urlParts, "")
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 //Submits an audition in auditions/{auditionid}
 func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
@@ -769,6 +891,10 @@ func main() {
 	http.HandleFunc("/project/edit/", editProjectHandler)
 	http.HandleFunc("/auditions/edit/", editAuditionHandler)
 	http.HandleFunc("/EditProject/", changeProjectHandler)
+	http.HandleFunc("/EditAudition/", changeAuditionHandler)
+	http.HandleFunc("/update/project/", updateProjectHandler)
+	http.HandleFunc("/update/audition/", updateRoleHandler)
+	//updateProjectHandler
 	// http.HandleFunc("/EditAudition/", changeAuditionHandler)
 	//END
 	
@@ -779,7 +905,7 @@ func main() {
 	http.HandleFunc("/auditions/", roleHandler)
 	//http.HandleFunc("/upload/", uploadTestHandler)
 	http.HandleFunc("/logout/", logoutHandler)
-	
+	//
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
 	http.HandleFunc("/api/v1/submitRole/", submitRoleHandler)

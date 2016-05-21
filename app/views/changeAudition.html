@@ -1,18 +1,18 @@
-{{define "createRole"}}
+{{define "changeAudition"}}
 {{template "header" .}}
-<script src="/public/js/submitRole.js"></script>
-<form id="roleForm" enctype="multipart/form-data" action="/api/v1/submitRole/" method="post">
+<script src="/public/js/editRole.js"></script>
+<form id="roleForm" enctype="multipart/form-data" action="/update/audition/?id={{ .Data.role.Id.Hex }}" method="post">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-3 card">
 				<div class="form-group">
 					<label>Name</label>
-					<input type="text" id="name" class="form-control input-lg" name="title" placeholder="Name">
+					<input type="text" id="name" class="form-control input-lg" name="title" value="{{ .Data.role.Title }}">
 				</div>
 				<div class="form-group">
 					<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
 					<label class="upload">Upload new photo (Max: 4MB)</label>
-					<p>(Optional)</p>
+					<p>(If no image is uploaded, previous image will be used)</p>
 					<div>
 						<input class="form-control" id="photoUpload" type="file" accept="image/*" name="photo">
 					</div>
@@ -26,7 +26,7 @@
 				<div class="form-group">
 					<div class="form-group">
 						<label>Age</label>
-						<input type="number" class="form-control" id="age" name="age" placeholder="Age">
+						<input type="number" class="form-control" id="age" name="age" value="{{ .Data.role.Age }}">
 					</div>
 				</div>
 				<div id="genderRadio" class="form-group">
@@ -43,15 +43,15 @@
 				</div>
 				<div class="form-group">
 					<label>Traits</label>
-					<input type="text" id="traits" class="form-control" name="traits" placeholder="Separate traits with commas (For example: Grumpy, Bubbly, Arrogant, etc...)">
+					<input type="text" id="traits" class="form-control" name="traits" vaue="{{ .Data.role.Traits }}">
 				</div>
 				<div class="form-group">
 					<label>Description</label>
-					<textarea id="description" type="text-area" rows="6" class="form-control" name="description" placeholder="Description"></textarea>
+					<textarea id="description" type="text-area" rows="6" class="form-control" name="description"></textarea>
 				</div>
 				<div class="form-group">
 					<label>Script</label>
-					<textarea id="script" type="text-area" rows="6" class="form-control" name="script" placeholder="Script"></textarea>
+					<textarea id="script" type="text-area" rows="6" class="form-control" name="script"></textarea>
 				</div>
 				<input id ="castSubmission" class="blue-btn-color btn" type="submit">
 			</div>		
@@ -59,6 +59,31 @@
 		<div id="notification"></div>
 	</div>	
 </form>
+
+<script>
+$(document).ready(function(){
+	if("{{ .Data.role.Gender }}" == "Female") {
+		radiobtn = document.getElementById("genderFemale");
+		radiobtn.checked = true;
+	} 
+	if ("{{ .Data.role.Gender }}" == "Male") {
+		radiobtn = document.getElementById("genderMale");
+		radiobtn.checked = true;
+	}
+	if ("{{ .Data.role.Gender }}" == "Other") {
+		radiobtn = document.getElementById("genderOther");
+		radiobtn.checked = true;
+	}
+	var traitList = {{ .Data.role.Traits }};
+	$("#traits").val(traitList.toString());
+	$("#description").val({{ .Data.role.Description }});
+	$("#script").val({{ .Data.role.Script }});
+	var date = {{ .Data.role.Deadline }};
+	var formattedDate = date.split("T17");
+	$("#date").val(formattedDate[0]);
+});
+	
+</script>
 
 {{template "footer" .}}
 {{end}}

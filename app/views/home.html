@@ -23,14 +23,19 @@
 				<ul style="left: -600px; top: 0px;">
 					{{ range .Data.projects }}
 						<!--Only supports youtube now-->
-						<li style="width: 200px;"><a href="/projects/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a></li>
+						<li class="thumbnail" style="width: 200px;">
+							<a href="/projects/?id={{ .Id.Hex }}">
+								<h2>{{ .Title }}</h2>
+								<img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg">
+							</a>
+						</li>
 					{{ end }}
 				</ul>
 			</div>
 			<a href="#" class="jcarousel-control-prev" data-jcarouselcontrol="true">‹</a>
 			<a href="#" class="jcarousel-control-next" data-jcarouselcontrol="true">›</a>
 			<p class="jcarousel-pagination" data-jcarouselpagination="true">
-				<a href="#1" class="">1</a>
+				<a href="#1" class="active">1</a>
 				<a href="#2" class="">2</a>
 				<a href="#3" class="">3</a>
 				<a href="#4" class="">4</a>

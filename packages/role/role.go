@@ -221,6 +221,66 @@ func NewRole(title string, user *user.User, description string, script string, d
 	return &Role{Title: title, User: dbRefUser, Description: description, Script: script, TimeStamp: time.Now(), Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl, Id: id}
 }
 
+func ChangedRoleWithPhoto(title string, description string, script string, deadline time.Time, traits []string, age int, gender string, imageUrl string) *Role {
+	return &Role{Title: title, Description: description, Script: script, Deadline: deadline, Traits: traits, Age: age, Gender: gender, ImageUrl: imageUrl}
+}
+
+func ChangedRoleNoPhoto(title string, description string, script string, deadline time.Time, traits []string, age int, gender string) *Role {
+	return &Role{Title: title, Description: description, Script: script, Deadline: deadline, Traits: traits, Age: age, Gender: gender}
+}
+
+func UpdateRoleWithPhoto(id string, role *Role) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("roles")
+	
+	//this shit is erasing the fields? Need to check for consistency
+	change := bson.M{
+		"$set": bson.M{
+				"title": role.Title,
+				"imageurl": role.ImageUrl, 
+				"description": role.Description,
+				"script" : role.Script,
+				"gender" : role.Gender,
+				"age" : role.Age,
+				"traits" : role.Traits,
+				"deadline" : role.Deadline}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	if err != nil {
+		panic(err)
+	}
+}
+func UpdateRoleNoPhoto(id string, role *Role) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("roles")
+	
+	//this shit is erasing the fields? Need to check for consistency
+	change := bson.M{
+		"$set": bson.M{
+				"title": role.Title,
+				"description": role.Description,
+				"script" : role.Script,
+				"gender" : role.Gender,
+				"age" : role.Age,
+				"traits" : role.Traits,
+				"deadline" : role.Deadline}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func NewTeam(users []*user.User, teamName string, motto string, id bson.ObjectId) *Team {
 	var dbRefUsers []*mgo.DBRef
 	for _,user := range users {
@@ -447,7 +507,6 @@ func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(result)
 	resultCount, err := c.Count()
 	if err != nil {
 		panic(err)
@@ -573,3 +632,4 @@ func FindSearchedContest(title string) []Contest {
 	
 	return result
 }
+

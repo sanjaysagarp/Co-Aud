@@ -6,7 +6,7 @@
 		<div class="col-md-8 col-md-offset-2 card">
 			<h3>Edit {{ .Data.project.Title }}</h3>
 			<hr>
-			<form id ="projectForm" action="/api/v1/submitProject/" method="post">
+			<form id ="projectForm" action="/update/project/?id={{ .Data.project.Id.Hex }}" method="post">
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" id="title" name="title" value="{{ .Data.project.Title }}">
@@ -27,7 +27,7 @@
 					<label>Cast Members</label>
 					{{ range .Data.project.GetCast }}
 					<div class="pair">
-					<br><div class="form-group castForm"><input type="text" class="castEmails form-control" name="castEmail[]" value="{{ .GetUser.DisplayName }}"/></div> as <div class="form-group castForm"><input type="text" class="castRoles form-control" name="castRole[]" value="{{ .Role }}"/></div>
+					<br><div class="form-group castForm"><input type="text" class="castEmails form-control" name="castEmail[]" value="{{ .GetUser.Email }}"/></div> as <div class="form-group castForm"><input type="text" class="castRoles form-control" name="castRole[]" value="{{ .Role }}"/></div>
 					</div>
 					{{ end }}
 				</div>

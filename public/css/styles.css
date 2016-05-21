@@ -4,22 +4,18 @@
 }
 
 @font-face {
-    font-family: sfEspressoShack;
-    src: url("/public/font/SF Espresso Shack.ttf");
-    font-weight: bold;
+    font-family: sfEspressoShackBold;
+    src: url("/public/font/SF Espresso Shack Bold.ttf");
 }
 
 @font-face {
-    font-family: sfEspressoShack;
+    font-family: sfEspressoShackItalic;
     src: url("/public/font/SF Espresso Shack Italic.ttf");
-    font-style: italic;
 }
 
 @font-face {
-    font-family: sfEspressoShack;
+    font-family: sfEspressoShackBoldItalic;
     src: url("/public/font/SF Espresso Shack Bold Italic.ttf");
-    font-style: italic;
-    font-weight: bold;
 }
 
 @font-face {
@@ -62,7 +58,7 @@
 }
 
 .navbar-brand {
-    padding-top: 30px
+    padding-top: 20px
 }
 
 .navbar-right {
@@ -72,6 +68,7 @@
 body {
 	background-color: #edeaed;
 	padding-bottom: 60px;
+    font-family: 'Roboto', sans-serif;
 }
 
 h1 {
@@ -150,13 +147,25 @@ audio::-webkit-media-controls-enclosure {
 	padding: 0px;
 }
 
+li.thumbnail {
+    margin-bottom: 0px;
+}
+
 .thumbnail h2 {
-	width: 100%;
-	background-color: rgba(1,1,1,0.5);
+	/*width: 100%;
+	background-color: rgba(30,34,61,0.75);
 	margin: 0px;
 	position: absolute;
 	padding: 5px;
-	overflow: hidden;
+	overflow: hidden;*/
+    width: 100%;
+    background-color: rgba(30,34,61,0.75);
+    margin: 0px;
+    position: relative;
+    padding: 5px;
+    overflow: hidden;
+    top: 43px;
+    margin-top: -43px;
 }
 
 .thumbnail a {
@@ -168,6 +177,16 @@ footer {
 	width: 100%;
 	padding-top: 30px;
     height: 200px;
+}
+
+#footer-links {
+    list-style: none;
+    padding: 0px;
+}
+
+#footer-links > li {
+    display: inline-block;
+    vertical-align: top;
 }
 
 /** JENNA'S STYLINGGGGGGGGG **/
@@ -209,17 +228,6 @@ input[type=text], input[type=number], input[type=date], textarea.form-control {
     width:0;
 }
 
-input[type=submit]{
-    padding:10px 20px;
-    font-family:whitePine;
-    color:white;
-    font-size:2em;
-    border-radius:5px;
-    background-color:#36ced9;
-    float: right;
-    clear: both;
-}
-
 textarea { 
     resize: vertical;
 }
@@ -253,10 +261,6 @@ hr {
     margin-top: 24px;
 }
 
-.tab-content {
-    padding-top: 30px;
-}
-
 .role-form {
     margin-bottom: 30px;
 }
@@ -264,20 +268,21 @@ hr {
 #submit-button.affix, #submit-button.affix-top{
     position: fixed;
     bottom: 50px;
-    right: 50px
+    right: 130px
 }
 
 #submit-button.affix-bottom{
     position: absolute;
-    right: 50px;
+    right: 130px;
 }
 
 .media-heading {
     display: inline-block;
 }
 
-.comment-message {
+.comment-message, .format-text {
     word-break: break-word;
+    white-space: pre-line;
 }
 
 /** Carousel **/
@@ -414,19 +419,6 @@ hr#profile-name {
     border-color: #f6efc0;
 }
 
-#colorsssssssssssssssssssssssssss {
-    color: #1e223d;
-    color: #f6efc0;
-    color: #edeaed;
-    color: #ffffff;
-    color: #dcd9dc;
-    color: #c3bbc3;
-    color: #8e8d8e;
-    color: #f8b72d #fce230 #53979c #36ced9;
-    color: #86adb2;
-    color: #eedd75;
-}
-
 .card-padding {
     padding: 20px;
 }
@@ -448,4 +440,161 @@ hr#profile-name {
 .thumbnail > a > h2 {
     font-family: sfEspressoShack;
     color: #f6efc0;
+}
+
+#audition-name {
+    text-align: center;
+    margin-top: 0px;
+    color: #1e223d;
+    font-family: sfEspressoShack;
+    font-size: 15pt;
+    word-break: break-word;
+}
+
+#tab-content > div > .card-padding {
+    padding-top: 0px;
+}
+
+#role-comment-button, #submitAuditionCommentButton {
+    margin-top: 10px;
+}
+
+#updateButton, .auditionCommentButton, #submitTeam, #castSubmission {
+    float: right;
+}
+
+.yellow-btn-color {
+    font-family: whitePine;
+    color: white;
+    background-color: #fce230;
+}
+
+.yellow-btn-color:hover {
+    font-family: whitePine;
+    color: white;
+    background-color: #fce230;
+}
+
+.blue-btn-color {
+    font-family: whitePine;
+    color: white;
+    background-color: #36ced9;
+}
+
+.blue-btn-color:hover {
+    font-family: whitePine;
+    color: white;
+    background-color: #36ced9;
+}
+
+.orange-btn-color {
+    font-family: whitePine;
+    color: white;
+    background-color: #f8b72d;
+}
+
+.orange-btn-color:hover {
+    font-family: whitePine;
+    color: white;
+    background-color: #f8b72d;
+}
+
+.aqua-btn-color {
+    font-family: whitePine;
+    color: white;
+    background-color: #53979c;
+}
+
+.aqua-btn-color:hover {
+    font-family: whitePine;
+    color: white;
+    background-color: #53979c;
+}
+
+.nav-tabs > li > a {
+    background-color: #DCD9DC;
+    color: #464646;
+}
+
+.input-group-btn:last-child>.btn[disabled] {
+    color: #A9A9A9;
+}
+
+.vertical-align {
+    vertical-align: middle;
+}
+
+#character-bio {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.badge-traits {
+    display: inline-block;
+    min-width: 10px;
+    padding: 5px 10px;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: #F2F2F2;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+#cast {
+    padding: 0px;
+}
+
+#project-description {
+    padding: 0px;
+    padding-right: 20px;
+}
+
+#cast > .card > h3, #project-description > .card > h3 {
+    color: #1e223d;
+}
+
+
+#colorsssssssssssssssssssssssssss {
+    color: #1e223d;
+    color: #f6efc0;
+    color: #edeaed;
+    color: #ffffff;
+    color: #dcd9dc;
+    color: #c3bbc3;
+    color: #8e8d8e;
+    color: #f8b72d #fce230 #53979c #36ced9;
+    color: #86adb2;
+    color: #eedd75;
+}
+
+.navbar-default .navbar-link {
+    color: #F6EFC0;
+}
+
+.navbar-default .navbar-link:hover {
+    color: #F6EFC0;
+}
+
+.team-motto {
+    font-style: italic;
+}
+
+.team-name {
+    margin-top: 0px;
+}
+
+.team-member-list {
+    list-style: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.team-member-list > a > img {
+    display: inline-block;
+}
+
+.team-member-list-item {
+    min-width: 125px;
 }

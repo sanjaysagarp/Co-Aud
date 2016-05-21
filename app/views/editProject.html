@@ -1,6 +1,7 @@
 {{define "editProject"}}
 {{template "header" .}}
 	<div id="ProfileForm" class="container">
+		<div id="notification"></div>
 		<div class="card profile-project">
 			<h3>Edit Projects</h3>
 				{{ range .Data.postedProjects }}
@@ -13,6 +14,18 @@
 				{{ end }}
 		</div>		
 	</div>
+	
+	<script>
+	$(document).ready(function(){
+		if(window.location.hash == '#success'){
+			$("#notification").css("display", "block");
+			$("#notification").addClass("alert alert-success");
+			$("#notification").html("Project has been edited");
+			$("#notification").fadeOut( 3000 );
+		}
+	});
+		
+	</script>
 
 {{template "footer" .}}
 {{end}}
