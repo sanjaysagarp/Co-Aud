@@ -597,8 +597,20 @@ hr#profile-name {
     min-width: 125px;
 }
 
+
 .timestamp {
     color: #8e8d8e;
     font-size: 10pt;
     padding-left: 10px;
+}
+
+#loading-indicator {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  z-index: 1;
+  position: absolute;
+  transform: translate(300%,250%);
+  -ms-transform: translate(300%,250%); /* IE 9 */
+  -webkit-transform: translate(300%,250%); /* Safari */
 }

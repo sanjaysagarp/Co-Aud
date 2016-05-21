@@ -2,14 +2,15 @@
 {{template "header" .}}
 <script src="/public/js/editProfile.js"></script>
 <div class="container">
+	<img src="/public/img/loading.gif" id="loading-indicator" style="display:none" />
 	<div class="row">
 		<div class="col-md-4">
 			<div class="card-padding">
 				<div class="card">
-					<img class="img-circle img-responsive" src="/public/img/default_profile_pic.png">
-					<form action="test.asp">
+					<img class="img-circle img-responsive" id="userImage" src="{{.Data.currentUser.ProfilePictureURL}}">
+					<form id="UploadProfilePicture" action="/api/v1/updateUserImage/" method="POST">
 						<label>Change your picture</label>	
-						<input type="file" name="pic" accept="image/*">
+						<input type="file" id="profPic" name="profPic" accept="image/*">
 					</form>	
 				</div>
 			</div>
@@ -17,14 +18,14 @@
 		<div class="col-md-8">
 			<div class="card-padding">
 				<div class="card">
-					<h1>Edit Profile</h1>
+					<h3>Edit Profile</h3>
 						<form action="/api/v1/updateUser/" method="POST">
 							<div class="form-group">
 								<label>Display Name</label>
 								<input type="text" class="form-control" name="displayName" value="{{.Data.currentUser.DisplayName}}">
 							</div>
 							<div class="form-group">
-								<labe>Title</label>
+								<label>Title</label>
 								<input type="text" class="form-control" name="title" value="{{.Data.currentUser.Title}}">
 							</div>
 							<div class="form-group">
@@ -56,6 +57,5 @@
 	</div>
 	<div id="notification"></div>
 </div>
-
 {{template "footer" .}}
 {{end}}

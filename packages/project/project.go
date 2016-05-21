@@ -260,3 +260,23 @@ func FindProjects(q interface{}, skip int, limit int) ([]Project, int) {
 	}
 	return result, resultCount
 }
+
+//DeleteProject deletes the project -- NEED TO TEST
+func DeleteProject(project *Project) {
+	session, err := mgo.Dial("127.0.0.1:27018")
+	if err != nil {
+		fmt.Println("not connected")
+		panic(err)
+	}
+	fmt.Println("connected")
+	
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("projects")
+	err = c.Remove(bson.M{"_id":project.Id})
+	
+	if err != nil {
+		fmt.Println("delete project")
+		panic(err)
+	}
+}

@@ -21,7 +21,6 @@ $(document).ready(function(){
 						$("#notification").addClass("alert alert-success");
 						$("#notification").html("User profile updated!");
 						$("#notification").fadeOut( 3000 );
-						window.location.href = "/profile/edit"
 					} 
 					
 				},
@@ -29,5 +28,43 @@ $(document).ready(function(){
 					console.log(err);
 				}
 		});
+	});
+	
+	$('input[id="profPic"]').change(function() { 
+		var formData = new FormData(this);
+		
+		formData.append('profPic', $('input[id="profPic"]')[0].files[0]);
+		
+		//e.preventDefault();
+		$.ajax({
+			method: 'POST',
+			url: "/api/v1/updateUserPicture/",
+			data: formData,
+			contentType: false,
+			processData: false,
+			cache: false,
+			success: function(data) {
+				if(data != "rejected") {
+					$('#userImage').attr('src',data);
+				} else {
+					$("#notification").css("display", "block");
+					$("#notification").addClass("alert alert-danger");
+					$("#notification").html("Image too big!");
+					$("#notification").fadeOut( 3000 );
+				}
+				
+			},
+			failure: function(err) {
+				console.log(err);
+			}
+		});
+	});
+	
+	$(document).ajaxSend(function(event, request, settings) {
+		$('#loading-indicator').show();
+	});
+
+	$(document).ajaxComplete(function(event, request, settings) {
+		$('#loading-indicator').hide();
 	});
 });
