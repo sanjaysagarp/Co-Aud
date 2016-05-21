@@ -605,7 +605,8 @@ hr#profile-name {
   display: block;
   z-index: 1;
   position: absolute;
-  transform: translate(300%,250%);
-  -ms-transform: translate(300%,250%); /* IE 9 */
-  -webkit-transform: translate(300%,250%); /* Safari */
+  transform: translate(150%,250%);
+  -ms-transform: translate(150%,250%); /* IE 9 */
+  -webkit-transform: translate(150%,250%); /* Safari */
+  background-color: RGBA(30,34,61,.65)
 }

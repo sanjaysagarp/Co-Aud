@@ -754,7 +754,7 @@ func updateUserPictureHandler(w http.ResponseWriter, r *http.Request) {
 				svc.DeleteObject(params)
 			}
 			
-			log.Println("Successfully deleted to", attachmentURL)
+			log.Println("Successfully deleted from ", attachmentURL)
 			
 			user.UpdateUserPicture(s.Get("ID"), result.Location, attachmentURL, currentUser)
 			
