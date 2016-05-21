@@ -22,7 +22,7 @@
 							<!--Username should go here <h3>{{ .Data.user.DisplayName }}</h3>-->
 							<hr id="profile-name" class="card-hr">
 							<p id="profile-title">{{ .Data.user.Title }}</p>
-							<p>Joined on: {{ .Data.user.JoinDate }}</p>
+							<p>Joined on: {{ .Data.user.JoinDate.Format "Jan 02, 2006" }}</p>
 							{{if .Data.currentUser }}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
 									<a href="/profile/edit/" class="btn btn-lg btn-default">Edit Profile</a>
@@ -79,10 +79,8 @@
 						{{ if .Data.postedProjects }}
 							{{ range .Data.postedProjects }}
 							<div class="thumbnail col-md-4">
-								<a href="/projects/?id={{ .Id.Hex }}">
-									<h2>{{.Title}}</h2>
-									<img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg">
-								</a>
+								<h2><a href="/projects/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+								<a href="/projects/?id={{ .Id.Hex }}"><img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
 							</div>
 							{{ end }}
 						{{ else }}
@@ -105,10 +103,8 @@
 						{{ if .Data.postedRoles }}
 							{{ range .Data.postedRoles }}
 								<div class="thumbnail col-md-4">
-									<a href="/auditions/?id={{ .Id.Hex }}">
-										<h2>{{.Title}}</h2>
-										<img class="img-responsive" src="{{.ImageUrl}}">
-									</a>
+									<h2><a href="/auditions/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+									<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
 								</div>
 							{{ end }}
 							{{ else}}

@@ -25,7 +25,7 @@
 					</div>
 					<br>
 					<p><strong>Deadline:</strong></p>
-					<p>{{ .Data.role.Deadline }}</p>
+					<p>{{ .Data.role.Deadline.Format "Jan 2, 2006" }}</p>
 				</div>
 			</div>
 		</div>
@@ -61,7 +61,7 @@
 							{{ if not (eq .Data.currentUser.Id.Hex .Data.author.Id.Hex) }}
 							<form id="formAudition" enctype="multipart/form-data" class="role-form form-horizontal" action="/api/v1/submitAudition/" method="POST">
 								<div class="form-group">
-									<label class="col-md-2 control-label" for="uploadInput">Your audition:</label>
+									<label class="col-md-3 control-label" for="uploadInput">Your audition:</label>
 									<div class="col-md-8">
 										<div class="input-group">
 											<input type="text" class="form-control" id="uploadInput" name="auditionName" placeholder="Choose File">
@@ -89,9 +89,7 @@
 										<div class="media-body">
 											<a href="/profile/?id={{$user.Id.Hex}}"><h4 class="media-heading">{{$user.DisplayName}}</h4></a>
 											<p>Title goes here
-												<!--<span class="pull-right glyphicon glyphicon-thumbs-up"></span>
-												<span class="pull-right">234</span>-->
-												<span class="pull-right">{{.TimeStamp}}</span>
+												<span class="pull-right timestamp">{{.TimeStamp.Format "Jan 02, 2006"}}</span>
 											</p>
 											<audio controls>
 												<source src="{{ .AttachmentUrl }}" type="audio/mpeg">
@@ -107,6 +105,7 @@
 													</div>
 													<div class="media-body">
 														<a href="/profile/?id={{.User.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
+														<span class="timestamp">{{.TimeStamp.Format "Jan 02, 2006"}}</span>
 														<p class="comment-message">{{ .Message }}</p>
 													</div>
 												</li>
@@ -157,6 +156,7 @@
 									</div>
 									<div class="media-body">
 										<a href="/profile/?id={{ $user.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
+										<span class="timestamp">{{.TimeStamp.Format "Jan 02, 2006"}}</span>
 										<p class="comment-message">{{ .Message }}</p>
 									</div>
 								</li>

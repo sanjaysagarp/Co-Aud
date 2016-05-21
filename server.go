@@ -874,7 +874,7 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request, collection str
 
 	role.InsertComment(newComment, collection, id, recentOrder)
 	
-	w.Write([]byte(`<li class="comment-posted media"><div class="media-left"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><h4 class="media-heading">` + currentUser.DisplayName + `</h4></a><p class="comment-message">` + message + `</p></div></li>`))
+	w.Write([]byte(`<li class="comment-posted media"><div class="media-left"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><h4 class="media-heading">` + currentUser.DisplayName + `</h4></a><span class="timestamp">` + newComment.TimeStamp.Format("Jan 02, 2006") + `</span><p class="comment-message">` + message + `</p></div></li>`))
 }
 
 
