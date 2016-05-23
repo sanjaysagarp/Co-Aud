@@ -78,9 +78,61 @@ $(document).ready(function(){
 	$("#traits").val(traitList.toString());
 	$("#description").val({{ .Data.role.Description }});
 	$("#script").val({{ .Data.role.Script }});
-	var date = {{ .Data.role.Deadline }};
-	var formattedDate = date.split("T17");
-	$("#date").val(formattedDate[0]);
+	var date = {{ .Data.role.Deadline.Format "2006-01-02" }};
+	$("#date").val(date);
+		$("#castSubmission").click(function() {
+			var checker = 0;
+			if(validateText("name")) {
+				checker++;
+			}
+			if(validateText("date")) {
+				checker++;
+			}
+			if(validateText("age")) {
+				checker++;
+			}
+			if(validateText("traits")) {
+				checker++;
+			}
+			if(validateText("description")) {
+				checker++;
+			}
+			if(validateText("script")) {
+				checker++;
+			}
+			if(validateForm()) {
+				checker++;
+			}
+			if(checker == 7) {
+				$("form#roleForm").submit();
+			} else {
+				return false;
+			}
+		});
+		$("#roleForm").submit(function(e){
+			e.preventDefault();
+			var formData = new FormData(this);
+			console.log(formData);
+			$.ajax({
+				url: "/update/audition/?id={{ .Data.role.Id.Hex }}",
+				type: 'POST',
+				data: formData,
+				contentType: false,
+				processData: false,
+				cache: false,
+				success: function (data) {
+					console.log(data);
+					if (data =="rejected") {
+						$("#notification").css("display", "block");
+						$("#notification").addClass("alert alert-danger");
+						$("#notification").html("Filesize too big!");
+						$("#notification").fadeOut( 3000 );
+					} else {
+						window.location.href = "/auditions/?id=" + data;
+					}
+				}
+			});
+		});
 });
 	
 </script>

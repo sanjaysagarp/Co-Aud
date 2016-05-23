@@ -127,7 +127,7 @@ func changeProjectHandler(w http.ResponseWriter, r *http.Request) {
 	projectId := r.URL.Query().Get("id")
 	project := project.FindProject(projectId)
 	data["project"] = project
-	data["castLength"] = len(project.Cast)
+	//data["castLength"] = len(project.Cast)
 	display(w, "changeProject", &Page{Title: project.Title, Data: data})
 }
 
@@ -295,9 +295,15 @@ func createContestHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "createContest", &Page{Title: "Create Contest", Data: data})
 }
 
+func contestProjectFormHandler(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	display(w, "createContestProject", &Page{Title: "Contest Submission", Data: data})
+}
+
 func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
 	currentUser := user.FindUser(s.Get("Email"))
+	fmt.Println(currentUser)
 	roleId := r.URL.Query().Get("id")
 	rawTraits := strings.Split(r.FormValue("traits"), ",")
 	var traits []string
@@ -334,10 +340,10 @@ func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
 		var megabytes float64
 		megabytes = (float64)(kilobytes / 1024)
 		
-		roleID := bson.NewObjectId()
+		//roleID := bson.NewObjectId()
 
 		if(megabytes < 4) {
-			attachmentURL := "/roles/" + roleID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
+			attachmentURL := "/roles/" + roleId + "/" + s.Get("Email") + "/" + handler.Filename
 		
 			uploader := s3manager.NewUploader(session.New())
 			result, err := uploader.Upload(&s3manager.UploadInput{
@@ -356,13 +362,9 @@ func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
 			
 			role.UpdateRoleWithPhoto(roleId, editedRoleWithPhoto)
 
-		urlParts := []string{"/auditions/edit/?id=", currentUser.Id.Hex(), "#success"}
-		url := strings.Join(urlParts, "")
-		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			w.Write([]byte(roleId))
 		} else {
-			urlParts := []string{"/auditions/edit/?id=", currentUser.Id.Hex(), "#failure"}
-			url := strings.Join(urlParts, "")
-			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			w.Write([]byte("rejected"))
 		}
 	} else {
 		fmt.Println("No photo is in there")
@@ -370,9 +372,7 @@ func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
 		
 		role.UpdateRoleNoPhoto(roleId, editedRoleWithNoPhoto)
 		
-		urlParts := []string{"/auditions/edit/?id=", currentUser.Id.Hex(), "#success"}
-		url := strings.Join(urlParts, "")
-		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		w.Write([]byte(roleId))
 	}
 	
 }
@@ -548,8 +548,39 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	url := strings.Join(urlParts, "")
 	// redirect to project page
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func submitContestProjectHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
 	
-	// ** Bottom
+	r.ParseForm()
+	castsAttendees := r.Form["castEmail[]"]
+	castRoles := r.Form["castRole[]"]
+
+	newContest := role.FindContests()
+	currentContest := newContest[0]
+	
+	var castContainer []*project.Cast
+	var newCast *project.Cast
+	for i := 0; i < len(castsAttendees); i++ {
+		castId := bson.NewObjectId()
+		castUser := user.FindUser(castsAttendees[i])
+		newCast = project.NewCast(castUser, castRoles[i], castId)
+		project.InsertCast(newCast)
+		castContainer = append(castContainer, newCast)
+	}
+
+	description := []string{r.FormValue("teamName") + ": \n", r.FormValue("description")}
+	combinedDescription := strings.Join(description, "")
+	
+	projectId := bson.NewObjectId()
+	newProject := project.NewContestProject(r.FormValue("title"), r.FormValue("url"),r.FormValue("shortDescription"), combinedDescription, castContainer, currentUser, projectId, currentContest)
+	project.InsertProject(newProject)
+	
+	urlParts := []string{"/projects/?id=", projectId.Hex()}
+	url := strings.Join(urlParts, "")
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
@@ -568,8 +599,6 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 		teamContainer = append(teamContainer, newUser)
 	}
 	
-	fmt.Println("jk below this")
-	fmt.Println(teamContainer)
 	teamId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
 	
@@ -579,12 +608,9 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 	role.InsertNewTeam(newTeam)
 	
 	currentContest.InsertTeam(newTeam)
-	fmt.Println("Below this")
 
-	urlParts := []string{"/teams/?id=", teamId.Hex()}
-	url := strings.Join(urlParts, "")
-	// redirect to project page
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	//data["contests"] = currentContest
+	http.Redirect(w, r, "/teams/browse", http.StatusTemporaryRedirect)
 }
 
 func submitContestHandler(w http.ResponseWriter, r *http.Request) {
@@ -885,13 +911,15 @@ func main() {
 	http.HandleFunc("/contest/", contestMainHandler)
 	http.HandleFunc("/teams/", teamHandler)
 	http.HandleFunc("/teams/create", createTeamHandler)
-	http.HandleFunc("/contest/create", createContestHandler)
 	
+	http.HandleFunc("/contest/create", createContestHandler)
+	http.HandleFunc("/contest/submit", contestProjectFormHandler)
 	//Edit functions for auditions and projects //START
 	http.HandleFunc("/project/edit/", editProjectHandler)
 	http.HandleFunc("/auditions/edit/", editAuditionHandler)
 	http.HandleFunc("/EditProject/", changeProjectHandler)
 	http.HandleFunc("/EditAudition/", changeAuditionHandler)
+	
 	http.HandleFunc("/update/project/", updateProjectHandler)
 	http.HandleFunc("/update/audition/", updateRoleHandler)
 	//updateProjectHandler
@@ -916,6 +944,8 @@ func main() {
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
 	http.HandleFunc("/api/v1/submitTeam/", submitTeamHandler)
 	http.HandleFunc("/api/v1/submitContest/", submitContestHandler)
+	http.HandleFunc("/api/v1/submitContestProject/", submitContestProjectHandler)
+	
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
 	http.ListenAndServe(":8080", nil)

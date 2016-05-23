@@ -70,46 +70,34 @@ $(document).ready(function(){
 				checker++;
 			}
 			if(checker == 7) {
-				$("form#castingForm").submit();
+				$("form#roleForm").submit();
 			} else {
 				return false;
 			}
 		});
-		$("#roleForm").submit(function(e){
-			e.preventDefault();
-			var formData = new FormData(this);
-			
-			//formData.append('auditionFile', $('input[id="auditionFile"]')[0].files[0]);
-			
-			// data: {
-			// 		name: $('[name="Name"]').val(),
-			// 		photo: $('input[id="photoUpload"]')[0].files[0],
-			// 		traits: $('[name="traits"]').val(),
-			// 		age: $('[name="age"]').val(),
-			// 		gender: $('[name="gender"]').val(),
-			// 		description: $('[name="description"]').val(),
-			// 		script: $('[name="script"]').val()
-			// 	},
-			console.log(formData);
-			$.ajax({
-				url: "/api/v1/submitRole/",
-				type: 'POST',
-				data: formData,
-				contentType: false,
-				processData: false,
-				cache: false,
-				success: function (data) {
-					console.log(data);
-					if (data =="rejected") {
-						$("#notification").css("display", "block");
-						$("#notification").addClass("alert alert-danger");
-						$("#notification").html("Filesize too big!");
-						$("#notification").fadeOut( 3000 );
-					} else {
-						window.location.href = "/auditions/?id=" + data+ "#success"
-					}
-				}
-			});
-		});
+		// $("#roleForm").submit(function(e){
+		// 	e.preventDefault();
+		// 	var formData = new FormData(this);
+		// 	console.log(formData);
+		// 	$.ajax({
+		// 		url: "/update/audition/?id={{ .Data.role.Id.Hex }}",
+		// 		type: 'POST',
+		// 		data: formData,
+		// 		contentType: false,
+		// 		processData: false,
+		// 		cache: false,
+		// 		success: function (data) {
+		// 			console.log(data);
+		// 			if (data =="rejected") {
+		// 				$("#notification").css("display", "block");
+		// 				$("#notification").addClass("alert alert-danger");
+		// 				$("#notification").html("Filesize too big!");
+		// 				$("#notification").fadeOut( 3000 );
+		// 			} else {
+		// 				window.location.href = "/auditions/?id=" + data;
+		// 			}
+		// 		}
+		// 	});
+		// });
 });
 

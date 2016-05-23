@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/sanjaysagarp/Co-Aud/packages/user"
+	"github.com/sanjaysagarp/Co-Aud/packages/role"
 	// "strings"
 	"regexp"
 )
@@ -43,7 +44,9 @@ type Project struct {
 	Cast []*mgo.DBRef
 	PostedDate time.Time
 	User *mgo.DBRef
+	Contest *mgo.DBRef
 }
+
 
 
 
@@ -110,6 +113,23 @@ func UpdateProject(id string, project *Project) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func NewContestProject(title string, url string, shortDescription string, description string, casts []*Cast, user *user.User, id bson.ObjectId, contest role.Contest) *Project {
+
+	var dbRefCasts []*mgo.DBRef
+	for _, cast := range casts {
+		//fmt.Println("Cast ID: " + cast.Id)
+		dbRefCast := &mgo.DBRef{Collection: "casts", Id: cast.Id, Database: "CoAud"}
+		dbRefCasts = append(dbRefCasts, dbRefCast)
+	}
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.Id, Database: "CoAud"}
+	// fmt.Println(dbRefUser)
+	// fmt.Println("project id: ", id)
+	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description: description, Cast: dbRefCasts, PostedDate: time.Now(), User: dbRefUser, Contest: dbRefContest}	
+	
+	
 }
 
 //NewProject creates a new instance of project

@@ -1,12 +1,12 @@
-{{define "createProject"}}
+{{define "createContestProject"}}
 {{template "header" .}}
-<script src="/public/js/submitWork.js"></script>
+<script src="/public/js/createContestProject.js"></script>
 <div class="container">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2 card">
-			<h3>Add Project</h3>
+			<h3>Contest Submission</h3>
 			<hr>
-			<form id ="projectForm" action="/api/v1/submitProject/" method="post">
+			<form id ="projectForm" action="/api/v1/submitContestProject/" method="post">
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" id="title" name="title" placeholder="Title">
@@ -23,6 +23,10 @@
 					<label>Description</label>
 					<textarea type="text-area" rows="6" class="form-control" name="description" placeholder="Description" id="description"></textarea>
 				</div>
+				<div class="form-group">
+					<label>Team Name</label>	
+					<input type="text" class="form-control" id="teamName" name="teamName" placeholder="Example: Team CoAud">	
+				</div>
 				<div class="form-group" id="dynamicInput">
 					<div>
 						<label>Cast Members</label>
@@ -34,8 +38,9 @@
 					<input type="button" class="btn btn-info" value="Add another cast member" id="addMoreCast">
 					<input type="button" class="btn btn-danger" value="Remove cast member" style="display:none;" id="removeCast">
 				</div>
+				<!--<input type="checkbox" name="yesContest" value="yesContest" checked>Project for Contest Submission<br>-->
 				<br/>
-				<button id="submitProject" type="submit" class="blue-btn-color btn btn-default" data-id="{{ .Data.project.Id.Hex }}">Submit</button>
+				<button id="submitProject" type="submit" class="blue-btn-color btn btn-default">Submit</button>
 			</form>
 		</div>
 	</div>
