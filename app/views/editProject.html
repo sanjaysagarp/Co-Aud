@@ -4,14 +4,14 @@
 		<div id="notification"></div>
 		<div class="card profile-project">
 			<h3>Edit Projects</h3>
-				{{ range .Data.postedProjects }}
-				<div class="thumbnail col-md-4">
-					<a href="/EditProject/?id={{ .Id.Hex }}">
-						<h2>{{.Title}}</h2>
-						<img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg">
-					</a>
+				<div class="flex-container">
+					{{ range .Data.postedProjects }}
+					<div class="thumbnail flex-item">
+						<h2><a href="/EditProject/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+						<a href="/EditProject/?id={{ .Id.Hex }}"><img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
+					</div>
+					{{ end }}
 				</div>
-				{{ end }}
 		</div>		
 	</div>
 	

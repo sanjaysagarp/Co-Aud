@@ -892,7 +892,7 @@ func getRoleHandler(w http.ResponseWriter, r *http.Request) {
 	var html string
 	if len(roles) != 0 {
 		for index, role := range roles {
-			html += "<div class=\"thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3\"><a href=\"/role/?id=" + role.Id.Hex() + "\"><h2>" + role.Title + "</h2><img class=\"img-responsive\" src=\"/public/img/placeholder.png\"></a></div>"
+			html += "<div class=\"thumbnail flex-item\"><a href=\"/role/?id=" + role.Id.Hex() + "\"><h2>" + role.Title + "</h2><img class=\"img-responsive\" src=\"/public/img/placeholder.png\"></a></div>"
 			fmt.Println(index)
 		}
 	}

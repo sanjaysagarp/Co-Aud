@@ -34,13 +34,13 @@
 				<div class="card">
 					<h3>Character Bio</h3>
 					<hr>
-					<p><strong>Age:</strong> {{ .Data.role.Age }}</p>
-					<p><strong>Gender:</strong> {{ .Data.role.Gender }}</p>
-					<p><strong>Traits:</strong></p>
+					<p><strong class="character-description">Age:</strong> {{ .Data.role.Age }}</p>
+					<p><strong class="character-description">Gender:</strong> {{ .Data.role.Gender }}</p>
+					<p><strong class="character-description">Traits:</strong></p>
 					<p>{{ range .Data.role.Traits }}<span class="badge-traits">{{.}}</span>{{end}}</p>
-					<p><strong>Description:</strong></p>
+					<p><strong class="character-description">Description:</strong></p>
 					<p class="format-text">{{ .Data.role.Description }}</p>
-					<p><strong>Script:</strong></p>
+					<p><strong class="character-description">Script:</strong></p>
 					<blockquote>
 						<p class="format-text">"{{ .Data.role.Script }}"</p>
 					</blockquote>

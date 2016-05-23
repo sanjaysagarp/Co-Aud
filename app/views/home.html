@@ -24,7 +24,7 @@
 					{{ range .Data.projects }}
 						<!--Only supports youtube now-->
 						<li class="thumbnail" style="width: 200px;">
-							<h2><a href="/projects/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
+							<h2 style="width: 100%"><a href="/projects/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
 							<a href="/projects/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
 						</li>
 					{{ end }}
@@ -43,9 +43,9 @@
 		</div>
 	</div>
 	{{end}}
-	<div id="home-page-roles" class="row" style="margin-top: 50px;">
+	<div id="home-page-roles" class="flex-container" style="margin-top: 50px;">
 		{{ range .Data.roles }}
-			<div class="thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3">
+			<div class="thumbnail flex-item">
 				<h2><a href="/auditions/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
 				<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
 			</div>
