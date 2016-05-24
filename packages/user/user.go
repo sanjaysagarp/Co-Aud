@@ -20,12 +20,14 @@ type User struct {
 	InstagramURL string
 	TwitterURL string
 	ContestTeamNames []string
+	ProfilePictureURL string
+	AwsPictureURL string
 	JoinDate time.Time
 }
 
 //NewUser creates a new user after signed in with google
 func NewUser(email string, displayName string) *User{
-	return &User{Email: email, DisplayName: displayName, JoinDate: time.Now()}
+	return &User{Email: email, DisplayName: displayName, ProfilePictureURL: "/public/img/default_profile_pic.png", JoinDate: time.Now()}
 }
 
 //NewChangeUser creates a new user with most fields
@@ -86,7 +88,7 @@ func InsertUser(user *User) {
 	
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("users")
-	err = c.Insert(&User{Email: user.Email, DisplayName: user.DisplayName, JoinDate: user.JoinDate})
+	err = c.Insert(user)
 	
 	if err != nil {
 		log.Fatal(err)
@@ -115,6 +117,27 @@ func UpdateUser(id string, user *User) {
 				"facebookurl" : user.FacebookURL,
 				"instagramurl" : user.InstagramURL,
 				"twitterurl" : user.TwitterURL}}
+	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
+	if err != nil {
+		panic(err)
+	}
+}
+
+//UpdateUserPicture updates a user's profile picture -- NEED TO TEST
+func UpdateUserPicture(id string, URL string, AWSURL string, user *User) {
+	
+	session, err := mgo.Dial("127.0.0.1:27018")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("CoAud").C("users")
+	
+	change := bson.M{"$set": bson.M{
+		"profilepictureurl" : URL,
+		"awspictureurl" : AWSURL}}
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
 	if err != nil {
 		panic(err)

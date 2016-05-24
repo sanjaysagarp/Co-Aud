@@ -23,7 +23,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/aws/aws-sdk-go/aws"
-	//"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/aws/session"
 )
@@ -732,6 +732,67 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
+func updateUserPictureHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	
+	file, handler, err := r.FormFile("profPic")
+	
+	if (err == nil) {
+		defer file.Close()
+		bytes, err := file.Seek(0,2)
+		if err != nil {
+			panic(err)
+		}
+		
+		//get file size in kilobytes and megabytes
+		var kilobytes int64
+		kilobytes = (bytes / 1024)
+		
+		var megabytes float64
+		megabytes = (float64)(kilobytes / 1024)
+		
+		imageID := bson.NewObjectId()
+		
+		if(megabytes < 4) {
+			attachmentURL := "/profiles/" + imageID.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
+		
+			uploader := s3manager.NewUploader(session.New())
+			result, err := uploader.Upload(&s3manager.UploadInput{
+				Body:   file,
+				Bucket: aws.String("coaud"),
+				Key:    aws.String(attachmentURL),
+			})
+			if err != nil {
+				log.Fatalln("Failed to upload", err)
+			}
+
+			log.Println("Successfully uploaded to", result.Location)
+			
+			if(currentUser.ProfilePictureURL != "/public/img/default_profile_pic.png") {
+				svc := s3.New(session.New(), &aws.Config{Region: aws.String("us-east-1")})
+
+				params := &s3.DeleteObjectInput{
+					Bucket: aws.String("coaud"),
+					Key : aws.String(currentUser.AwsPictureURL),
+				}
+				
+				svc.DeleteObject(params)
+			}
+			
+			log.Println("Successfully deleted from ", attachmentURL)
+			
+			user.UpdateUserPicture(s.Get("ID"), result.Location, attachmentURL, currentUser)
+			
+			w.Write([]byte(""+ result.Location))
+		} else {
+			w.Write([]byte("rejected"))
+		}
+	} else {
+		w.Write([]byte("Invalid File Type"))
+	}
+	
+}
 func updateProjectHandler(w http.ResponseWriter, r*http.Request) {
 	//s := redis_session.Session(w, r)
 	r.ParseForm()
@@ -839,7 +900,7 @@ func submitCommentHandler(w http.ResponseWriter, r *http.Request, collection str
 
 	role.InsertComment(newComment, collection, id, recentOrder)
 	
-	w.Write([]byte(`<li class="comment-posted media"><div class="media-left"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><h4 class="media-heading">` + currentUser.DisplayName + `</h4></a><p class="comment-message">` + message + `</p></div></li>`))
+	w.Write([]byte(`<li class="comment-posted media"><div class="media-left"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png"></a></div><div class="media-body"><a href="/profile/?id=` + currentUser.Id.Hex() + `"><h4 class="media-heading">` + currentUser.DisplayName + `</h4></a><span class="timestamp">` + newComment.TimeStamp.Format("Jan 02, 2006") + `</span><p class="comment-message">` + message + `</p></div></li>`))
 }
 
 
@@ -857,7 +918,7 @@ func getRoleHandler(w http.ResponseWriter, r *http.Request) {
 	var html string
 	if len(roles) != 0 {
 		for index, role := range roles {
-			html += "<div class=\"thumbnail col-sm-3 col-lg-3 col-xs-6 col-md-3\"><a href=\"/role/?id=" + role.Id.Hex() + "\"><h2>" + role.Title + "</h2><img class=\"img-responsive\" src=\"/public/img/placeholder.png\"></a></div>"
+			html += "<div class=\"thumbnail flex-item\"><a href=\"/role/?id=" + role.Id.Hex() + "\"><h2>" + role.Title + "</h2><img class=\"img-responsive\" src=\"/public/img/placeholder.png\"></a></div>"
 			fmt.Println(index)
 		}
 	}
@@ -874,7 +935,8 @@ func setDefaultData(w http.ResponseWriter, r *http.Request) map[string]interface
 	if(currentUser != nil) {
 		s.Set("DisplayName", currentUser.Email)
 		s.Set("Email", currentUser.Email)
-		s.Set("ID", currentUser.Id.Hex()) 
+		s.Set("ID", currentUser.Id.Hex())
+		s.Set("ProfilePictureURL", currentUser.ProfilePictureURL)
 	}
 	return data
 }
@@ -936,6 +998,7 @@ func main() {
 	//
 	//update handlers
 	http.HandleFunc("/api/v1/updateUser/", updateUserHandler)
+	http.HandleFunc("/api/v1/updateUserPicture/", updateUserPictureHandler)
 	http.HandleFunc("/api/v1/submitRole/", submitRoleHandler)
 	http.HandleFunc("/api/v1/submitAudition/", submitAuditionHandler)
 	http.HandleFunc("/api/v1/submitRoleComment/", submitRoleCommentHandler)
@@ -944,7 +1007,9 @@ func main() {
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
 	http.HandleFunc("/api/v1/submitTeam/", submitTeamHandler)
 	http.HandleFunc("/api/v1/submitContest/", submitContestHandler)
+
 	http.HandleFunc("/api/v1/submitContestProject/", submitContestProjectHandler)
+
 	
 	//Listen on port 80
 	fmt.Println("Server is listening on port 8080...")
