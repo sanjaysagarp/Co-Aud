@@ -17,7 +17,7 @@
 					<p><strong>Posted by:</strong></p>
 					<div class="media-left">
 						<a href="/profile/?id={{.Data.author.Id.Hex}}">
-							<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+							<img class="img-profile media-object img-circle" src="{{.Data.author.ProfilePictureURL}}">
 						</a>
 					</div>
 					<div class="media-body vertical-align">
@@ -83,7 +83,7 @@
 										<hr>
 										<div class="media-left">
 											<a href="/profile/?id={{$user.Id.Hex}}">
-												<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+												<img class="img-profile media-object img-circle" src="{{ $user.ProfilePictureURL }}">
 											</a>
 										</div>
 										<div class="media-body">
@@ -100,7 +100,7 @@
 												<li class="comment-posted media">
 													<div class="media-left">
 														<a href="/profile/?id={{ $user.Id.Hex}}">
-															<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+															<img class="img-profile media-object img-circle" src="{{ $user.ProfilePictureURL }}">
 														</a>
 													</div>
 													<div class="media-body">
@@ -132,7 +132,7 @@
 							<div class="role-form comment-submission media">
 								<div class="media-left">
 									<a href="/profile/?id={{.Data.currentUser.Id.Hex}}">
-										<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+										<img class="img-profile media-object img-circle" src="{{ .Data.currentUser.ProfilePictureURL }}">
 									</a>
 								</div>
 								<div class="media-body">
@@ -151,7 +151,7 @@
 									<div class="media-left">
 										{{ $user := .GetUser }}
 										<a href="/profile/?id={{ $user.Id.Hex}}">
-											<img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+											<img class="img-profile media-object img-circle" src="{{ $user.ProfilePictureURL }}">
 										</a>
 									</div>
 									<div class="media-body">

@@ -14,7 +14,7 @@
 				<li class="media">
 				  <div class="media-left">
 				    <a href="/profile/">
-				      <img class="img-profile media-object img-circle" src="/public/img/default_profile_pic.png">
+				      <img class="img-profile media-object img-circle" src="{{.User.ProfilePictureURL}}">
 				    </a>
 				  </div>
 				  <div class="media-body">
@@ -27,25 +27,6 @@
 	</div>
 
 </div>
-
-<!--<style>
-	iframe {
-		float:left
-	}
-	#profile #cast {
-		float:left
-	}
-	li > img {
-		float:left
-	}
-	li > p {
-		float:left
-	}
-	li > img {
-		margin-bottom:8px
-		
-	}
-</style>-->
 
 {{template "footer" .}}
 {{end}}
