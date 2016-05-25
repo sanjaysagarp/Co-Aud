@@ -5,7 +5,7 @@
 		<div class="col-md-8 col-md-offset-2 card">
 			<h3>Create a Contest</h3>
 			<hr>
-			<form id ="contestForm" action="/api/v1/submitContest/" method="post">
+			<form enctype="multipart/form-data" id ="contestForm" action="/api/v1/submitContest/" method="post">
 				<div class="form-group">
 					<label>Title</label>
 					<input type="text" class="form-control" id="title" name="title" placeholder="Title">
@@ -16,8 +16,8 @@
 				</div>
 				<br/>
 				<div class="form-group">
-					<img class="img-circle img-responsive" src="/public/img/default_role_pic.png">
-					<label class="upload">Upload new photo</label>
+					<label class="upload">Upload new photo (Max: 4MB)</label>
+					<p>(Optional)</p>
 					<div>
 						<input class="form-control" id="photoUpload" type="file" accept="image/*" name="photo">
 					</div>
