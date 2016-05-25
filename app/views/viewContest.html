@@ -3,14 +3,16 @@
 
 <div class="container">
 	<div class="row">
-		<div class="col-md-8">
+		<div class="col-md-12">
 			<div class="card-padding">
 				<div class="card">
 					<h3>{{ .Data.contest.Title }}</h3>
-					<img width="100%" height="450px" class="img-circle img-responsive" src="{{ .Data.contest.ImageUrl }}">
+					<img width="100%" class="img-circle img-responsive" src="{{ .Data.contest.ImageUrl }}">
+					<!--<iframe width="100%" height="450px" src="https://www.youtube.com/embed/7AIdIkDLSIE" frameborder="0" allowfullscreen></iframe>-->
+					<!--<p style="text-align: center;"><img src="https://www.teamunify.com/miaac/UserFiles/Image/pool-party.jpg" alt="contest image"></p>-->
 					<br>
 					<h4><strong>Description:</strong></h4>
-					<p>
+					<p class="description-text">
 						{{ .Data.contest.Description }}
 					</p>
 					<hr>
@@ -23,13 +25,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="prevContests col-md-4">
+		<!--<div class="prevContests col-md-4">
 			<div class="card-padding">
 				<div class="card">
 					<h3>Previous Contests</h3>
 				</div>
 			</div>
-		</div>
+		</div>-->
 	</div>
 
 	

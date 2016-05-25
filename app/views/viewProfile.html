@@ -22,10 +22,11 @@
 							<!--Username should go here <h3>{{ .Data.user.DisplayName }}</h3>-->
 							<hr id="profile-name" class="card-hr">
 							<p id="profile-title">{{ .Data.user.Title }}</p>
-							<p>Joined on: {{ .Data.user.JoinDate.Format "Jan 02, 2006" }}</p>
+							<p>Join Date: {{ .Data.user.JoinDate.Format "Jan 02, 2006" }}</p>
+							{{if .Data.user.PersonalWebsite}}<p><a href="{{.Data.user.PersonalWebsite}}">Personal Website</a></p>{{end}}
 							{{if .Data.currentUser }}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-									<a href="/profile/edit/" class="btn btn-lg btn-default">Edit Profile</a>
+									<a href="/profile/edit/" class="btn btn-default orange-btn-color pull-right">Edit Profile</a>
 								{{end}}
 							{{end}}
 						</div>
@@ -64,7 +65,7 @@
 								<h3>About Me</h3>
 								<hr>
 								<p>Tell us more about yourself!</p>
-								<a href="/profile/edit/" class="btn btn-default">Edit</a>
+								<a href="/profile/edit/" class="orange-btn-color btn btn-default pull-right">Edit</a>
 							</div>
 						</div>
 						{{end}}
@@ -128,14 +129,5 @@
 			</div>
 		</div>
 	</div>
-	
-	<style>
-		.edit {
-			float:right;
-		}
-		
-		
-		
-	</style>
 {{template "footer" .}}
 {{end}}

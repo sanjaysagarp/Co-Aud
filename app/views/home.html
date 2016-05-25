@@ -2,6 +2,12 @@
 {{template "header" .}}
 <script src="/public/js/multiItemCarousel.js"></script>
 <script src="/public/js/infiniteScroll.js"></script>
+{{if not .Data.currentUser}}
+<div id="call-to-action">
+	<h1>Let your voice be heard</h1>
+	<p><a href="/login" class="blue-btn-color btn btn-lg btn-default">Sign Up</a></p>
+</div>
+{{end}}
 <div class="container">
 	<div class="row">
 		<div class="col-lg-12">
@@ -15,16 +21,17 @@
 			</div>
 		</div>
 	</div>
-	
+	<br>
 	{{if .Data.projects }}
-	<div class="row">
+	<div class="row card">
+		<h3>Recent Showcase</h3>
 		<div class="jcarousel-wrapper">
 			<div class="jcarousel" data-jcarousel="true">
 				<ul style="left: -600px; top: 0px;">
 					{{ range .Data.projects }}
 						<!--Only supports youtube now-->
 						<li class="thumbnail" style="width: 200px;">
-							<h2 style="width: 100%"><a href="/projects/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
+							<h2><a href="/projects/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
 							<a href="/projects/?id={{ .Id.Hex }}"><img src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
 						</li>
 					{{ end }}
@@ -43,13 +50,18 @@
 		</div>
 	</div>
 	{{end}}
-	<div id="home-page-roles" class="flex-container" style="margin-top: 50px;">
-		{{ range .Data.roles }}
-			<div class="thumbnail flex-item">
-				<h2><a href="/auditions/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
-				<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
-			</div>
-		{{ end }}
+	<br>
+	<br>
+	<div class="card">
+		<h3>New Auditions</h3>
+		<div id="home-page-roles" class="flex-container" style="margin-top: 50px;">
+			{{ range .Data.roles }}
+				<div class="thumbnail flex-item">
+					<h2><a href="/auditions/?id={{ .Id.Hex }}">{{ .Title }}</a></h2>
+					<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
+				</div>
+			{{ end }}
+		</div>
 	</div>
 </div>
 {{template "footer" .}}
