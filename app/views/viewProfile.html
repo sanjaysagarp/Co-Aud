@@ -74,9 +74,12 @@
 			</div>
 			<div class="col-md-7">
 				<div id="projects" class="card-padding row">
-					<div class="card profile-project">			
-						<a class="btn btn-default orange-btn-color pull-right" href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Projects</a>
-						<h3>Showcase</h3>
+					<div class="card profile-project">		
+						{{ if .Data.postedProjects }}
+							<h3>Showcase<a href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Projects</button></a></h3>
+						{{ else }}
+							<h3>Showcase</h3>
+						{{ end }}
 						{{ if .Data.postedProjects }}
 							{{ range .Data.postedProjects }}
 							<div class="thumbnail col-md-4">
@@ -99,8 +102,11 @@
 				</div>
 				<div class="card-padding row">
 					<div class="card">
-						<a class="btn btn-default orange-btn-color pull-right" href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Auditions</a>
-						<h3>Posted Auditions</h3>
+						{{ if .Data.postedRoles }}
+							<h3>Posted Auditions<a href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Auditions</button></a></h3>
+						{{ else }}
+							<h3>Posted Auditions</h3>
+						{{ end }}
 						{{ if .Data.postedRoles }}
 							{{ range .Data.postedRoles }}
 								<div class="thumbnail col-md-4">

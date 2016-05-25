@@ -340,8 +340,6 @@ func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
 		var megabytes float64
 		megabytes = (float64)(kilobytes / 1024)
 		
-		//roleID := bson.NewObjectId()
-
 		if(megabytes < 4) {
 			attachmentURL := "/roles/" + roleId + "/" + s.Get("Email") + "/" + handler.Filename
 		
@@ -614,7 +612,7 @@ func submitTeamHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func submitContestHandler(w http.ResponseWriter, r *http.Request) {
-
+	s := redis_session.Session(w, r)
 	contestId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
 	layout := "2006-01-02"
@@ -624,14 +622,46 @@ func submitContestHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	  
-	newContest := role.NewContest(r.FormValue("title"), r.FormValue("description"), r.FormValue("photo"), deadline, contestId)
+	fmt.Println(r.FormFile("photo"))
+	file, handler, err := r.FormFile("photo")
+	if (err == nil) {
+		fmt.Println("success photo is in there")
+		defer file.Close()
+		//bytes, err := file.Seek(0,2)
+		if err != nil {
+			panic(err)
+		}
+		//var kilobytes int64
+		//kilobytes = (bytes / 1024)
+		
+		//var megabytes float64
+		//megabytes = (float64)(kilobytes / 1024)
+		attachmentURL := "/contests/" + contestId.Hex() + "/" + s.Get("Email") + "/" + handler.Filename
+		
+		uploader := s3manager.NewUploader(session.New())
+		result, err := uploader.Upload(&s3manager.UploadInput{
+			Body:   file,
+			Bucket: aws.String("coaud"),
+			Key:    aws.String(attachmentURL),
+		})
+		
+		if err != nil {
+			log.Fatalln("Failed to upload", err)
+		}
+			
+		newContest := role.NewContest(r.FormValue("title"), r.FormValue("description"), result.Location, deadline, contestId)
+		fmt.Println("Below this")
+		fmt.Println(result.Location)
+		role.InsertContest(newContest)
+		http.Redirect(w, r, "/contest/", http.StatusTemporaryRedirect)
+	} else {
+		fmt.Println("Default picture time")
+		newContest := role.NewContest(r.FormValue("title"), r.FormValue("description"), "/public/img/default_role_pic.png", deadline, contestId)
 	
-	role.InsertContest(newContest)
+		role.InsertContest(newContest)
 	
-	urlParts := []string{"/contest/?id=", contestId.Hex()}
-	url := strings.Join(urlParts, "")
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/contest/", http.StatusTemporaryRedirect)
+	}
 }
 
 //gets the numbers of the pages that will be shown in pagination given the max page, current page,
