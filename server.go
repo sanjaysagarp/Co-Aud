@@ -109,6 +109,17 @@ func editAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	data["rolesCount"] = rolesCount
 	display(w, "editAudition", &Page{Title: user.DisplayName, Data: data})
 }
+func viewUserAuditions(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	userID := r.URL.Query().Get("id")
+	user := user.FindUserById(userID)
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user": dbRefUser}, 0, 500)
+	data["user"] = user
+	data["postedRoles"] = postedRoles
+	data["rolesCount"] = rolesCount
+	display(w, "viewUserAuditions", &Page{Title: user.DisplayName, Data: data})
+}
 
 func editProjectHandler(w http.ResponseWriter, r *http.Request) {
 	data := setDefaultData(w, r)
@@ -120,6 +131,18 @@ func editProjectHandler(w http.ResponseWriter, r *http.Request) {
 	data["postedProjects"] = postedProjects
 	data["projectCount"] = projectCount
 	display(w, "editProject", &Page{Title: user.DisplayName, Data: data})
+}
+
+func viewUserProjects(w http.ResponseWriter, r *http.Request) {
+	data := setDefaultData(w, r)
+	userID := r.URL.Query().Get("id")
+	user := user.FindUserById(userID)
+	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
+	postedProjects, projectCount := project.FindProjects(bson.M{"user": dbRefUser}, 0, 500)
+	data["user"] = user
+	data["postedProjects"] = postedProjects
+	data["projectCount"] = projectCount
+	display(w, "viewUserProjects", &Page{Title: user.DisplayName, Data: data})
 }
 
 func changeProjectHandler(w http.ResponseWriter, r *http.Request) {
@@ -527,9 +550,8 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	var castContainer []*project.Cast
 	var newCast *project.Cast
 	for i := 0; i < len(castsAttendees); i++ {
-		castId := bson.NewObjectId()
+		castId := bson.NewObjectId()		
 		castUser := user.FindUser(castsAttendees[i])
-		//fmt.Println("ARWAREWARNEW " + castUser.Email)
 		newCast = project.NewCast(castUser, castRoles[i], castId)
 		project.InsertCast(newCast)
 		castContainer = append(castContainer, newCast)
@@ -998,6 +1020,8 @@ func main() {
 	http.HandleFunc("/projects/", projectHandler)
 	http.HandleFunc("/projects/browse/", projectBrowseHandler)
 	http.HandleFunc("/profile/edit/", editProfileHandler)
+	http.HandleFunc("/projects/user/", viewUserProjects)
+	http.HandleFunc("/auditions/user/", viewUserAuditions)
 	//http.HandleFunc("/projectPage/", projectPageHandler)
 	http.HandleFunc("/projects/create", createProjectHandler)
 	http.HandleFunc("/contest/", contestMainHandler)

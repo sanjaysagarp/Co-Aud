@@ -1,0 +1,17 @@
+{{define "viewUserAuditions"}}
+{{template "header" .}}
+	<div class="container">
+		<div class="card profile-project">
+			<h3>View all Auditions</h3>
+				<div class="flex-container">
+					{{ range .Data.postedRoles }}
+					<div class="thumbnail flex-item">
+						<h2><a href="/auditions/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+						<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
+					</div>
+					{{ end }}
+				</div>
+		</div>		
+	</div>
+{{template "footer" .}}
+{{end}}

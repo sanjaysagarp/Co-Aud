@@ -87,6 +87,14 @@
 								<a href="/projects/?id={{ .Id.Hex }}"><img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
 							</div>
 							{{ end }}
+							<!--
+							Start Here
+							-->
+							{{ if .Data.postedProjects }}
+								<div id="viewAll"> 
+									<a href="/projects/user/?id={{ .Data.user.Id.Hex }}"><button class="btn btn-default edit">View all Projects</button></a></h3>
+								</div>
+							{{ end }}
 						{{ else }}
 							{{if .Data.currentUser}}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
@@ -98,6 +106,7 @@
 							{{end}}
 						{{ end }}
 					</div>
+					
 					
 				</div>
 				<div class="card-padding row">
@@ -112,6 +121,11 @@
 								<div class="thumbnail col-md-4">
 									<h2><a href="/auditions/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
 									<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
+								</div>
+							{{ end }}
+							{{ if .Data.postedRoles }}
+								<div id="viewAll"> 
+									<a href="/auditions/user/?id={{ .Data.user.Id.Hex }}"><button class="btn btn-default edit">View all Auditions</button></a></h3>
 								</div>
 							{{ end }}
 							{{ else}}
@@ -129,5 +143,13 @@
 			</div>
 		</div>
 	</div>
+	
+	<style>
+		#viewAll {
+			clear:both;
+			text-align:center;
+		}
+		
+	</style>
 {{template "footer" .}}
 {{end}}
