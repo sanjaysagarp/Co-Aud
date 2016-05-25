@@ -168,6 +168,8 @@ li.thumbnail {
     overflow: hidden;
     top: 43px;
     margin-top: -43px;
+    white-space: nowrap;
+    max-width: 250px;
 }
 
 footer {
@@ -278,7 +280,7 @@ hr {
     display: inline-block;
 }
 
-.comment-message, .format-text {
+.comment-message, .format-text, .description-text {
     word-break: break-word;
     white-space: pre-line;
 }
