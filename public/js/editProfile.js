@@ -16,11 +16,7 @@ $(document).ready(function(){
 				dataType: 'html',
 				success: function(data) {
 					if(data) {
-						console.log(data);
-						$("#notification").css("display", "block");
-						$("#notification").addClass("alert alert-success");
-						$("#notification").html("User profile updated!");
-						$("#notification").fadeOut( 3000 );
+						window.location.href = "/profile/?id=" + data;
 					} 
 					
 				},

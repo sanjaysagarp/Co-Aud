@@ -3,28 +3,29 @@ package role
 import (
 	// "log"
 	"fmt"
+	"time"
+
+	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/sanjaysagarp/Co-Aud/packages/user"
-	"time"
 )
 
 //Contest struct
 type Contest struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Title string
-	Description string
+	Id                 bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Title              string
+	Description        string
 	ParticipatingTeams []*mgo.DBRef
-	ImageUrl string
-	StartDate time.Time
-	EndDate time.Time
+	ImageUrl           string
+	StartDate          time.Time
+	EndDate            time.Time
 }
 
 func (c *Contest) GetTeams() []*Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := []*Team{}
@@ -37,22 +38,22 @@ func (c *Contest) GetTeams() []*Team {
 		}
 		result = append(result, oneResult)
 	}
-    return result
+	return result
 }
 
 //Team struct
 type Team struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Users []*mgo.DBRef
+	Id       bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Users    []*mgo.DBRef
 	TeamName string
-	Motto string
+	Motto    string
 }
 
 func (t *Team) GetMembers() []*user.User {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := []*user.User{}
@@ -65,31 +66,31 @@ func (t *Team) GetMembers() []*user.User {
 		}
 		result = append(result, oneResult)
 	}
-    return result
+	return result
 }
 
 //Role struct - posting
 type Role struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Title string
-	ImageUrl string
-	User *mgo.DBRef
-	Traits []string
+	Id          bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Title       string
+	ImageUrl    string
+	User        *mgo.DBRef
+	Traits      []string
 	Description string
-	Script string
-	Gender string
-	Age int
-	TimeStamp time.Time
-	Deadline time.Time
-	Comment []*mgo.DBRef
-	Audition []*mgo.DBRef
+	Script      string
+	Gender      string
+	Age         int
+	TimeStamp   time.Time
+	Deadline    time.Time
+	Comment     []*mgo.DBRef
+	Audition    []*mgo.DBRef
 }
 
 func (r *Role) GetComments() []*Comment {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := []*Comment{}
@@ -102,14 +103,14 @@ func (r *Role) GetComments() []*Comment {
 		}
 		result = append(result, oneResult)
 	}
-    return result
+	return result
 }
 
 func (r *Role) GetUser() *user.User {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := &user.User{}
@@ -117,14 +118,14 @@ func (r *Role) GetUser() *user.User {
 	if err != nil {
 		panic(err)
 	}
-    return result
+	return result
 }
 
 func (r *Role) GetAuditions() []*Audition {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := []*Audition{}
@@ -137,23 +138,24 @@ func (r *Role) GetAuditions() []*Audition {
 		}
 		result = append(result, oneResult)
 	}
-    return result
+	return result
 }
 
 //Comment struct - Maybe include audio clip
 type Audition struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	User *mgo.DBRef
+	Id            bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Title         string
+	User          *mgo.DBRef
 	AttachmentUrl string
-	TimeStamp time.Time
-	Comment []*mgo.DBRef
+	TimeStamp     time.Time
+	Comment       []*mgo.DBRef
 }
 
 func (a *Audition) GetComments() []*Comment {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := []*Comment{}
@@ -166,14 +168,14 @@ func (a *Audition) GetComments() []*Comment {
 		}
 		result = append(result, oneResult)
 	}
-    return result
+	return result
 }
 
 func (a *Audition) GetUser() *user.User {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := &user.User{}
@@ -181,14 +183,14 @@ func (a *Audition) GetUser() *user.User {
 	if err != nil {
 		panic(err)
 	}
-    return result
+	return result
 }
 
 //Comment struct - Maybe include audio clip
 type Comment struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	User *mgo.DBRef
-	Message string
+	Id        bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	User      *mgo.DBRef
+	Message   string
 	TimeStamp time.Time
 }
 
@@ -196,7 +198,7 @@ func (c *Comment) GetUser() *user.User {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := &user.User{}
@@ -204,14 +206,14 @@ func (c *Comment) GetUser() *user.User {
 	if err != nil {
 		panic(err)
 	}
-    return result
+	return result
 }
 
 //NewComment creates an instance of a new comment and returns it
 //TODO: FILL OUT FIELDS
 func NewComment(user *user.User, message string, id bson.ObjectId) *Comment {
 	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-	return &Comment{User : dbRefUser, Message : message, TimeStamp : time.Now(), Id: id}
+	return &Comment{User: dbRefUser, Message: message, TimeStamp: time.Now(), Id: id}
 }
 
 //NewRole creates an instance of a new role and returns it
@@ -235,21 +237,21 @@ func UpdateRoleWithPhoto(id string, role *Role) {
 		panic(err)
 	}
 	defer session.Close()
-	
+
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
-	
+
 	//this shit is erasing the fields? Need to check for consistency
 	change := bson.M{
 		"$set": bson.M{
-				"title": role.Title,
-				"imageurl": role.ImageUrl, 
-				"description": role.Description,
-				"script" : role.Script,
-				"gender" : role.Gender,
-				"age" : role.Age,
-				"traits" : role.Traits,
-				"deadline" : role.Deadline}}
+			"title":       role.Title,
+			"imageurl":    role.ImageUrl,
+			"description": role.Description,
+			"script":      role.Script,
+			"gender":      role.Gender,
+			"age":         role.Age,
+			"traits":      role.Traits,
+			"deadline":    role.Deadline}}
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
 	if err != nil {
 		panic(err)
@@ -261,20 +263,20 @@ func UpdateRoleNoPhoto(id string, role *Role) {
 		panic(err)
 	}
 	defer session.Close()
-	
+
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
-	
+
 	//this shit is erasing the fields? Need to check for consistency
 	change := bson.M{
 		"$set": bson.M{
-				"title": role.Title,
-				"description": role.Description,
-				"script" : role.Script,
-				"gender" : role.Gender,
-				"age" : role.Age,
-				"traits" : role.Traits,
-				"deadline" : role.Deadline}}
+			"title":       role.Title,
+			"description": role.Description,
+			"script":      role.Script,
+			"gender":      role.Gender,
+			"age":         role.Age,
+			"traits":      role.Traits,
+			"deadline":    role.Deadline}}
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
 	if err != nil {
 		panic(err)
@@ -283,32 +285,30 @@ func UpdateRoleNoPhoto(id string, role *Role) {
 
 func NewTeam(users []*user.User, teamName string, motto string, id bson.ObjectId) *Team {
 	var dbRefUsers []*mgo.DBRef
-	for _,user := range users {
+	for _, user := range users {
 		dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
 		dbRefUsers = append(dbRefUsers, dbRefUser)
 	}
-	
-	return &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto, Id : id}
+
+	return &Team{Users: dbRefUsers, TeamName: teamName, Motto: motto, Id: id}
 }
 
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
 func InsertNewTeam(team *Team) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
-	
+
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	//dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.id, Database: "CoAud"}
-	
-	
-	
+
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("teams")
 	err = c.Insert(team)
-	
+
 	if err != nil {
 		panic(err)
 	}
@@ -316,14 +316,14 @@ func InsertNewTeam(team *Team) *Team {
 
 }
 
-func NewAudition(user *user.User, attachmentUrl string, id bson.ObjectId) *Audition {
+func NewAudition(user *user.User, title string, attachmentUrl string, id bson.ObjectId) *Audition {
 	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-	return &Audition{User: dbRefUser, AttachmentUrl: attachmentUrl, TimeStamp: time.Now(), Id: id}
+	return &Audition{User: dbRefUser, Title: title, AttachmentUrl: attachmentUrl, TimeStamp: time.Now(), Id: id}
 }
 
 //NewContest creates an instance of a new role and returns it
 func NewContest(title string, description string, imageUrl string, endDate time.Time, id bson.ObjectId) *Contest {
-	return &Contest{Title: title,Description: description,ImageUrl: imageUrl,StartDate: time.Now(),EndDate: endDate, Id: id}
+	return &Contest{Title: title, Description: description, ImageUrl: imageUrl, StartDate: time.Now(), EndDate: endDate, Id: id}
 }
 
 //InsertComment takes a role and inserts a comment into the role's comment array
@@ -346,9 +346,9 @@ func InsertComment(comment *Comment, collection string, id string, recentOrder b
 	if err != nil {
 		panic(err)
 	}
-	
+
 	c = session.DB("CoAud").C(collection)
-	
+
 	dbRefComment := &mgo.DBRef{Collection: "comments", Id: comment.Id, Database: "CoAud"}
 
 	// store comment into slice so we can push it to the top in mongo
@@ -373,7 +373,7 @@ func InsertAudition(audition *Audition, role *Role) {
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
-	
+
 	//insert new audition
 	c := session.DB("CoAud").C("auditions")
 
@@ -383,12 +383,12 @@ func InsertAudition(audition *Audition, role *Role) {
 	}
 	fmt.Println("audition.Id: ")
 	fmt.Println(audition.Id)
-	
+
 	//reference audition to role
 	c = session.DB("CoAud").C("roles")
-	
+
 	dbRefAudition := &mgo.DBRef{Collection: "auditions", Id: audition.Id, Database: "CoAud"}
-	
+
 	change := bson.M{"$push": bson.M{"audition": dbRefAudition}}
 	err = c.Update(bson.M{"_id": role.Id}, change)
 	if err != nil {
@@ -405,11 +405,11 @@ func InsertAudition(audition *Audition, role *Role) {
 // 	defer session.Close()
 // 	session.SetMode(mgo.Monotonic, true)
 // 	c := session.DB("CoAud").C("roles")
-	
+
 // 	role.Comment = append(role.Comment, comment)
 // 	change := bson.M{"$set": bson.M{"Comment": role.Comment}}
 // 	//err = c.Insert(&Role{User: cast.User, Role: cast.Role})
-	
+
 // 	err = c.Update(bson.M{"_id": role.Id}, change)
 // 	//update role - add comment to slice
 // }
@@ -425,7 +425,7 @@ func InsertAudition(audition *Audition, role *Role) {
 // 	c := session.DB("CoAud").C("auditions")
 
 // 	//find audition
-// 	//update audition - add comment to slice	
+// 	//update audition - add comment to slice
 // 	audition.Comment = append(audition.Comment, comment)
 // 	change := bson.M{"$set": bson.M{"Comment": audition.Comment}}
 // 	err = c.Update(bson.M{"_id": audition.Id}, change)
@@ -476,7 +476,7 @@ func (contest *Contest) InsertTeam(team *Team) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("contests")
 	// Find contest, then insert into contest by contest name
-	
+
 	//contest.ParticipatingTeams = append(contest.ParticipatingTeams, team)
 	//box.AddItem(item1)
 	//change := bson.M{"$set": bson.M{"ParticipatingTeams": contest.AddItem(team)}}
@@ -485,7 +485,7 @@ func (contest *Contest) InsertTeam(team *Team) {
 	dbRefTeams = append(dbRefTeams, dbRefTeam)
 	change := bson.M{"$push": bson.M{"participatingteams": bson.M{"$each": dbRefTeams}}}
 	err = c.Update(bson.M{"_id": contest.Id}, change)
-	
+
 	if err != nil {
 		panic(err)
 	}
@@ -511,7 +511,7 @@ func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return result, resultCount
 }
 
@@ -526,7 +526,7 @@ func FindRole(id string) *Role {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("roles")
-	
+
 	result := &Role{}
 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 	if err != nil {
@@ -545,7 +545,7 @@ func FindRole(id string) *Role {
 // 	defer session.Close()
 // 	session.SetMode(mgo.Monotonic, true)
 // 	c := session.DB("CoAud").C("contests")
-	
+
 // 	result := &Contest{}
 // 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 // 	if err != nil {
@@ -568,17 +568,17 @@ func FindContests() []Contest {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("contests")
-	
+
 	result := []Contest{}
 	err = c.Find(nil).Sort("-startdate").All(&result)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return result
 }
 
-func FindContest(id string) *Contest{
+func FindContest(id string) *Contest {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -597,7 +597,7 @@ func FindContest(id string) *Contest{
 	return result
 }
 
-func FindTeam(id string) *Team{
+func FindTeam(id string) *Team {
 	session, err := mgo.Dial("127.0.0.1:27018")
 	fmt.Println("connected")
 	if err != nil {
@@ -606,7 +606,7 @@ func FindTeam(id string) *Team{
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("teams")
-	
+
 	result := &Team{}
 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 	if err != nil {
@@ -629,7 +629,6 @@ func FindSearchedContest(title string) []Contest {
 	c := session.DB("CoAud").C("contests")
 	result := []Contest{}
 	err = c.Find(bson.M{"Title": title}).One(&result)
-	
+
 	return result
 }
-

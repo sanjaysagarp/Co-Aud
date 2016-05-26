@@ -656,3 +656,8 @@ hr#profile-name {
     color: #86adb2;
     color: #eedd75;
 }
+
+#viewAll {
+    clear:both;
+    text-align:center;
+}

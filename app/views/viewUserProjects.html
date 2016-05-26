@@ -1,0 +1,18 @@
+{{define "viewUserProjects"}}
+{{template "header" .}}
+	<div class="container">
+		<div id="notification"></div>
+		<div class="card profile-project">
+			<h3>View all Projects</h3>
+				<div class="flex-container">
+					{{ range .Data.postedProjects }}
+					<div class="thumbnail flex-item">
+						<h2><a href="/projects/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+						<a href="/projects/?id={{ .Id.Hex }}"><img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
+					</div>
+					{{ end }}
+				</div>
+		</div>		
+	</div>
+{{template "footer" .}}
+{{end}}

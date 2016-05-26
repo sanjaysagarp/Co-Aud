@@ -102,6 +102,7 @@
 						{{ end }}
 					</div>
 					
+					
 				</div>
 				<div class="card-padding row">
 					<div class="card">
@@ -120,15 +121,15 @@
 									</div>
 								{{ end }}
 							</div>
-							{{ else}}
-								{{if .Data.currentUser}}
-									{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-									<p>Do you need a voice actor? Request one now!</p>
-									<a href="/auditions/create" class="btn btn-default">Request an Audition</a>
-									{{end}}
-								{{ else }}
-									<p>{{ .Data.user.DisplayName }} doesn't have any auditions posted.</p>
+						{{ else}}
+							{{if .Data.currentUser}}
+								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+								<p>Do you need a voice actor? Request one now!</p>
+								<a href="/auditions/create" class="btn btn-default">Request an Audition</a>
 								{{end}}
+							{{ else }}
+								<p>{{ .Data.user.DisplayName }} doesn't have any auditions posted.</p>
+							{{end}}
 						{{ end }}
 					</div>
 				</div>
