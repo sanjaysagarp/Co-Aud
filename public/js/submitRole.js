@@ -106,7 +106,7 @@ $(document).ready(function(){
 						$("#notification").html("Filesize too big!");
 						$("#notification").fadeOut( 3000 );
 					} else {
-						window.location.href = "/auditions/?id=" + data+ "#success"
+						window.location.href = "/auditions/?id=" + data;
 					}
 				}
 			});

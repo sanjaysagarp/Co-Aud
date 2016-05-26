@@ -176,16 +176,5 @@
 	
 	<br>
 </div>
-<script>
-	$(document).ready(function(){
-		if(window.location.hash == '#success'){
-			$("#notification").css("display", "block");
-			$("#notification").addClass("alert alert-success");
-			$("#notification").html("Audition has been edited");
-			$("#notification").fadeOut( 3000 );
-		}
-	});
-	
-</script>
 {{template "footer" .}}
 {{end}}

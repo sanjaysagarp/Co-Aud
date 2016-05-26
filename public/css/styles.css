@@ -155,12 +155,6 @@ li.thumbnail {
 }
 
 .thumbnail h2 {
-	/*width: 100%;
-	background-color: rgba(30,34,61,0.75);
-	margin: 0px;
-	position: absolute;
-	padding: 5px;
-	overflow: hidden;*/
     background-color: rgba(30,34,61,0.75);
     margin: 0px;
     position: relative;
@@ -170,6 +164,10 @@ li.thumbnail {
     margin-top: -43px;
     white-space: nowrap;
     max-width: 250px;
+}
+
+.jcarousel .thumbnail h2 {
+    max-width: none;
 }
 
 footer {
@@ -655,4 +653,9 @@ hr#profile-name {
     color: #f8b72d #fce230 #53979c #36ced9;
     color: #86adb2;
     color: #eedd75;
+}
+
+#viewAll {
+    clear:both;
+    text-align:center;
 }
