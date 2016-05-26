@@ -52,7 +52,7 @@ var configFile, _ = ioutil.ReadFile("./secret/config.json")
 
 var (
 	googleOauthConfig = &oauth2.Config{
-		RedirectURL:  "http://localhost:8080/GoogleCallback",
+		RedirectURL:  "http://co-aud.io/GoogleCallback",
 		ClientID:     os.Getenv("GOOGLEKEY"),
 		ClientSecret: os.Getenv("GOOGLESECRET"),
 		Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
@@ -412,7 +412,7 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-  	layout := "2006-01-02"
+	layout := "2006-01-02"
 	var UTC *time.Location = time.UTC
 	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
@@ -547,7 +547,7 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	var castContainer []*project.Cast
 	var newCast *project.Cast
 	for i := 0; i < len(castsAttendees); i++ {
-		castId := bson.NewObjectId()		
+		castId := bson.NewObjectId()
 		castUser := user.FindUser(castsAttendees[i])
 		newCast = project.NewCast(castUser, castRoles[i], castId)
 		project.InsertCast(newCast)
@@ -636,7 +636,7 @@ func submitContestHandler(w http.ResponseWriter, r *http.Request) {
 	//s := redis_session.Session(w, r)
 	layout := "2006-01-02"
 	var UTC *time.Location = time.UTC
-	
+
 	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
 		fmt.Println(err)

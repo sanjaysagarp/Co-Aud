@@ -1,29 +1,31 @@
 package project
+
 // //127.0.0.1:27018
 import (
 	// "log"
 	"fmt"
 	"time"
+
+	"github.com/sanjaysagarp/Co-Aud/packages/role"
+	"github.com/sanjaysagarp/Co-Aud/packages/user"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/sanjaysagarp/Co-Aud/packages/user"
-	"github.com/sanjaysagarp/Co-Aud/packages/role"
 	// "strings"
 	"regexp"
 )
 
 //Cast struct
 type Cast struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Id   bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	User *mgo.DBRef
 	Role string
 }
 
 func (c *Cast) GetUser() *user.User {
-    session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := &user.User{}
@@ -31,39 +33,36 @@ func (c *Cast) GetUser() *user.User {
 	if err != nil {
 		panic(err)
 	}
-    return result
+	return result
 }
 
 //Project struct defines a person's personal project
 type Project struct {
-	Id bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Title string 
-	URL string
+	Id               bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Title            string
+	URL              string
 	ShortDescription string
-	Description string
-	Cast []*mgo.DBRef
-	PostedDate time.Time
-	User *mgo.DBRef
-	Contest *mgo.DBRef
+	Description      string
+	Cast             []*mgo.DBRef
+	PostedDate       time.Time
+	User             *mgo.DBRef
+	Contest          *mgo.DBRef
 }
 
-
-
-
 func (p *Project) GetYoutubeID() string {
-    r, _ := regexp.Compile(`^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*`)
-    return r.FindAllStringSubmatch(p.URL, -1)[0][7]
+	r, _ := regexp.Compile(`^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*`)
+	return r.FindAllStringSubmatch(p.URL, -1)[0][7]
 }
 
 func (p *Project) GetCast() []*Cast {
-    session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := []*Cast{}
-	
+
 	for i, c := range p.Cast {
 		oneResult := &Cast{}
 		err = session.FindRef(c).One(oneResult)
@@ -73,14 +72,14 @@ func (p *Project) GetCast() []*Cast {
 		}
 		result = append(result, oneResult)
 	}
-    return result
+	return result
 }
 
 func (p *Project) GetUser() *user.User {
-    session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
-			panic(err)
+		panic(err)
 	}
 	defer session.Close()
 	result := &user.User{}
@@ -88,27 +87,27 @@ func (p *Project) GetUser() *user.User {
 	if err != nil {
 		panic(err)
 	}
-    return result
+	return result
 }
 
 func UpdateProject(id string, project *Project) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
 	defer session.Close()
-	
+
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("projects")
-	
+
 	//this shit is erasing the fields? Need to check for consistency
 	change := bson.M{
 		"$set": bson.M{
-				"title": project.Title,
-				"url": project.URL, 
-				"shortdescription": project.ShortDescription,
-				"description" : project.Description,
-				"cast" : project.Cast}}
+			"title":            project.Title,
+			"url":              project.URL,
+			"shortdescription": project.ShortDescription,
+			"description":      project.Description,
+			"cast":             project.Cast}}
 	err = c.Update(bson.M{"_id": bson.ObjectIdHex(id)}, change)
 	if err != nil {
 		panic(err)
@@ -127,9 +126,8 @@ func NewContestProject(title string, url string, shortDescription string, descri
 	dbRefContest := &mgo.DBRef{Collection: "contests", Id: contest.Id, Database: "CoAud"}
 	// fmt.Println(dbRefUser)
 	// fmt.Println("project id: ", id)
-	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description: description, Cast: dbRefCasts, PostedDate: time.Now(), User: dbRefUser, Contest: dbRefContest}	
-	
-	
+	return &Project{Id: id, Title: title, URL: url, ShortDescription: shortDescription, Description: description, Cast: dbRefCasts, PostedDate: time.Now(), User: dbRefUser, Contest: dbRefContest}
+
 }
 
 //NewProject creates a new instance of project
@@ -164,7 +162,7 @@ func NewCast(user *user.User, role string, id bson.ObjectId) *Cast {
 
 //InsertProject inserts a project into the projects collection
 func InsertProject(project *Project) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		fmt.Println("not connected")
 		panic(err)
@@ -183,24 +181,24 @@ func InsertProject(project *Project) {
 
 //InsertCast inserts a new cast into a project
 func InsertCast(cast *Cast) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
 	defer session.Close()
-	
+
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("casts")
 	err = c.Insert(cast)
-	
+
 	if err != nil {
 		panic(err)
 	}
 }
 
 //FindCast finds casting for project
-func FindCast(project *Project) []Cast{
-	session, err := mgo.Dial("127.0.0.1:27018")
+func FindCast(project *Project) []Cast {
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -208,7 +206,7 @@ func FindCast(project *Project) []Cast{
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("projects")
-	
+
 	result := []Cast{}
 	err = c.Find(bson.M{"Id": project.Id}).All(&result)
 	if err != nil {
@@ -219,8 +217,8 @@ func FindCast(project *Project) []Cast{
 }
 
 //FindProjects finds projects for all selected
-func FindProject(id string) *Project{
-	session, err := mgo.Dial("127.0.0.1:27018")
+func FindProject(id string) *Project {
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -228,7 +226,7 @@ func FindProject(id string) *Project{
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("projects")
-	
+
 	result := &Project{}
 	err = c.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&result)
 	if err != nil {
@@ -248,7 +246,7 @@ func FindProject(id string) *Project{
 // 	defer session.Close()
 // 	session.SetMode(mgo.Monotonic, true)
 // 	c := session.DB("CoAud").C("works")
-	
+
 // 	result := Work{}
 // 	err = c.Find(bson.M{"Title": title}).One(&result)
 // 	if err != nil {
@@ -257,11 +255,10 @@ func FindProject(id string) *Project{
 // 	return result
 // }
 
-
 // FindRoles searches for all roles
 // Optional param: q = nil, skip = 0, limit = -1
 func FindProjects(q interface{}, skip int, limit int) ([]Project, int) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -283,18 +280,18 @@ func FindProjects(q interface{}, skip int, limit int) ([]Project, int) {
 
 //DeleteProject deletes the project -- NEED TO TEST
 func DeleteProject(project *Project) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		fmt.Println("not connected")
 		panic(err)
 	}
 	fmt.Println("connected")
-	
+
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("CoAud").C("projects")
-	err = c.Remove(bson.M{"_id":project.Id})
-	
+	err = c.Remove(bson.M{"_id": project.Id})
+
 	if err != nil {
 		fmt.Println("delete project")
 		panic(err)

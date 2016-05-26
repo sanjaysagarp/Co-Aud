@@ -22,7 +22,7 @@ type Contest struct {
 }
 
 func (c *Contest) GetTeams() []*Team {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ type Team struct {
 }
 
 func (t *Team) GetMembers() []*user.User {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -87,7 +87,7 @@ type Role struct {
 }
 
 func (r *Role) GetComments() []*Comment {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -107,7 +107,7 @@ func (r *Role) GetComments() []*Comment {
 }
 
 func (r *Role) GetUser() *user.User {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -122,7 +122,7 @@ func (r *Role) GetUser() *user.User {
 }
 
 func (r *Role) GetAuditions() []*Audition {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -152,7 +152,7 @@ type Audition struct {
 }
 
 func (a *Audition) GetComments() []*Comment {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -172,7 +172,7 @@ func (a *Audition) GetComments() []*Comment {
 }
 
 func (a *Audition) GetUser() *user.User {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -195,7 +195,7 @@ type Comment struct {
 }
 
 func (c *Comment) GetUser() *user.User {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -232,7 +232,7 @@ func ChangedRoleNoPhoto(title string, description string, script string, deadlin
 }
 
 func UpdateRoleWithPhoto(id string, role *Role) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
@@ -258,7 +258,7 @@ func UpdateRoleWithPhoto(id string, role *Role) {
 	}
 }
 func UpdateRoleNoPhoto(id string, role *Role) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
@@ -296,7 +296,7 @@ func NewTeam(users []*user.User, teamName string, motto string, id bson.ObjectId
 //NewTeam creates an instance of a new role and returns it
 //TODO: FILL OUT FIELDS
 func InsertNewTeam(team *Team) *Team {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 
 	//session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
@@ -333,7 +333,7 @@ func NewContest(title string, description string, imageUrl string, endDate time.
 //GENERIC INSERT COMMENT
 //
 func InsertComment(comment *Comment, collection string, id string, recentOrder bool) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -366,7 +366,7 @@ func InsertComment(comment *Comment, collection string, id string, recentOrder b
 
 //InsertAudition inserts audition into db
 func InsertAudition(audition *Audition, role *Role) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -433,7 +433,7 @@ func InsertAudition(audition *Audition, role *Role) {
 
 //InsertContest inserts contest into db
 func InsertContest(contest *Contest) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -450,7 +450,7 @@ func InsertContest(contest *Contest) {
 
 //InsertRole inserts role into db
 func InsertRole(role *Role) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		fmt.Println("InsertRole IS THE PROBLEM")
@@ -467,7 +467,7 @@ func InsertRole(role *Role) {
 }
 
 func (contest *Contest) InsertTeam(team *Team) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -494,7 +494,7 @@ func (contest *Contest) InsertTeam(team *Team) {
 // FindRoles searches for all roles
 // Optional param: q = nil, skip = 0, limit = -1
 func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -518,7 +518,7 @@ func FindRoles(q interface{}, skip int, limit int) ([]Role, int) {
 //FindRole searches for the selected role
 //TODO: query db for roles and add to result, then return roles
 func FindRole(id string) *Role {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -560,7 +560,7 @@ func FindRole(id string) *Role {
 //FindContests searches for all contests
 //TODO: query db for contests and add to result, then return contests
 func FindContests() []Contest {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -579,7 +579,7 @@ func FindContests() []Contest {
 }
 
 func FindContest(id string) *Contest {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -598,7 +598,7 @@ func FindContest(id string) *Contest {
 }
 
 func FindTeam(id string) *Team {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
@@ -619,7 +619,7 @@ func FindTeam(id string) *Team {
 //FindContest searches for the user
 //TODO: query db for a single contest and add to result, then return roles
 func FindSearchedContest(title string) []Contest {
-	session, err := mgo.Dial("127.0.0.1:27018")
+	session, err := mgo.Dial("127.0.0.1")
 	fmt.Println("connected")
 	if err != nil {
 		panic(err)
