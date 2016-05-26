@@ -76,7 +76,7 @@
 				<div id="projects" class="card-padding row">
 					<div class="card profile-project">		
 						{{ if .Data.postedProjects }}
-							<h3>Showcase<a href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Projects</button></a></h3>
+							<h3>Showcase<a href="/projects/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Projects</button></a></h3>
 						{{ else }}
 							<h3>Showcase</h3>
 						{{ end }}
