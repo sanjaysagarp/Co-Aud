@@ -25,7 +25,7 @@
 					</div>
 					<br>
 					<p><strong>Deadline:</strong></p>
-					<p>{{ .Data.role.Deadline.Format "Jan 2, 2006" }}</p>
+					<p>{{ .Data.role.Deadline.UTC.Format "Jan 2, 2006" }}</p>
 				</div>
 			</div>
 		</div>
@@ -89,7 +89,7 @@
 										<div class="media-body">
 											<a href="/profile/?id={{$user.Id.Hex}}"><h4 class="media-heading">{{$user.DisplayName}}</h4></a>
 											<p>Title goes here
-												<span class="pull-right timestamp">{{.TimeStamp.Format "Jan 02, 2006"}}</span>
+												<span class="pull-right timestamp">{{.TimeStamp.UTC.Format "Jan 02, 2006"}}</span>
 											</p>
 											<audio controls>
 												<source src="{{ .AttachmentUrl }}" type="audio/mpeg">
@@ -105,7 +105,7 @@
 													</div>
 													<div class="media-body">
 														<a href="/profile/?id={{.User.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
-														<span class="timestamp">{{.TimeStamp.Format "Jan 02, 2006"}}</span>
+														<span class="timestamp">{{.TimeStamp.UTC.Format "Jan 02, 2006"}}</span>
 														<p class="comment-message">{{ .Message }}</p>
 													</div>
 												</li>
@@ -156,7 +156,7 @@
 									</div>
 									<div class="media-body">
 										<a href="/profile/?id={{ $user.Id.Hex}}"><h4 class="media-heading">{{ $user.DisplayName }}</h4></a>
-										<span class="timestamp">{{.TimeStamp.Format "Jan 02, 2006"}}</span>
+										<span class="timestamp">{{.TimeStamp.UTC.Format "Jan 02, 2006"}}</span>
 										<p class="comment-message">{{ .Message }}</p>
 									</div>
 								</li>

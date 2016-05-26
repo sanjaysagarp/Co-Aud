@@ -22,7 +22,7 @@
 							<!--Username should go here <h3>{{ .Data.user.DisplayName }}</h3>-->
 							<hr id="profile-name" class="card-hr">
 							<p id="profile-title">{{ .Data.user.Title }}</p>
-							<p>Join Date: {{ .Data.user.JoinDate.Format "Jan 02, 2006" }}</p>
+							<p>Join Date: {{ .Data.user.JoinDate.UTC.Format "Jan 02, 2006" }}</p>
 							{{if .Data.user.PersonalWebsite}}<p><a href="{{.Data.user.PersonalWebsite}}">Personal Website</a></p>{{end}}
 							{{if .Data.currentUser }}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
@@ -76,17 +76,20 @@
 				<div id="projects" class="card-padding row">
 					<div class="card profile-project">		
 						{{ if .Data.postedProjects }}
-							<h3>Showcase<a href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Projects</button></a></h3>
+							<a class="blue-btn-color btn btn-default pull-right" href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Projects</a>
+							<h3>Showcase</h3>
 						{{ else }}
 							<h3>Showcase</h3>
 						{{ end }}
 						{{ if .Data.postedProjects }}
-							{{ range .Data.postedProjects }}
-							<div class="thumbnail col-md-4">
-								<h2><a href="/projects/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
-								<a href="/projects/?id={{ .Id.Hex }}"><img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
+							<div class="flex-container">
+								{{ range .Data.postedProjects }}
+								<div class="thumbnail flex-item">
+									<h2><a href="/projects/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+									<a href="/projects/?id={{ .Id.Hex }}"><img class="img-responsive" src="http://img.youtube.com/vi/{{.GetYoutubeID}}/0.jpg"></a>
+								</div>
+								{{ end }}
 							</div>
-							{{ end }}
 						{{ else }}
 							{{if .Data.currentUser}}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
@@ -103,17 +106,20 @@
 				<div class="card-padding row">
 					<div class="card">
 						{{ if .Data.postedRoles }}
-							<h3>Posted Auditions<a href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}"><button class="btn btn-default edit">Edit Posted Auditions</button></a></h3>
+							<a class="blue-btn-color btn btn-default pull-right" href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Auditions</a>
+							<h3>Posted Auditions</h3>
 						{{ else }}
 							<h3>Posted Auditions</h3>
 						{{ end }}
 						{{ if .Data.postedRoles }}
-							{{ range .Data.postedRoles }}
-								<div class="thumbnail col-md-4">
-									<h2><a href="/auditions/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
-									<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
-								</div>
-							{{ end }}
+							<div class="flex-container">
+								{{ range .Data.postedRoles }}
+									<div class="thumbnail flex-item">
+										<h2><a href="/auditions/?id={{ .Id.Hex }}">{{.Title}}</a></h2>
+										<a href="/auditions/?id={{ .Id.Hex }}"><img class="img-responsive" src="{{.ImageUrl}}"></a>
+									</div>
+								{{ end }}
+							</div>
 							{{ else}}
 								{{if .Data.currentUser}}
 									{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}

@@ -570,7 +570,7 @@ func FindContests() []Contest {
 	c := session.DB("CoAud").C("contests")
 	
 	result := []Contest{}
-	err = c.Find(nil).All(&result)
+	err = c.Find(nil).Sort("-startdate").All(&result)
 	if err != nil {
 		panic(err)
 	}

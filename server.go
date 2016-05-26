@@ -89,8 +89,8 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.URL.Query().Get("id")
 	user := user.FindUserById(userID)
 	dbRefUser := &mgo.DBRef{Collection: "users", Id: user.Id, Database: "CoAud"}
-	postedRoles, rolesCount := role.FindRoles(bson.M{"user": dbRefUser}, 0, 3)
-	postedProjects, projectCount := project.FindProjects(bson.M{"user": dbRefUser}, 0, 3)
+	postedRoles, rolesCount := role.FindRoles(bson.M{"user": dbRefUser}, 0, 4)
+	postedProjects, projectCount := project.FindProjects(bson.M{"user": dbRefUser}, 0, 4)
 	data["user"] = user
 	data["postedRoles"] = postedRoles
 	data["rolesCount"] = rolesCount
@@ -314,8 +314,9 @@ func updateRoleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	layout := "2006-01-02"
+	var UTC *time.Location = time.UTC
 	fmt.Println(r.FormValue("deadline"))
-	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -393,8 +394,8 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
   	layout := "2006-01-02"
-
-	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	var UTC *time.Location = time.UTC
+	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
       fmt.Println(err)
       return
@@ -616,8 +617,9 @@ func submitContestHandler(w http.ResponseWriter, r *http.Request) {
 	contestId := bson.NewObjectId()
 	//s := redis_session.Session(w, r)
 	layout := "2006-01-02"
-
-	deadline, err := time.Parse(layout, r.FormValue("deadline"))
+	var UTC *time.Location = time.UTC
+	
+	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
 		fmt.Println(err)
 		return

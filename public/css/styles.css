@@ -613,6 +613,8 @@ hr#profile-name {
 
 .flex-item {
     align-self: auto;
+    overflow: hidden;
+    max-height: 250px;
 }
 
 .flex-item > a > img {
