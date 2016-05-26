@@ -15,7 +15,7 @@
 				<div class="card-padding">
 					<div class="card">
 						<div class="col-md-6">
-							<img class="img-circle img-responsive" src="{{.Data.currentUser.ProfilePictureURL}}">
+							<img class="img-circle img-responsive" src="{{.Data.user.ProfilePictureURL}}">
 						</div>
 						<div class="col-md-6">
 							<h3 id="profile-display-name">{{ .Data.user.DisplayName }}</h3>
@@ -76,9 +76,11 @@
 				<div id="projects" class="card-padding row">
 					<div class="card profile-project">		
 						{{ if .Data.postedProjects }}
-							<a class="blue-btn-color btn btn-default pull-right" href="/project/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Projects</a>
+							{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+								<a class="orange-btn-color btn btn-default pull-right" href="/projects/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Projects</a>
+							{{end}}
 							<h3>Showcase</h3>
-						{{ else }}
+						{{else}}
 							<h3>Showcase</h3>
 						{{ end }}
 						{{ if .Data.postedProjects }}
@@ -93,10 +95,12 @@
 						{{ else }}
 							{{if .Data.currentUser}}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-								<p>Do you have something to show? Submit it to the showcase!</p>
-								<a href="/projects/create" class="btn btn-default">Submit A Project</a>
+									<p>Do you have something to show? Submit it to the showcase!</p>
+									<a href="/projects/create" class="blue-btn-color btn btn-default">Submit A Project</a>
+								{{else}}
+									<p>{{ .Data.user.DisplayName }} doesn't have any projects submitted.</p>
 								{{end}}
-							{{ else }}
+							{{else}}
 								<p>{{ .Data.user.DisplayName }} doesn't have any projects submitted.</p>
 							{{end}}
 						{{ end }}
@@ -107,11 +111,11 @@
 				<div class="card-padding row">
 					<div class="card">
 						{{ if .Data.postedRoles }}
-							<a class="blue-btn-color btn btn-default pull-right" href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Auditions</a>
+							{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+								<a class="orange-btn-color btn btn-default pull-right" href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Auditions</a>
+							{{end}}
+						{{end}}
 							<h3>Posted Auditions</h3>
-						{{ else }}
-							<h3>Posted Auditions</h3>
-						{{ end }}
 						{{ if .Data.postedRoles }}
 							<div class="flex-container">
 								{{ range .Data.postedRoles }}
@@ -125,9 +129,11 @@
 							{{if .Data.currentUser}}
 								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
 								<p>Do you need a voice actor? Request one now!</p>
-								<a href="/auditions/create" class="btn btn-default">Request an Audition</a>
+								<a href="/auditions/create" class="blue-btn-color btn btn-default">Request an Audition</a>
+								{{else}}
+									<p>{{ .Data.user.DisplayName }} doesn't have any auditions posted.</p>
 								{{end}}
-							{{ else }}
+							{{else}}
 								<p>{{ .Data.user.DisplayName }} doesn't have any auditions posted.</p>
 							{{end}}
 						{{ end }}
