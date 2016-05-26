@@ -175,6 +175,7 @@ footer {
 	width: 100%;
 	padding-top: 30px;
     height: 200px;
+    display: inline-table;
 }
 
 #footer-links {

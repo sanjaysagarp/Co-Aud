@@ -17,28 +17,32 @@
   </div>	
   <hr>
 	<div class="row">
-		{{ range .Data.contests.GetTeams }}
-		<div class="col-md-12 col-lg-10 col-lg-offset-1">
-			<div class="card-padding">
-				<div class="card">
-					<h3 class="team-name">{{ .TeamName }}</h3>
-					{{if .Motto}}
-						<p class="team-motto">"{{ .Motto }}"</p>
-					{{end}}
-					{{ range .GetMembers }}
-					<ul class="team-member-list">
-						<li class="team-member-list-item">
-							<a href="/profile/?id={{.Id.Hex}}">
-								<img class="img-profile img-circle" src="{{.ProfilePictureURL}}">
-								<p>{{.DisplayName}}</p>
-							</a>
-						</li>
-					</ul>
-					{{end}}
+		{{if .Data.contests.GetTeams}}
+			{{ range .Data.contests.GetTeams }}
+			<div class="col-md-12 col-lg-10 col-lg-offset-1">
+				<div class="card-padding">
+					<div class="card">
+						<h3 class="team-name">{{ .TeamName }}</h3>
+						{{if .Motto}}
+							<p class="team-motto">"{{ .Motto }}"</p>
+						{{end}}
+						{{ range .GetMembers }}
+						<ul class="team-member-list">
+							<li class="team-member-list-item">
+								<a href="/profile/?id={{.Id.Hex}}">
+									<img class="img-profile img-circle" src="{{.ProfilePictureURL}}">
+									<p>{{.DisplayName}}</p>
+								</a>
+							</li>
+						</ul>
+						{{end}}
+					</div>
 				</div>
 			</div>
-		</div>
-		{{ end }}
+			{{ end }}
+		{{else}}
+			<p class="text-center">There are no teams yet.</p>
+		{{end}}
 	</div>
 
 </div>
