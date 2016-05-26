@@ -412,7 +412,7 @@ func submitRoleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-  	layout := "2006-01-02"
+	layout := "2006-01-02"
 	var UTC *time.Location = time.UTC
 	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
@@ -547,7 +547,7 @@ func submitProjectHandler(w http.ResponseWriter, r *http.Request) {
 	var castContainer []*project.Cast
 	var newCast *project.Cast
 	for i := 0; i < len(castsAttendees); i++ {
-		castId := bson.NewObjectId()		
+		castId := bson.NewObjectId()
 		castUser := user.FindUser(castsAttendees[i])
 		newCast = project.NewCast(castUser, castRoles[i], castId)
 		project.InsertCast(newCast)
@@ -636,7 +636,7 @@ func submitContestHandler(w http.ResponseWriter, r *http.Request) {
 	//s := redis_session.Session(w, r)
 	layout := "2006-01-02"
 	var UTC *time.Location = time.UTC
-	
+
 	deadline, err := time.ParseInLocation(layout, r.FormValue("deadline"), UTC)
 	if err != nil {
 		fmt.Println(err)
@@ -870,6 +870,17 @@ func updateProjectHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
+func deleteProjectHandler(w http.ResponseWriter, r *http.Request) {
+	s := redis_session.Session(w, r)
+	currentUser := user.FindUser(s.Get("Email"))
+	projectID := r.URL.Query().Get("id")
+	selected := project.FindProject(projectID)
+	project.DeleteProject(selected)
+	urlParts := []string{"/projects/edit/?id=", currentUser.Id.Hex()}
+	url := strings.Join(urlParts, "")
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 //Submits an audition in auditions/{auditionid}
 func submitAuditionHandler(w http.ResponseWriter, r *http.Request) {
 	s := redis_session.Session(w, r)
@@ -1055,6 +1066,7 @@ func main() {
 	http.HandleFunc("/api/v1/getRole/", getRoleHandler)
 	http.HandleFunc("/api/v1/submitTeam/", submitTeamHandler)
 	http.HandleFunc("/api/v1/submitContest/", submitContestHandler)
+	http.HandleFunc("/api/v1/deleteProject/", deleteProjectHandler)
 
 	http.HandleFunc("/api/v1/submitContestProject/", submitContestProjectHandler)
 

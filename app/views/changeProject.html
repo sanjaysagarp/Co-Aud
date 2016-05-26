@@ -39,6 +39,11 @@
 				<br/>
 				<button id="submitProject" type="submit" class="btn btn-default" data-id="{{ .Data.project.Id.Hex }}">Submit</button>
 			</form>
+			<br/>
+			<form id ="deleteProjectForm" action="/api/v1/deleteProject/?id={{ .Data.project.Id.Hex }}" method="post">
+				<button id="deleteProject" type="submit" class="btn btn-danger" data-id="{{ .Data.project.Id.Hex }}">Delete Project</button>
+			</form>
+			
 		</div>
 	</div>
 </div>

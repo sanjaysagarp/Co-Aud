@@ -1,14 +1,5 @@
 {{define "viewProfile"}}
 {{template "header" .}}
-<!--{{if .Data.currentUser }}
-	{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-	<div class="search-side-nav">
-		<div data-spy="affix" data-offset-top="200px" data-offset-bottom="200px">
-			<a href="/profile/edit/" class="btn btn-lg btn-default">Edit Profile</a>
-		</div>
-	</div>
-	{{end}}
-{{end}}-->
 	<div id="ProfileForm" class="container">
 		<div class="row">
 			<div class="col-md-5">
@@ -76,8 +67,10 @@
 				<div id="projects" class="card-padding row">
 					<div class="card profile-project">		
 						{{ if .Data.postedProjects }}
-							{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-								<a class="orange-btn-color btn btn-default pull-right" href="/projects/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Projects</a>
+							{{if .Data.currentUser}}
+								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+									<a class="orange-btn-color btn btn-default pull-right" href="/projects/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Projects</a>
+								{{end}}
 							{{end}}
 							<h3>Showcase</h3>
 						{{else}}
@@ -111,8 +104,10 @@
 				<div class="card-padding row">
 					<div class="card">
 						{{ if .Data.postedRoles }}
-							{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
-								<a class="orange-btn-color btn btn-default pull-right" href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Auditions</a>
+							{{if .Data.currentUser}}
+								{{if eq .Data.currentUser.Id.Hex .Data.user.Id.Hex }}
+									<a class="orange-btn-color btn btn-default pull-right" href="/auditions/edit/?id={{ .Data.currentUser.Id.Hex }}">Edit Posted Auditions</a>
+								{{end}}
 							{{end}}
 						{{end}}
 							<h3>Posted Auditions</h3>
